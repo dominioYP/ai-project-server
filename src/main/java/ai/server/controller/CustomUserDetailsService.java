@@ -1,4 +1,4 @@
-package ai.supermarket.controller;
+package ai.server.controller;
 
 import java.util.HashSet;
 import java.util.Set;

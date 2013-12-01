@@ -1,4 +1,4 @@
-package ai.supermarket.controller;
+package ai.server.controller;
 
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;

@@ -1,4 +1,4 @@
-package ai.supermarket.controller;
+package ai.server.controller;
 
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;

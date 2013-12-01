@@ -1,4 +1,4 @@
-package ai.supermarket.controller;
+package ai.server.controller;
 
 import java.io.IOException;
 import java.util.HashMap;

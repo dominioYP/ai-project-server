@@ -1,4 +1,4 @@
-package ai.supermarket.controller;
+package ai.server.controller;
 
 import java.security.Principal;
 import java.util.HashMap;

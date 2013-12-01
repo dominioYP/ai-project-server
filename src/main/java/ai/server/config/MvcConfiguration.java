@@ -1,4 +1,4 @@
-package ai.supermarket.config;
+package ai.server.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
