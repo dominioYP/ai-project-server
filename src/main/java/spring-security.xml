@@ -27,7 +27,7 @@
 	</http>
 	
 	
-	<beans:bean id="customUserDetailService" class="ai.supermarket.controller.CustomUserDetailsService"></beans:bean>
+	<beans:bean id="customUserDetailService" class="ai.server.controller.CustomUserDetailsService"></beans:bean>
           
 	<authentication-manager>
 		<authentication-provider user-service-ref="customUserDetailService">

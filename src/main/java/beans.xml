@@ -20,7 +20,7 @@
           	
           </bean>
           
-          <bean id="mail" class="ai.supermarket.controller.Mail">
+          <bean id="mail" class="ai.server.controller.Mail">
           	<property name="mailSender" ref="mailSender"></property>
           </bean>
 </beans>

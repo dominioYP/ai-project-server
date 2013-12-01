@@ -22,7 +22,7 @@
 		</init-param>
 		<init-param>
 			<param-name>contextConfigLocation</param-name>
-			<param-value>ai.supermarket</param-value>
+			<param-value>ai.server</param-value>
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
@@ -44,7 +44,7 @@
 	
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
-		<param-value>ai.supermarket.config</param-value>
+		<param-value>ai.server.config</param-value>
 	</context-param>
 	<filter>  
         <filter-name>springSecurityFilterChain</filter-name>  

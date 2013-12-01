@@ -13,7 +13,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import dati.Dati;
 
 @Configuration
-@ComponentScan(basePackages="ai.supermarket")
+@ComponentScan(basePackages="ai.server")
 @EnableWebMvc
 @ImportResource("classpath:spring-security.xml")
 public class MvcConfiguration extends WebMvcConfigurerAdapter{
