@@ -9,6 +9,8 @@ public class Main {
 		
 		System.out.println("Main avviato*********************************");
 		System.out.println("mia mod");
+		System.out.println("Main avviatoasdfasdf******************");
+		System.out.println("mia mod");
 		System.out.println("ljdsngfsjdlgnvb");
 	}
 	
