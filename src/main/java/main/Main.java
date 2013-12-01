@@ -9,7 +9,7 @@ public class Main {
 		
 		System.out.println("Main avviato*********************************");
 		
-		
+		System.out.println("ljdsngfsjdlgnvb");
 	}
 	
 }
