@@ -7,11 +7,7 @@ public class Main {
 
 	public static void main(String args[]){
 		
-		System.out.println("Main avviato*********************************");
-		System.out.println("mia mod");
-		System.out.println("Main avviatoasdfasdf******************");
-		System.out.println("mia mod");
-		System.out.println("ljdsngfsjdlgnvb");
+		System.out.println("ciao");
 	}
 	
 }
