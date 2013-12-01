@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 21-nov-2013 16.24.11 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="hibernate.Inserzione" table="inserzione" catalog="supermercati">
+        <id name="idInserzione" type="java.lang.Integer">
+            <column name="ID_Inserzione" />
+            <generator class="identity" />
+        </id>
+        <many-to-one name="utente" class="hibernate.Utente" fetch="select">
+            <column name="ID_Utente" />
+        </many-to-one>
+        <many-to-one name="supermercato" class="hibernate.Supermercato" fetch="select">
+            <column name="ID_Supermercato" />
+        </many-to-one>
+        <many-to-one name="prodotto" class="hibernate.Prodotto" fetch="select">
+            <column name="ID_Prodotto" />
+        </many-to-one>
+        <property name="prezzo" type="java.lang.Float">
+            <column name="Prezzo" precision="12" scale="0" />
+        </property>
+        <property name="dataInizio" type="date">
+            <column name="DataInizio" length="10" />
+        </property>
+        <property name="dataFine" type="date">
+            <column name="DataFine" length="10" />
+        </property>
+        <property name="descrizione" type="string">
+            <column name="Descrizione" length="45" />
+        </property>
+        <property name="foto" type="string">
+            <column name="Foto" length="30" />
+        </property>
+    </class>
+</hibernate-mapping>

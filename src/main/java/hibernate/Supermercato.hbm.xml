@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 21-nov-2013 16.24.11 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="hibernate.Supermercato" table="supermercato" catalog="supermercati">
+        <id name="idSupermercato" type="java.lang.Integer">
+            <column name="ID_Supermercato" />
+            <generator class="identity" />
+        </id>
+        <property name="nome" type="string">
+            <column name="Nome" length="45" />
+        </property>
+        <property name="latitudine" type="big_decimal">
+            <column name="Latitudine" precision="10" scale="7" />
+        </property>
+        <property name="longitudine" type="big_decimal">
+            <column name="Longitudine" precision="10" scale="7" />
+        </property>
+        <set name="inserziones" table="inserzione" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="ID_Supermercato" />
+            </key>
+            <one-to-many class="hibernate.Inserzione" />
+        </set>
+    </class>
+</hibernate-mapping>

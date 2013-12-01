@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 21-nov-2013 16.24.11 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="hibernate.ListaDesideri" table="lista_desideri" catalog="supermercati">
+        <id name="idListaDesideri" type="java.lang.Integer">
+            <column name="ID_ListaDesideri" />
+            <generator class="identity" />
+        </id>
+        <many-to-one name="utente" class="hibernate.Utente" fetch="select">
+            <column name="ID_Utente" not-null="true" />
+        </many-to-one>
+        <property name="nomeListaDesideri" type="string">
+            <column name="NomeListaDesideri" length="45" not-null="true" />
+        </property>
+        <set name="listaDesideriProdottis" table="lista_desideri_prodotti" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="ID_ListaDesideri" not-null="true" />
+            </key>
+            <one-to-many class="hibernate.ListaDesideriProdotti" />
+        </set>
+    </class>
+</hibernate-mapping>

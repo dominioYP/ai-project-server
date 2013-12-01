@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 21-nov-2013 16.24.11 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="hibernate.Profilo" table="profilo" catalog="supermercati">
+        <id name="idProfilo" type="java.lang.Integer">
+            <column name="ID_profilo" />
+            <generator class="identity" />
+        </id>
+        <many-to-one name="utente" class="hibernate.Utente" fetch="select">
+            <column name="ID_Utente" unique="true" />
+        </many-to-one>
+        <property name="creditiAcquisiti" type="java.lang.Integer">
+            <column name="CreditiAcquisiti" />
+        </property>
+        <property name="creditiPendenti" type="java.lang.Integer">
+            <column name="CreditiPendenti" />
+        </property>
+        <property name="reputazione" type="java.lang.Integer">
+            <column name="Reputazione" />
+        </property>
+        <property name="premium" type="java.lang.Boolean">
+            <column name="Premium" />
+        </property>
+        <property name="contatoreInfrazioni" type="java.lang.Integer">
+            <column name="ContatoreInfrazioni" />
+        </property>
+    </class>
+</hibernate-mapping>

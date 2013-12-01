@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 21-nov-2013 16.24.11 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="hibernate.ListaDesideriProdotti" table="lista_desideri_prodotti" catalog="supermercati">
+        <composite-id name="id" class="hibernate.ListaDesideriProdottiId">
+            <key-property name="idListaDesideri" type="int">
+                <column name="ID_ListaDesideri" />
+            </key-property>
+            <key-property name="idProdotto" type="int">
+                <column name="ID_Prodotto" />
+            </key-property>
+            <key-property name="descrizione" type="string">
+                <column name="Descrizione" length="45" />
+            </key-property>
+        </composite-id>
+        <many-to-one name="prodotto" class="hibernate.Prodotto" update="false" insert="false" fetch="select">
+            <column name="ID_Prodotto" not-null="true" />
+        </many-to-one>
+        <many-to-one name="listaDesideri" class="hibernate.ListaDesideri" update="false" insert="false" fetch="select">
+            <column name="ID_ListaDesideri" not-null="true" />
+        </many-to-one>
+    </class>
+</hibernate-mapping>

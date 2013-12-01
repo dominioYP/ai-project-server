@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 21-nov-2013 16.24.11 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="hibernate.ListaSpesaProdotti" table="lista_spesa_prodotti" catalog="supermercati">
+        <composite-id name="id" class="hibernate.ListaSpesaProdottiId">
+            <key-property name="idSpesa" type="int">
+                <column name="ID_Spesa" />
+            </key-property>
+            <key-property name="idProdotto" type="int">
+                <column name="ID_Prodotto" />
+            </key-property>
+            <key-property name="descrizione" type="string">
+                <column name="Descrizione" length="45" />
+            </key-property>
+        </composite-id>
+        <many-to-one name="prodotto" class="hibernate.Prodotto" update="false" insert="false" fetch="select">
+            <column name="ID_Prodotto" not-null="true" />
+        </many-to-one>
+        <many-to-one name="listaSpesa" class="hibernate.ListaSpesa" update="false" insert="false" fetch="select">
+            <column name="ID_Spesa" not-null="true" />
+        </many-to-one>
+        <property name="acquistato" type="java.lang.Boolean">
+            <column name="Acquistato" />
+        </property>
+        <property name="quantit&#224;" type="string">
+            <column name="Quantit&#224;" length="45" />
+        </property>
+    </class>
+</hibernate-mapping>

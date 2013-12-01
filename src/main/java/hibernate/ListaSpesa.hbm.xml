@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 21-nov-2013 16.24.11 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="hibernate.ListaSpesa" table="lista_spesa" catalog="supermercati">
+        <id name="idSpesa" type="java.lang.Integer">
+            <column name="ID_Spesa" />
+            <generator class="identity" />
+        </id>
+        <many-to-one name="utente" class="hibernate.Utente" fetch="select">
+            <column name="ID_Utente" not-null="true" />
+        </many-to-one>
+        <property name="nomeListaSpesa" type="string">
+            <column name="NomeListaSpesa" length="45" not-null="true" />
+        </property>
+        <property name="prezzoTot" type="java.lang.Float">
+            <column name="Prezzo_Tot" precision="12" scale="0" />
+        </property>
+        <set name="listaSpesaProdottis" table="lista_spesa_prodotti" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="ID_Spesa" not-null="true" />
+            </key>
+            <one-to-many class="hibernate.ListaSpesaProdotti" />
+        </set>
+    </class>
+</hibernate-mapping>
