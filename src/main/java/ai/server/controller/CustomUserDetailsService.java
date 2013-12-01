@@ -3,13 +3,10 @@ package ai.server.controller;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.transaction.Transactional;
 
 import hibernate.Utente;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
