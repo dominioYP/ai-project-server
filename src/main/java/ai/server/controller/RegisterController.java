@@ -56,7 +56,7 @@ public class RegisterController {
 			return new ModelAndView("register");
 		}
 		try{
-			dati.insertUtente(registration.getEmail(), registration.getUserName(), registration.getPassword(),new Date(0),numerocasuale);
+			dati.insertUtente(registration.getEmail(), registration.getUserName(), registration.getPassword(),new Date(),numerocasuale);
 		}catch(Exception e){
 			
 			return new ModelAndView("register","error",e.toString());
@@ -67,7 +67,7 @@ public class RegisterController {
 		String [] temp = request.getRequestURL().toString().split("/");
 		String url = temp[0]+"//"+temp[1]+temp[2]+"/"+temp[3]+"/";
 		
-		mail.sendMail("giorgio.ciacchella@gmail.com", "ciakitton@hotmail.com", "Registration Confirmation", "Click the link above to confirm your registration\n\n\n"+"<a href='"+url+"confirmregistration?id="+numerocasuale+"' />");
+		mail.sendMail("giorgio.ciacchella@gmail.com", registration.getEmail(), "Registration Confirmation", "Click the link above to confirm your registration\n\n\n"+"<a href='"+url+"confirmregistration?id="+numerocasuale+"' />");
 		return new ModelAndView("registersuccess","registration",registration);
 	}
 	
