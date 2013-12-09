@@ -7,6 +7,12 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 public class Registration {
 	
+	// TODO - marco
+	/**
+	 * qui dobbiamo inserire anche le regex
+	 * in javax.validation ci sono cose fighe, appena riesco a far runnare il progetto le inserisco.
+	 */
+	
 	private String userName;
 	@NotEmpty
 	@Size(min = 4,max = 20)
@@ -18,7 +24,6 @@ public class Registration {
 	
 	@NotEmpty
 	@Email
-	
 	private String email;
 	
 	public String getPassword() {
