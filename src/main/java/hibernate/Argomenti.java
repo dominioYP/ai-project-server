@@ -1,6 +1,6 @@
 package hibernate;
 
-// Generated 21-nov-2013 16.24.11 by Hibernate Tools 3.4.0.CR1
+// Generated 9-dic-2013 18.06.06 by Hibernate Tools 3.4.0.CR1
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,14 +18,12 @@ public class Argomenti implements java.io.Serializable {
 
 	private Integer idArgomenti;
 	private String arg1;
-	private String arg2;
 
 	public Argomenti() {
 	}
 
-	public Argomenti(String arg1, String arg2) {
+	public Argomenti(String arg1) {
 		this.arg1 = arg1;
-		this.arg2 = arg2;
 	}
 
 	@Id
@@ -46,15 +44,6 @@ public class Argomenti implements java.io.Serializable {
 
 	public void setArg1(String arg1) {
 		this.arg1 = arg1;
-	}
-
-	@Column(name = "arg2", length = 30)
-	public String getArg2() {
-		return this.arg2;
-	}
-
-	public void setArg2(String arg2) {
-		this.arg2 = arg2;
 	}
 
 }

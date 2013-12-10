@@ -1,6 +1,6 @@
 package hibernate;
 
-// Generated 21-nov-2013 16.24.11 by Hibernate Tools 3.4.0.CR1
+// Generated 9-dic-2013 18.06.06 by Hibernate Tools 3.4.0.CR1
 
 import java.util.Date;
 import java.util.HashSet;
@@ -166,7 +166,7 @@ public class Utente implements java.io.Serializable {
 		this.inserziones = inserziones;
 	}
 
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "utente")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "utente")
 	public Set getProfilos() {
 		return this.profilos;
 	}

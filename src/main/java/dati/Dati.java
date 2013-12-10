@@ -126,14 +126,14 @@ public class Dati {
 		return argomenti;
 	}
 	
-	public void insertArgomenti(String arg1, String arg2){
+	public void insertArgomenti(String arg1){
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
 		try{
 			tx=session.beginTransaction();
-			if(arg1==null || arg2==null)
+			if(arg1==null )
 				throw new RuntimeException("tutti gli argomenti devono essere non nulli");
-			Argomenti arg = new Argomenti(arg1, arg2);
+			Argomenti arg = new Argomenti(arg1);
 			
 			session.save(arg);
 			
@@ -176,12 +176,12 @@ public class Dati {
 		return argomenti;
 	}
 	// si deve fornire l'oggetto settando l'id del vecchio oggetto
-	public void modifyArgomenti(int idargomenti,String arg1,String arg2){
+	public void modifyArgomenti(int idargomenti,String arg1){
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
-		if(idargomenti <= 0 || arg1 == null || arg2 == null)
+		if(idargomenti <= 0 || arg1 == null )
 			throw new RuntimeException("tutti gli argomenti devono essere non nulli");
-		Argomenti argomenti = new Argomenti(arg1, arg2);
+		Argomenti argomenti = new Argomenti(arg1);
 		argomenti.setIdArgomenti(idargomenti);
 		boolean trovato = false;
 		try{
@@ -219,7 +219,7 @@ public class Dati {
 	}
 	
 	
-	public void insertCategoria(String nome,Set<Sottocategoria> sottocategorie){
+	public void insertCategoria(String nome,Set<Sottocategoria> sottocategorie,Set<Prodotto> prodotti){
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
 		try{
@@ -969,7 +969,7 @@ public class Dati {
 		return ls;
 	}
 	
-	public void insertProdotto(int codicebarre,String descrizione,int idarg,int arg1,int arg2){
+	public void insertProdotto(Sottocategoria sottocategoria,int codicebarre,String descrizione,int idarg,int arg1,int arg2){
 		
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
@@ -980,7 +980,9 @@ public class Dati {
 			if(codicebarre <=0 || descrizione == null || idarg<=0 || arg1 <= 0|| arg2 <= 0 )
 				throw new RuntimeException("tutti gli argomenti devono essere non nulli");
 				
-			Prodotto prodotto = new Prodotto(codicebarre, descrizione, idarg, arg1, arg2, new HashSet<Inserzione>(), new HashSet<ListaDesideriProdotti>(),new HashSet<ListaSpesaProdotti>());
+			Prodotto prodotto = new Prodotto(sottocategoria,codicebarre, descrizione, idarg, arg1, arg2, new HashSet<Inserzione>(), new HashSet<ListaDesideriProdotti>(),new HashSet<ListaSpesaProdotti>());
+			
+			
 			
 			session.save(prodotto);
 			
@@ -989,6 +991,12 @@ public class Dati {
 			
 			setProdotto.add(prodotto);
 			
+			for(Sottocategoria s : setSottocategoria){
+				if(s.equals(sottocategoria)){
+					s.getProdottos().add(prodotto);
+					break;
+				}
+			}
 			
 			
 			tx.commit();
@@ -1004,7 +1012,7 @@ public class Dati {
 		}
 	}
 	
-	public void modifyProdotto(int idprodotto,int codicebarre,String descrizione,int idarg,int arg1,int arg2,Set<Inserzione> inserzioni,Set<ListaDesideriProdotti> desideriprodotti,Set<ListaSpesaProdotti> spesaprodotti){
+	public void modifyProdotto(Sottocategoria sottocategoria,int idprodotto,int codicebarre,String descrizione,int idarg,int arg1,int arg2,Set<Inserzione> inserzioni,Set<ListaDesideriProdotti> desideriprodotti,Set<ListaSpesaProdotti> spesaprodotti){
 		
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
@@ -1014,7 +1022,7 @@ public class Dati {
 		if(idprodotto <= 0 || codicebarre<=0 || descrizione == null || idarg <= 0 || arg1<= 0 || arg2<=0 || inserzioni == null || desideriprodotti == null || spesaprodotti == null)
 			throw new RuntimeException("tutti gli argomenti devono essere immessi");
 		
-		Prodotto prodotto = new Prodotto(codicebarre, descrizione, idarg, arg1, arg2, new HashSet<Inserzione>(), new HashSet<ListaDesideriProdotti>(), new HashSet<ListaSpesaProdotti>());
+		Prodotto prodotto = new Prodotto(sottocategoria,codicebarre, descrizione, idarg, arg1, arg2, new HashSet<Inserzione>(), new HashSet<ListaDesideriProdotti>(), new HashSet<ListaSpesaProdotti>());
 		prodotto.setIdProdotto(idprodotto);
 		
 		for(Inserzione inserzione : inserzioni){
@@ -1040,12 +1048,23 @@ public class Dati {
 				
 				if(p.getIdProdotto().equals(idprodotto)){
 					trovato= true;
+					
+					for(Sottocategoria s : setSottocategoria){
+						if(s.equals(sottocategoria)){
+							s.getProdottos().remove(p);
+							s.getProdottos().add(prodotto);
+							break;
+						}
+					}
+					
 					setProdotto.remove(p);
 					setProdotto.add(prodotto);
 					break;
 				}
 				
 			}				
+			
+			
 				
 			
 			if(!trovato){
@@ -1298,14 +1317,14 @@ public class Dati {
 			
 	}
 	
-	public void insertSottocategoria(Categoria categoria,String nome){
+	public void insertSottocategoria(Categoria categoria,String nome,Set<Prodotto> prodotti){
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
 		
 		if(categoria == null || nome == null)
 			throw new RuntimeException("tutti i parametri devono essere non nulli");
 		
-		Sottocategoria sottocategoria = new Sottocategoria(categoria, nome);
+		Sottocategoria sottocategoria = new Sottocategoria(categoria, nome,prodotti);
 		
 		
 		try{
@@ -1339,7 +1358,7 @@ public class Dati {
 		}
 	}
 	
-	public void modifySottocategoria(int idsottocategoria,Categoria categoria,String nome){
+	public void modifySottocategoria(int idsottocategoria,Categoria categoria,String nome,Set<Prodotto> prodotti){
 		
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
@@ -1355,7 +1374,7 @@ public class Dati {
 			}
 		}
 		
-		Sottocategoria sottocategoria = new Sottocategoria(categoria, nome);
+		Sottocategoria sottocategoria = new Sottocategoria(categoria, nome,prodotti);
 		sottocategoria.setIdSottocategoria(idsottocategoria);
 		
 		try{

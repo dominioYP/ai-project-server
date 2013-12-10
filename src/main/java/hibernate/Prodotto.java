@@ -1,6 +1,6 @@
 package hibernate;
 
-// Generated 21-nov-2013 16.24.11 by Hibernate Tools 3.4.0.CR1
+// Generated 9-dic-2013 18.06.06 by Hibernate Tools 3.4.0.CR1
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,6 +10,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -22,7 +24,8 @@ import javax.persistence.UniqueConstraint;
 public class Prodotto implements java.io.Serializable {
 
 	private Integer idProdotto;
-	private Integer codiceBarre;
+	private Sottocategoria sottocategoria;
+	private int codiceBarre;
 	private String descrizione;
 	private Integer idArg;
 	private Integer arg1;
@@ -34,9 +37,17 @@ public class Prodotto implements java.io.Serializable {
 	public Prodotto() {
 	}
 
-	public Prodotto(Integer codiceBarre, String descrizione, Integer idArg,
-			Integer arg1, Integer arg2, Set inserziones,
-			Set listaDesideriProdottis, Set listaSpesaProdottis) {
+	public Prodotto(Sottocategoria sottocategoria, int codiceBarre,
+			String descrizione) {
+		this.sottocategoria = sottocategoria;
+		this.codiceBarre = codiceBarre;
+		this.descrizione = descrizione;
+	}
+
+	public Prodotto(Sottocategoria sottocategoria, int codiceBarre,
+			String descrizione, Integer idArg, Integer arg1, Integer arg2,
+			Set inserziones, Set listaDesideriProdottis, Set listaSpesaProdottis) {
+		this.sottocategoria = sottocategoria;
 		this.codiceBarre = codiceBarre;
 		this.descrizione = descrizione;
 		this.idArg = idArg;
@@ -58,16 +69,26 @@ public class Prodotto implements java.io.Serializable {
 		this.idProdotto = idProdotto;
 	}
 
-	@Column(name = "CodiceBarre", unique = true)
-	public Integer getCodiceBarre() {
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "ID_SottoCategoria", nullable = false)
+	public Sottocategoria getSottocategoria() {
+		return this.sottocategoria;
+	}
+
+	public void setSottocategoria(Sottocategoria sottocategoria) {
+		this.sottocategoria = sottocategoria;
+	}
+
+	@Column(name = "CodiceBarre", unique = true, nullable = false)
+	public int getCodiceBarre() {
 		return this.codiceBarre;
 	}
 
-	public void setCodiceBarre(Integer codiceBarre) {
+	public void setCodiceBarre(int codiceBarre) {
 		this.codiceBarre = codiceBarre;
 	}
 
-	@Column(name = "Descrizione", length = 45)
+	@Column(name = "Descrizione", nullable = false, length = 45)
 	public String getDescrizione() {
 		return this.descrizione;
 	}

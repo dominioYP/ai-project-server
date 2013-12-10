@@ -1,18 +1,21 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
-<!-- Generated 21-nov-2013 16.24.11 by Hibernate Tools 3.4.0.CR1 -->
+<!-- Generated 9-dic-2013 18.06.07 by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
     <class name="hibernate.Prodotto" table="prodotto" catalog="supermercati">
         <id name="idProdotto" type="java.lang.Integer">
             <column name="ID_Prodotto" />
             <generator class="identity" />
         </id>
-        <property name="codiceBarre" type="java.lang.Integer">
-            <column name="CodiceBarre" unique="true" />
+        <many-to-one name="sottocategoria" class="hibernate.Sottocategoria" fetch="select">
+            <column name="ID_SottoCategoria" not-null="true" />
+        </many-to-one>
+        <property name="codiceBarre" type="int">
+            <column name="CodiceBarre" not-null="true" unique="true" />
         </property>
         <property name="descrizione" type="string">
-            <column name="Descrizione" length="45" />
+            <column name="Descrizione" length="45" not-null="true" />
         </property>
         <property name="idArg" type="java.lang.Integer">
             <column name="ID_Arg" />

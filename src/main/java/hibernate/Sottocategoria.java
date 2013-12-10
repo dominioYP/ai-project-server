@@ -1,7 +1,9 @@
 package hibernate;
 
-// Generated 21-nov-2013 16.24.11 by Hibernate Tools 3.4.0.CR1
+// Generated 9-dic-2013 18.06.06 by Hibernate Tools 3.4.0.CR1
 
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,6 +12,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -23,13 +26,15 @@ public class Sottocategoria implements java.io.Serializable {
 	private Integer idSottocategoria;
 	private Categoria categoria;
 	private String nome;
+	private Set prodottos = new HashSet(0);
 
 	public Sottocategoria() {
 	}
 
-	public Sottocategoria(Categoria categoria, String nome) {
+	public Sottocategoria(Categoria categoria, String nome, Set prodottos) {
 		this.categoria = categoria;
 		this.nome = nome;
+		this.prodottos = prodottos;
 	}
 
 	@Id
@@ -60,6 +65,15 @@ public class Sottocategoria implements java.io.Serializable {
 
 	public void setNome(String nome) {
 		this.nome = nome;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "sottocategoria")
+	public Set getProdottos() {
+		return this.prodottos;
+	}
+
+	public void setProdottos(Set prodottos) {
+		this.prodottos = prodottos;
 	}
 
 }

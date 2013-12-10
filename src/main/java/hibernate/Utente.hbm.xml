@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
-<!-- Generated 21-nov-2013 16.24.11 by Hibernate Tools 3.4.0.CR1 -->
+<!-- Generated 9-dic-2013 18.06.07 by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
     <class name="hibernate.Utente" table="utente" catalog="supermercati">
         <id name="idUtente" type="java.lang.Integer">
@@ -50,7 +50,7 @@
             </key>
             <one-to-many class="hibernate.Inserzione" />
         </set>
-        <set name="profilos" table="profilo" inverse="true" lazy="false" fetch="select">
+        <set name="profilos" table="profilo" inverse="true" lazy="true" fetch="select">
             <key>
                 <column name="ID_Utente" unique="true" />
             </key>
