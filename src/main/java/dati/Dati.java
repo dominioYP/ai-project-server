@@ -250,14 +250,14 @@ public class Dati {
 		
 	}
 	
-	public void insertInserzione(Utente utente,Supermercato supermercato,Prodotto prodotto,float prezzo,Date dataInizio,Date dataFine,String descrizione,String foto){
+	public void insertInserzione(Utente utente,Supermercato supermercato,Prodotto prodotto,float prezzo,Date dataInizio,Date dataFine,String descrizione,byte [] foto){
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
 		try{
 			tx=session.beginTransaction();
 			if(utente == null || supermercato == null || prodotto == null || prezzo<=0 || dataInizio == null || dataFine == null || foto == null)
 				throw new RuntimeException("errore nell'immissione dei parametri");
-			Inserzione inserzione = new Inserzione(utente, supermercato, prodotto, prezzo, dataInizio, dataFine, descrizione, foto);
+			Inserzione inserzione = new Inserzione(utente, supermercato, prodotto, prezzo, dataInizio, dataFine, descrizione, foto,0,(float)0.0,new HashSet<ValutazioneInserzione>());
 			
 			session.save(inserzione);
 			
@@ -301,22 +301,22 @@ public class Dati {
 		
 	}
 	//in ingresso inserzione modificata con id dell'inserzione vecchia
-	public void modifyInserzione(int idinserzione,Utente utente,Supermercato supermercato,Prodotto prodotto,float prezzo,Date dataInizio,Date dataFine,String descrizione,String foto){
+	public void modifyInserzione(int idinserzione,Utente utente,Supermercato supermercato,Prodotto prodotto,float prezzo,Date dataInizio,Date dataFine,String descrizione,byte[] foto,Set<ValutazioneInserzione> valutazioni){
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
 		boolean trovato = false;
 		if(idinserzione <= 0 || utente == null || supermercato == null || prodotto == null || prezzo <= 0 || dataInizio == null || dataFine == null || descrizione == null || foto == null)
 			throw new RuntimeException("tutti gli argomenti devono essere non nulli");
-		Inserzione inserzione = new Inserzione(utente, supermercato, prodotto, prezzo, dataInizio, dataFine, descrizione, foto);
+		Inserzione inserzione = new Inserzione(utente, supermercato, prodotto, prezzo, dataInizio, dataFine, descrizione, foto,0,(float)0.0,valutazioni);
 		inserzione.setIdInserzione(idinserzione);
 		try{
 			tx=session.beginTransaction();
 			
 			Iterator<Inserzione> it = setInserzione.iterator();
-			
+			Inserzione i = null;
 			for(;it.hasNext();){
-				Inserzione a = it.next();
-				if(a.getIdInserzione().equals(idinserzione)){
+				i = it.next();
+				if(i.getIdInserzione().equals(idinserzione)){
 				//	it.remove();
 			//		setInserzione.add(inserzione);
 					trovato= true;
@@ -329,44 +329,62 @@ public class Dati {
 			
 			session.update(inserzione);
 			
+			for(ValutazioneInserzione valutazione : (Set<ValutazioneInserzione>)i.getValutazioneInserziones()){
+				for(ValutazioneInserzione v : setValutazioneInserzione){
+					if(v.equals(valutazione)){
+						setValutazioneInserzione.remove(v);
+						break;
+					}
+				}
+			}
+			for(ValutazioneInserzione valutazione : valutazioni){
+				setValutazioneInserzione.add(valutazione);
+			}
 		
 			it.remove();
 			setInserzione.add(inserzione);
 			
-			
-			
-			it = inserzione.getUtente().getInserziones().iterator();
-			for(;it.hasNext();){
-				Inserzione a = it.next();
-				if(a.getIdInserzione().equals(idinserzione)){
-					it.remove();
-					setInserzione.add(inserzione);
+			for(Utente u : setUtente){
+				if(u.equals(i.getUtente())){
+					u.getInserziones().remove(i);
 					break;
 				}
 			}
-		
 			
-			it = inserzione.getSupermercato().getInserziones().iterator();
-			for(;it.hasNext();){
-				Inserzione a = it.next();
-				if(a.getIdInserzione().equals(idinserzione)){
-					it.remove();
-					setInserzione.add(inserzione);
+			for(Utente u : setUtente){
+				if(u.equals(inserzione.getUtente())){
+					u.getInserziones().add(inserzione);
 					break;
 				}
 			}
-		
 			
-			
-			it = inserzione.getProdotto().getInserziones().iterator();
-			for(;it.hasNext();){
-				Inserzione a = it.next();
-				if(a.getIdInserzione().equals(idinserzione)){
-					it.remove();
-					setInserzione.add(inserzione);
+			for(Supermercato s : setSupermercato){
+				if(s.equals(i.getSupermercato())){
+					s.getInserziones().remove(i);
 					break;
 				}
 			}
+			for(Supermercato s : setSupermercato){
+				if(s.equals(inserzione.getSupermercato())){
+					s.getInserziones().add(inserzione);
+					break;
+				}
+			}
+			
+			for(Prodotto p : setProdotto){
+				if(p.equals(i.getProdotto())){
+					p.getInserziones().remove(i);
+					break;
+				}
+			}
+			
+			for(Prodotto p : setProdotto){
+				if(p.equals(inserzione.getProdotto())){
+					p.getInserziones().add(inserzione);
+					break;
+				}
+			}
+			
 			
 			
 			tx.commit();
@@ -390,27 +408,35 @@ public class Dati {
 		try{
 			tx=session.beginTransaction();
 			
-			Iterator<Inserzione> it = inserzione.getUtente().getInserziones().iterator();
+			Iterator<Inserzione> it;
 			session.delete(inserzione);
 			
-			for(;it.hasNext();){
-				Inserzione a = it.next();
-				if(a.getIdInserzione().equals(inserzione.getIdInserzione())){
-					it.remove();
+			for(ValutazioneInserzione v : (Set<ValutazioneInserzione>)inserzione.getValutazioneInserziones()){
+				for(ValutazioneInserzione val : setValutazioneInserzione){
+					if(val.equals(v)){
+						setValutazioneInserzione.remove(v);
+						break;
+					}
+				}
+			}
+			
+			for(Utente u : setUtente){
+				if(u.equals(inserzione.getUtente())){
 					trovato = true;
+					u.getInserziones().remove(inserzione);
 					break;
 				}
 			}
+			
 			if(!trovato)
 				throw new RuntimeException("elemento non trovato nell'utente");
 			trovato=false;
 			
-			it = inserzione.getSupermercato().getInserziones().iterator();
-			for(;it.hasNext();){
-				Inserzione a = it.next();
-				if(a.getIdInserzione().equals(inserzione.getIdInserzione())){
-					it.remove();
-					trovato = true;
+			
+			for(Supermercato s : setSupermercato){
+				if(s.equals(inserzione.getSupermercato())){
+					s.getInserziones().remove(inserzione);
+					trovato=true;
 					break;
 				}
 			}
@@ -419,15 +445,14 @@ public class Dati {
 				throw new RuntimeException("elemento non trovato nel supermercato");
 			trovato=false;
 		
-			it = inserzione.getProdotto().getInserziones().iterator();
-			for(;it.hasNext();){
-				Inserzione a = it.next();
-				if(a.getIdInserzione().equals(inserzione.getIdInserzione())){
-					it.remove();
+			for(Prodotto p : setProdotto){
+				if(p.equals(inserzione.getProdotto())){
+					p.getInserziones().remove(inserzione);
 					trovato=true;
 					break;
 				}
 			}
+			
 			
 			if(!trovato)
 				throw new RuntimeException("elemento non trovato nel prodotto");
@@ -1915,14 +1940,14 @@ public class Dati {
 		return utenti;
 	}
 	
-	public void insertValutazioneInserzioneValutatore(Utente utente,int valutazione,Date data){
+	public void insertValutazioneInserzioneValutatore(Inserzione inserzione,Utente utente,int valutazione,Date data){
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
 		
 		if(utente == null || valutazione<0 || data == null)
 			throw new RuntimeException("parametri non corretti");
 		
-		ValutazioneInserzione valutazioneinserzione = new ValutazioneInserzione(utente, null, valutazione, data);
+		ValutazioneInserzione valutazioneinserzione = new ValutazioneInserzione(inserzione,utente, null, valutazione, data);
 		
 		
 		
@@ -1933,11 +1958,18 @@ public class Dati {
 			
 			session.persist(valutazioneinserzione);
 			
-			setUtente.add(utente);
+			setValutazioneInserzione.add(valutazioneinserzione);
 			
 			for(Utente u : setUtente){
 				if(u.equals(utente)){
 					u.getValutazioneInserzionesForIdUtenteValutatore().add(valutazioneinserzione);
+					break;
+				}
+			}
+			
+			for(Inserzione i : setInserzione){
+				if(i.equals(inserzione)){
+					i.getValutazioneInserziones().add(valutazioneinserzione);
 					break;
 				}
 			}
@@ -1957,7 +1989,7 @@ public class Dati {
 		
 	}
 	
-	public void modifyValutazioneInserzioneValutatore(int idvalutazione,Utente utente,Date data,int valutazione){
+	public void modifyValutazioneInserzioneValutatore(int idvalutazione,Inserzione inserzione,Utente utente,Date data,int valutazione){
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
 		ValutazioneInserzione vold = null;
@@ -1975,7 +2007,7 @@ public class Dati {
 		if(vold==null)
 			throw new RuntimeException("elemento non trovato");
 		
-		ValutazioneInserzione valutazioneinserzione = new ValutazioneInserzione(utente, null, valutazione, data);
+		ValutazioneInserzione valutazioneinserzione = new ValutazioneInserzione(inserzione,utente, null, valutazione, data);
 		valutazioneinserzione.setIdValutazioneInserzione(idvalutazione);
 		
 		try{
@@ -1988,6 +2020,13 @@ public class Dati {
 				}
 			}
 			
+			for(Inserzione i : setInserzione){
+				if(i.equals(vold.getInserzione())){
+					i.getValutazioneInserziones().remove(vold);
+					break;
+				}
+			}
+			
 			setValutazioneInserzione.remove(vold);
 			
 			setValutazioneInserzione.add(valutazioneinserzione);
@@ -1995,6 +2034,13 @@ public class Dati {
 			for(Utente u : setUtente){
 				if(u.equals(utente)){
 					u.getValutazioneInserzionesForIdUtenteValutatore().add(valutazioneinserzione);
+					break;
+				}
+			}
+			
+			for(Inserzione i : setInserzione){
+				if(i.equals(inserzione)){
+					i.getValutazioneInserziones().add(valutazioneinserzione);
 					break;
 				}
 			}
@@ -2013,7 +2059,7 @@ public class Dati {
 		
 	}
 	
-	public void deleteValutazioneInserzioneValutatore(int idvalutazione){
+	public void deleteValutazioneInserzione(int idvalutazione){
 		
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
@@ -2044,6 +2090,13 @@ public class Dati {
 					break;
 				}
 			}
+			
+			for(Inserzione i : setInserzione){
+				if(i.equals(vold.getInserzione())){
+					i.getValutazioneInserziones().remove(vold);
+					break;
+				}
+			}
 
 			tx.commit();
 		}catch(Throwable ex){
@@ -2059,14 +2112,14 @@ public class Dati {
 		
 	}
 	
-	public void insertValutazioneInserzioneInserzionista(Utente utente,int valutazione,Date data){
+	public void insertValutazioneInserzioneInserzionista(Inserzione inserzione,Utente utente,int valutazione,Date data){
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
 		
 		if(utente == null || valutazione<0 || data == null)
 			throw new RuntimeException("parametri non corretti");
 		
-		ValutazioneInserzione valutazioneinserzione = new ValutazioneInserzione(null, utente, valutazione, data);
+		ValutazioneInserzione valutazioneinserzione = new ValutazioneInserzione(inserzione,null, utente, valutazione, data);
 		
 		
 		
@@ -2077,11 +2130,18 @@ public class Dati {
 			
 			session.persist(valutazioneinserzione);
 			
-			setUtente.add(utente);
+			setValutazioneInserzione.add(valutazioneinserzione);
 			
 			for(Utente u : setUtente){
 				if(u.equals(utente)){
 					u.getValutazioneInserzionesForIdUtenteInserzionista().add(valutazioneinserzione);
+					break;
+				}
+			}
+			
+			for(Inserzione i : setInserzione){
+				if(i.equals(inserzione)){
+					i.getValutazioneInserziones().add(valutazioneinserzione);
 					break;
 				}
 			}
@@ -2101,7 +2161,7 @@ public class Dati {
 		
 	}
 	
-	public void modifyValutazioneInserzioneInserzionista(int idvalutazione,Utente utente,Date data,int valutazione){
+	public void modifyValutazioneInserzioneInserzionista(Inserzione inserzione,int idvalutazione,Utente utente,Date data,int valutazione){
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
 		ValutazioneInserzione vold = null;
@@ -2119,7 +2179,7 @@ public class Dati {
 		if(vold==null)
 			throw new RuntimeException("elemento non trovato");
 		
-		ValutazioneInserzione valutazioneinserzione = new ValutazioneInserzione(null , utente, valutazione, data);
+		ValutazioneInserzione valutazioneinserzione = new ValutazioneInserzione(inserzione,null , utente, valutazione, data);
 		valutazioneinserzione.setIdValutazioneInserzione(idvalutazione);
 		
 		try{
@@ -2132,6 +2192,13 @@ public class Dati {
 				}
 			}
 			
+			for(Inserzione i : setInserzione){
+				if(i.equals(vold.getInserzione())){
+					i.getValutazioneInserziones().remove(vold);
+					break;
+				}
+			}
+			
 			setValutazioneInserzione.remove(vold);
 			
 			setValutazioneInserzione.add(valutazioneinserzione);
@@ -2139,6 +2206,13 @@ public class Dati {
 			for(Utente u : setUtente){
 				if(u.equals(utente)){
 					u.getValutazioneInserzionesForIdUtenteInserzionista().add(valutazioneinserzione);
+					break;
+				}
+			}
+			
+			for(Inserzione i : setInserzione){
+				if(i.equals(inserzione)){
+					i.getValutazioneInserziones().add(valutazioneinserzione);
 					break;
 				}
 			}
@@ -2157,51 +2231,6 @@ public class Dati {
 		
 	}
 	
-	public void deleteValutazioneInserzioneInserzionista(int idvalutazione){
-		
-		Session session = factory.getCurrentSession();
-		Transaction tx = null;
-		ValutazioneInserzione vold = null;
-		
-		if(idvalutazione <=0 )
-			throw new RuntimeException("id non valido");
-		
-		for(ValutazioneInserzione v : setValutazioneInserzione){
-			if(v.getIdValutazioneInserzione().equals(idvalutazione)){
-				vold=v;
-				break;
-			}
-		}
-		
-		if(vold==null)
-			throw new RuntimeException("elemento non trovato");
-		
-
-		try{
-			tx=session.beginTransaction();
-			
-			session.delete(vold);
-			
-			for(Utente u : setUtente){
-				if(u.equals(vold.getUtenteByIdUtenteInserzionista())){
-					u.getValutazioneInserzionesForIdUtenteInserzionista().remove(vold);
-					break;
-				}
-			}
-
-			tx.commit();
-		}catch(Throwable ex){
-			if(tx!=null)
-				tx.rollback();
-			throw new RuntimeException(ex);
-		}finally{
-			if(session!=null && session.isOpen()){
-				session.close();
-			}
-			session=null;
-		}
-		
-	}
 	
 	public Set<ValutazioneInserzione> getValutazioniInserzioni(){
 		HashSet<ValutazioneInserzione> valutazioni = new HashSet<ValutazioneInserzione>();

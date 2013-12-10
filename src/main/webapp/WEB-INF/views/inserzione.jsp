@@ -18,7 +18,13 @@
 	<td>Descrizione<font color="red"><form:errors path="descrizione"></form:errors></font></td>
 	</tr>
 	<tr>
-	<td><form:input path="name"/></td>
+	<td><form:input path="name" autocomplete=""/></td>
+	</tr>
+	<tr>
+	<td>Codice a barre<font color="red"><form:errors path="codiceBarre"></form:errors></font></td>
+	</tr>
+	<tr>
+	<td><form:input path="codiceBarre"/></td>
 	</tr>
 	<tr>
 	<td>Categoria<font color="red"><form:errors path="categoria"></form:errors></font>
@@ -62,6 +68,12 @@
 	</tr>
 	<tr>
 	<td><form:input path="dataInizio"/></td>
+	</tr>
+	<tr>
+	<td>Data Fine Promozione<font color="red"><form:errors path="dataFine"></form:errors></font></td>
+	</tr>
+	<tr>
+	<td><form:input path="dataFine"/></td>
 	</tr>
 	<tr>
 	<td>Data Fine Promozione<font color="red"><form:errors path="dataFine"></form:errors></font></td>

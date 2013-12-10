@@ -1,8 +1,10 @@
 package hibernate;
 
-// Generated 9-dic-2013 18.06.06 by Hibernate Tools 3.4.0.CR1
+// Generated 10-dic-2013 16.19.44 by Hibernate Tools 3.4.0.CR1
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -11,6 +13,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -30,14 +33,18 @@ public class Inserzione implements java.io.Serializable {
 	private Date dataInizio;
 	private Date dataFine;
 	private String descrizione;
-	private String foto;
+	private byte[] foto;
+	private Integer numeroValutazioni;
+	private Float totaleVoti;
+	private Set valutazioneInserziones = new HashSet(0);
 
 	public Inserzione() {
 	}
 
 	public Inserzione(Utente utente, Supermercato supermercato,
 			Prodotto prodotto, Float prezzo, Date dataInizio, Date dataFine,
-			String descrizione, String foto) {
+			String descrizione, byte[] foto, Integer numeroValutazioni,
+			Float totaleVoti, Set valutazioneInserziones) {
 		this.utente = utente;
 		this.supermercato = supermercato;
 		this.prodotto = prodotto;
@@ -46,6 +53,9 @@ public class Inserzione implements java.io.Serializable {
 		this.dataFine = dataFine;
 		this.descrizione = descrizione;
 		this.foto = foto;
+		this.numeroValutazioni = numeroValutazioni;
+		this.totaleVoti = totaleVoti;
+		this.valutazioneInserziones = valutazioneInserziones;
 	}
 
 	@Id
@@ -127,13 +137,40 @@ public class Inserzione implements java.io.Serializable {
 		this.descrizione = descrizione;
 	}
 
-	@Column(name = "Foto", length = 30)
-	public String getFoto() {
+	@Column(name = "Foto")
+	public byte[] getFoto() {
 		return this.foto;
 	}
 
-	public void setFoto(String foto) {
+	public void setFoto(byte[] foto) {
 		this.foto = foto;
+	}
+
+	@Column(name = "NumeroValutazioni")
+	public Integer getNumeroValutazioni() {
+		return this.numeroValutazioni;
+	}
+
+	public void setNumeroValutazioni(Integer numeroValutazioni) {
+		this.numeroValutazioni = numeroValutazioni;
+	}
+
+	@Column(name = "TotaleVoti", precision = 12, scale = 0)
+	public Float getTotaleVoti() {
+		return this.totaleVoti;
+	}
+
+	public void setTotaleVoti(Float totaleVoti) {
+		this.totaleVoti = totaleVoti;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "inserzione")
+	public Set getValutazioneInserziones() {
+		return this.valutazioneInserziones;
+	}
+
+	public void setValutazioneInserziones(Set valutazioneInserziones) {
+		this.valutazioneInserziones = valutazioneInserziones;
 	}
 
 }

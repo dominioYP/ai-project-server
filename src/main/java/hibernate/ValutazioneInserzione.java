@@ -1,6 +1,6 @@
 package hibernate;
 
-// Generated 9-dic-2013 18.06.06 by Hibernate Tools 3.4.0.CR1
+// Generated 10-dic-2013 16.19.44 by Hibernate Tools 3.4.0.CR1
 
 import java.util.Date;
 import javax.persistence.Column;
@@ -23,6 +23,7 @@ import javax.persistence.TemporalType;
 public class ValutazioneInserzione implements java.io.Serializable {
 
 	private Integer idValutazioneInserzione;
+	private Inserzione inserzione;
 	private Utente utenteByIdUtenteValutatore;
 	private Utente utenteByIdUtenteInserzionista;
 	private Integer valutazione;
@@ -31,8 +32,10 @@ public class ValutazioneInserzione implements java.io.Serializable {
 	public ValutazioneInserzione() {
 	}
 
-	public ValutazioneInserzione(Utente utenteByIdUtenteValutatore,
+	public ValutazioneInserzione(Inserzione inserzione,
+			Utente utenteByIdUtenteValutatore,
 			Utente utenteByIdUtenteInserzionista, Integer valutazione, Date data) {
+		this.inserzione = inserzione;
 		this.utenteByIdUtenteValutatore = utenteByIdUtenteValutatore;
 		this.utenteByIdUtenteInserzionista = utenteByIdUtenteInserzionista;
 		this.valutazione = valutazione;
@@ -48,6 +51,16 @@ public class ValutazioneInserzione implements java.io.Serializable {
 
 	public void setIdValutazioneInserzione(Integer idValutazioneInserzione) {
 		this.idValutazioneInserzione = idValutazioneInserzione;
+	}
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "ID_Inserzione")
+	public Inserzione getInserzione() {
+		return this.inserzione;
+	}
+
+	public void setInserzione(Inserzione inserzione) {
+		this.inserzione = inserzione;
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
