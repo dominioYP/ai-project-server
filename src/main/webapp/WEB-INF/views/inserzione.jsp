@@ -5,10 +5,22 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true&libraries=places"></script>
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
 <title>Inserzione</title>
+<style>
+      html, body, #map-canvas {
+        height:330px;
+        width:330px;
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
 </head>
 <body>
-<form:form method="post" action="register.html" commandName="registration">
+<form:form method="post" action="inserzione" commandName="inserzioneForm">
 	<% String error = (String) request.getAttribute("error");
 	if(null != error ) {%>
 		<div id="hibernate.error" class="errors"><%= error %></div>
@@ -18,7 +30,7 @@
 	<td>Descrizione<font color="red"><form:errors path="descrizione"></form:errors></font></td>
 	</tr>
 	<tr>
-	<td><form:input path="name" autocomplete=""/></td>
+	<td><form:input id="descrizione" path="descrizione"/></td>
 	</tr>
 	<tr>
 	<td>Codice a barre<font color="red"><form:errors path="codiceBarre"></form:errors></font></td>
@@ -31,14 +43,14 @@
 	</td>
 	</tr>
 	<tr>
-	<td><form:input path="categoria"/></td>
+	<td><form:select id="categorie" path="categoria" items="${categorie}"/></td>
 	</tr>
 	<tr>
 	<td>SottoCategoria<font color="red"><form:errors path="sottoCategoria"></form:errors></font>
 	</td>
 	</tr>
 	<tr>
-	<td><form:input path="sottoCategoria"/></td>
+	<td><form:select id="sottoCategorie" path="sottoCategoria"/></td>
 	</tr>
 	<tr>
 	<td>Prezzo<font color="red"><form:errors path="prezzo"></form:errors></font></td>
@@ -60,10 +72,6 @@
 	<td><form:input path="arg1_corpo"/></td>
 	</tr>
 	<tr>
-	<td><input type="submit" value="Submit">
-	</td>
-	</tr>
-	<tr>
 	<td>Data Acquisizione<font color="red"><form:errors path="dataInizio"></form:errors></font></td>
 	</tr>
 	<tr>
@@ -76,12 +84,23 @@
 	<td><form:input path="dataFine"/></td>
 	</tr>
 	<tr>
-	<td>Data Fine Promozione<font color="red"><form:errors path="dataFine"></form:errors></font></td>
+	<td>Supermercato<font color="red"><form:errors path="supermercato"></form:errors></font></td>
+	<td>Indirizzo<font color="red"><form:errors path="indirizzo"></form:errors></font></td>
 	</tr>
 	<tr>
-	<td><form:input path="dataFine"/></td>
+	<td><form:input id="supermercato" path="supermercato"/></td>
+	<td>
+	<td><form:input id="indirizzo" path="indirizzo"/></td>
+	
+	<tr><td><div id="map-canvas"></div></td></tr>
+	<tr>
+	<td><form:button id="submit" >Invia</form:button>
+	</td>
+	
 	</tr>
 	</table>
 </form:form>
+
 </body>
+<script type="text/javascript" src="resources/js/inserzione.js"></script>
 </html>

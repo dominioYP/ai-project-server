@@ -1,6 +1,6 @@
 package hibernate;
 
-// Generated 10-dic-2013 16.19.44 by Hibernate Tools 3.4.0.CR1
+// Generated 19-dic-2013 19.14.54 by Hibernate Tools 3.4.0.CR1
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

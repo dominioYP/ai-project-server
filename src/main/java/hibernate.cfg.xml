@@ -28,5 +28,6 @@
   <mapping resource="hibernate/Profilo.hbm.xml"/>
   <mapping resource="hibernate/Sottocategoria.hbm.xml"/>
   <mapping resource="hibernate/ValutazioneInserzione.hbm.xml"/>
+  <mapping resource="hibernate/ArgomentiInserzione.hbm.xml"/>
  </session-factory>
 </hibernate-configuration>

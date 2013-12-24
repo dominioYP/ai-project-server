@@ -1,6 +1,6 @@
 package hibernate;
 
-// Generated 10-dic-2013 16.19.44 by Hibernate Tools 3.4.0.CR1
+// Generated 19-dic-2013 19.14.54 by Hibernate Tools 3.4.0.CR1
 
 import java.util.Date;
 import java.util.HashSet;
@@ -37,6 +37,7 @@ public class Inserzione implements java.io.Serializable {
 	private Integer numeroValutazioni;
 	private Float totaleVoti;
 	private Set valutazioneInserziones = new HashSet(0);
+	private Set argomentiInserziones = new HashSet(0);
 
 	public Inserzione() {
 	}
@@ -44,7 +45,8 @@ public class Inserzione implements java.io.Serializable {
 	public Inserzione(Utente utente, Supermercato supermercato,
 			Prodotto prodotto, Float prezzo, Date dataInizio, Date dataFine,
 			String descrizione, byte[] foto, Integer numeroValutazioni,
-			Float totaleVoti, Set valutazioneInserziones) {
+			Float totaleVoti, Set valutazioneInserziones,
+			Set argomentiInserziones) {
 		this.utente = utente;
 		this.supermercato = supermercato;
 		this.prodotto = prodotto;
@@ -56,6 +58,7 @@ public class Inserzione implements java.io.Serializable {
 		this.numeroValutazioni = numeroValutazioni;
 		this.totaleVoti = totaleVoti;
 		this.valutazioneInserziones = valutazioneInserziones;
+		this.argomentiInserziones = argomentiInserziones;
 	}
 
 	@Id
@@ -171,6 +174,15 @@ public class Inserzione implements java.io.Serializable {
 
 	public void setValutazioneInserziones(Set valutazioneInserziones) {
 		this.valutazioneInserziones = valutazioneInserziones;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "inserzione")
+	public Set getArgomentiInserziones() {
+		return this.argomentiInserziones;
+	}
+
+	public void setArgomentiInserziones(Set argomentiInserziones) {
+		this.argomentiInserziones = argomentiInserziones;
 	}
 
 }

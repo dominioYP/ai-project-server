@@ -1,12 +1,16 @@
 package hibernate;
 
-// Generated 10-dic-2013 16.19.44 by Hibernate Tools 3.4.0.CR1
+// Generated 19-dic-2013 19.14.54 by Hibernate Tools 3.4.0.CR1
 
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -18,12 +22,14 @@ public class Argomenti implements java.io.Serializable {
 
 	private Integer idArgomenti;
 	private String arg1;
+	private Set argomentiInserziones = new HashSet(0);
 
 	public Argomenti() {
 	}
 
-	public Argomenti(String arg1) {
+	public Argomenti(String arg1, Set argomentiInserziones) {
 		this.arg1 = arg1;
+		this.argomentiInserziones = argomentiInserziones;
 	}
 
 	@Id
@@ -44,6 +50,15 @@ public class Argomenti implements java.io.Serializable {
 
 	public void setArg1(String arg1) {
 		this.arg1 = arg1;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "argomenti")
+	public Set getArgomentiInserziones() {
+		return this.argomentiInserziones;
+	}
+
+	public void setArgomentiInserziones(Set argomentiInserziones) {
+		this.argomentiInserziones = argomentiInserziones;
 	}
 
 }

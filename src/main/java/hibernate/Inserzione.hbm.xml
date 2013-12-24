@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
-<!-- Generated 10-dic-2013 16.19.44 by Hibernate Tools 3.4.0.CR1 -->
+<!-- Generated 19-dic-2013 19.14.54 by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
     <class name="hibernate.Inserzione" table="inserzione" catalog="supermercati">
         <id name="idInserzione" type="java.lang.Integer">
@@ -43,6 +43,12 @@
                 <column name="ID_Inserzione" />
             </key>
             <one-to-many class="hibernate.ValutazioneInserzione" />
+        </set>
+        <set name="argomentiInserziones" table="argomenti_inserzione" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="ID_Insezione" not-null="true" />
+            </key>
+            <one-to-many class="hibernate.ArgomentiInserzione" />
         </set>
     </class>
 </hibernate-mapping>

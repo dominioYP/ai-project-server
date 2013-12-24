@@ -1,6 +1,6 @@
 package hibernate;
 
-// Generated 10-dic-2013 16.19.44 by Hibernate Tools 3.4.0.CR1
+// Generated 19-dic-2013 19.14.54 by Hibernate Tools 3.4.0.CR1
 
 import java.util.HashSet;
 import java.util.Set;
@@ -27,9 +27,6 @@ public class Prodotto implements java.io.Serializable {
 	private Sottocategoria sottocategoria;
 	private int codiceBarre;
 	private String descrizione;
-	private Integer idArg;
-	private Integer arg1;
-	private Integer arg2;
 	private Set inserziones = new HashSet(0);
 	private Set listaDesideriProdottis = new HashSet(0);
 	private Set listaSpesaProdottis = new HashSet(0);
@@ -45,14 +42,11 @@ public class Prodotto implements java.io.Serializable {
 	}
 
 	public Prodotto(Sottocategoria sottocategoria, int codiceBarre,
-			String descrizione, Integer idArg, Integer arg1, Integer arg2,
-			Set inserziones, Set listaDesideriProdottis, Set listaSpesaProdottis) {
+			String descrizione, Set inserziones, Set listaDesideriProdottis,
+			Set listaSpesaProdottis) {
 		this.sottocategoria = sottocategoria;
 		this.codiceBarre = codiceBarre;
 		this.descrizione = descrizione;
-		this.idArg = idArg;
-		this.arg1 = arg1;
-		this.arg2 = arg2;
 		this.inserziones = inserziones;
 		this.listaDesideriProdottis = listaDesideriProdottis;
 		this.listaSpesaProdottis = listaSpesaProdottis;
@@ -95,33 +89,6 @@ public class Prodotto implements java.io.Serializable {
 
 	public void setDescrizione(String descrizione) {
 		this.descrizione = descrizione;
-	}
-
-	@Column(name = "ID_Arg")
-	public Integer getIdArg() {
-		return this.idArg;
-	}
-
-	public void setIdArg(Integer idArg) {
-		this.idArg = idArg;
-	}
-
-	@Column(name = "Arg1")
-	public Integer getArg1() {
-		return this.arg1;
-	}
-
-	public void setArg1(Integer arg1) {
-		this.arg1 = arg1;
-	}
-
-	@Column(name = "Arg2")
-	public Integer getArg2() {
-		return this.arg2;
-	}
-
-	public void setArg2(Integer arg2) {
-		this.arg2 = arg2;
 	}
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "prodotto")

@@ -1,8 +1,7 @@
 package hibernate;
 
-// Generated 10-dic-2013 16.19.44 by Hibernate Tools 3.4.0.CR1
+// Generated 19-dic-2013 19.14.54 by Hibernate Tools 3.4.0.CR1
 
-import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Column;
@@ -23,15 +22,15 @@ public class Supermercato implements java.io.Serializable {
 
 	private Integer idSupermercato;
 	private String nome;
-	private BigDecimal latitudine;
-	private BigDecimal longitudine;
+	private Float latitudine;
+	private Float longitudine;
 	private Set inserziones = new HashSet(0);
 
 	public Supermercato() {
 	}
 
-	public Supermercato(String nome, BigDecimal latitudine,
-			BigDecimal longitudine, Set inserziones) {
+	public Supermercato(String nome, Float latitudine, Float longitudine,
+			Set inserziones) {
 		this.nome = nome;
 		this.latitudine = latitudine;
 		this.longitudine = longitudine;
@@ -58,21 +57,21 @@ public class Supermercato implements java.io.Serializable {
 		this.nome = nome;
 	}
 
-	@Column(name = "Latitudine", precision = 10, scale = 7)
-	public BigDecimal getLatitudine() {
+	@Column(name = "Latitudine", precision = 12, scale = 0)
+	public Float getLatitudine() {
 		return this.latitudine;
 	}
 
-	public void setLatitudine(BigDecimal latitudine) {
+	public void setLatitudine(Float latitudine) {
 		this.latitudine = latitudine;
 	}
 
-	@Column(name = "Longitudine", precision = 10, scale = 7)
-	public BigDecimal getLongitudine() {
+	@Column(name = "Longitudine", precision = 12, scale = 0)
+	public Float getLongitudine() {
 		return this.longitudine;
 	}
 
-	public void setLongitudine(BigDecimal longitudine) {
+	public void setLongitudine(Float longitudine) {
 		this.longitudine = longitudine;
 	}
 

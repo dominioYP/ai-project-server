@@ -1,6 +1,6 @@
 package hibernate;
 
-// Generated 10-dic-2013 16.19.44 by Hibernate Tools 3.4.0.CR1
+// Generated 19-dic-2013 19.14.54 by Hibernate Tools 3.4.0.CR1
 
 import java.util.HashSet;
 import java.util.Set;
@@ -48,7 +48,7 @@ public class Sottocategoria implements java.io.Serializable {
 		this.idSottocategoria = idSottocategoria;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "ID_Categoria")
 	public Categoria getCategoria() {
 		return this.categoria;
@@ -67,7 +67,7 @@ public class Sottocategoria implements java.io.Serializable {
 		this.nome = nome;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "sottocategoria")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "sottocategoria")
 	public Set getProdottos() {
 		return this.prodottos;
 	}

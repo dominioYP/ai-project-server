@@ -11,6 +11,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import dati.Dati;
+import dati.InserzioneValidation;
 
 @Configuration
 @ComponentScan(basePackages="ai.server")
@@ -29,6 +30,12 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter{
 	public Dati dati(){
 		return dati.Dati.getInstance();
 	}
+	
+	@Bean
+	public InserzioneValidation inserzioneValidation(){
+		return new InserzioneValidation();
+	}
+	
 	
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {

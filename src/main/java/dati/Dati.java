@@ -4,6 +4,7 @@ package dati;
 
 
 import hibernate.Argomenti;
+import hibernate.ArgomentiInserzione;
 import hibernate.Categoria;
 import hibernate.Inserzione;
 import hibernate.ListaDesideri;
@@ -32,6 +33,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 
 
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -48,6 +50,7 @@ public class Dati {
 	private static volatile Dati istanza;
 
 	private volatile Set<Utente> setUtente = new CopyOnWriteArraySet<Utente>();
+	private volatile Set<ArgomentiInserzione> setArgomentiInserzione = new CopyOnWriteArraySet<ArgomentiInserzione>();
 	private volatile Set<Categoria> setCategoria = new CopyOnWriteArraySet<Categoria>();
 	private volatile Set<ListaSpesaProdotti> setListaSpesaProdotti = new CopyOnWriteArraySet<ListaSpesaProdotti>();
 	private volatile Set<ListaDesideriProdotti> setListaDesideriProdotti = new CopyOnWriteArraySet<ListaDesideriProdotti>();
@@ -85,7 +88,7 @@ public class Dati {
 
 			List<Utente> result = session.createQuery("from Utente").list();
 			setUtente.addAll(result);
-			
+			setArgomentiInserzione.addAll(session.createQuery("from ArgomentiInserzione").list());
 			setCategoria.addAll(session.createQuery("from Categoria").list());
 			setListaSpesaProdotti.addAll(session.createQuery("from ListaSpesaProdotti").list());
 			setListaDesideriProdotti.addAll(session.createQuery("from ListaDesideriProdotti").list());
@@ -133,8 +136,7 @@ public class Dati {
 			tx=session.beginTransaction();
 			if(arg1==null )
 				throw new RuntimeException("tutti gli argomenti devono essere non nulli");
-			Argomenti arg = new Argomenti(arg1);
-			
+			Argomenti arg = new Argomenti(arg1,new HashSet<ArgomentiInserzione>());
 			session.save(arg);
 			
 			session.persist(arg);
@@ -176,32 +178,43 @@ public class Dati {
 		return argomenti;
 	}
 	// si deve fornire l'oggetto settando l'id del vecchio oggetto
-	public void modifyArgomenti(int idargomenti,String arg1){
+	public void modifyArgomenti(int idargomenti,String arg1,Set<ArgomentiInserzione> argomentiinserzione){
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
 		if(idargomenti <= 0 || arg1 == null )
 			throw new RuntimeException("tutti gli argomenti devono essere non nulli");
-		Argomenti argomenti = new Argomenti(arg1);
+		Argomenti argomenti = new Argomenti(arg1,argomentiinserzione);
 		argomenti.setIdArgomenti(idargomenti);
-		boolean trovato = false;
 		try{
 			tx=session.beginTransaction();
 			
 			Iterator<Argomenti> it = setArgomenti.iterator();
-			
+			Argomenti argold=null;
 			for(;it.hasNext();){
 				Argomenti a = it.next();
 				if(a.getIdArgomenti().equals(idargomenti)){
+					argold=a;
 					it.remove();
 					setArgomenti.add(argomenti);
-					trovato= true;
 					break;
 				}
 			}
 			
-			if(!trovato)
+			if(argold==null)
 				throw new RuntimeException("elemento non trovato");
 			session.update(argomenti);
+			
+			for(ArgomentiInserzione ai : setArgomentiInserzione){
+				if(ai.getArgomenti().equals(argold)){
+					setArgomentiInserzione.remove(ai);
+				}
+			}
+			for(ArgomentiInserzione ai : argomentiinserzione){
+				
+				setArgomentiInserzione.add(ai);
+				
+			}
+			
 			
 			tx.commit();
 		}catch(Throwable ex){
@@ -250,20 +263,32 @@ public class Dati {
 		
 	}
 	
-	public void insertInserzione(Utente utente,Supermercato supermercato,Prodotto prodotto,float prezzo,Date dataInizio,Date dataFine,String descrizione,byte [] foto){
+	public Set<Categoria> getCategorie(){
+		
+		Set<Categoria> categorie = new HashSet<Categoria>();
+		for(Categoria c : setCategoria){
+			categorie.add(c);
+		}
+		
+		return categorie;
+		
+	}
+	
+	public int insertInserzione(Utente utente,Supermercato supermercato,Prodotto prodotto,float prezzo,Date dataInizio,Date dataFine,String descrizione,byte [] foto){
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
+		int idInserzione = -1;
 		try{
 			tx=session.beginTransaction();
-			if(utente == null || supermercato == null || prodotto == null || prezzo<=0 || dataInizio == null || dataFine == null || foto == null)
+			if(utente == null || supermercato == null || prodotto == null || prezzo<=0 || dataInizio == null )
 				throw new RuntimeException("errore nell'immissione dei parametri");
-			Inserzione inserzione = new Inserzione(utente, supermercato, prodotto, prezzo, dataInizio, dataFine, descrizione, foto,0,(float)0.0,new HashSet<ValutazioneInserzione>());
+			Inserzione inserzione = new Inserzione(utente, supermercato, prodotto, prezzo, dataInizio, dataFine, descrizione, foto,0,(float)0.0,new HashSet<ValutazioneInserzione>(),new HashSet<ArgomentiInserzione>());
 			
 			session.save(inserzione);
 			
 			session.persist(inserzione);
 			
-			
+			idInserzione=inserzione.getIdInserzione();
 			setInserzione.add(inserzione);
 			
 			for(Utente u : setUtente){
@@ -298,25 +323,25 @@ public class Dati {
 			}
 			session=null;
 		}
-		
+		return idInserzione;
 	}
 	//in ingresso inserzione modificata con id dell'inserzione vecchia
-	public void modifyInserzione(int idinserzione,Utente utente,Supermercato supermercato,Prodotto prodotto,float prezzo,Date dataInizio,Date dataFine,String descrizione,byte[] foto,Set<ValutazioneInserzione> valutazioni){
+	public void modifyInserzione(int idinserzione,Utente utente,Supermercato supermercato,Prodotto prodotto,float prezzo,Date dataInizio,Date dataFine,String descrizione,byte[] foto,Set<ValutazioneInserzione> valutazioni,Set<ArgomentiInserzione> argins){
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
 		boolean trovato = false;
-		if(idinserzione <= 0 || utente == null || supermercato == null || prodotto == null || prezzo <= 0 || dataInizio == null || dataFine == null || descrizione == null || foto == null)
+		if(idinserzione <= 0 || utente == null || supermercato == null || prodotto == null || prezzo <= 0 || dataInizio == null || dataFine == null || descrizione == null || foto == null || argins == null || valutazioni == null)
 			throw new RuntimeException("tutti gli argomenti devono essere non nulli");
-		Inserzione inserzione = new Inserzione(utente, supermercato, prodotto, prezzo, dataInizio, dataFine, descrizione, foto,0,(float)0.0,valutazioni);
+		Inserzione inserzione = new Inserzione(utente, supermercato, prodotto, prezzo, dataInizio, dataFine, descrizione, foto,0,(float)0.0,valutazioni,argins);
 		inserzione.setIdInserzione(idinserzione);
 		try{
 			tx=session.beginTransaction();
 			
 			Iterator<Inserzione> it = setInserzione.iterator();
-			Inserzione i = null;
+			Inserzione iold = null;
 			for(;it.hasNext();){
-				i = it.next();
-				if(i.getIdInserzione().equals(idinserzione)){
+				iold = it.next();
+				if(iold.getIdInserzione().equals(idinserzione)){
 				//	it.remove();
 			//		setInserzione.add(inserzione);
 					trovato= true;
@@ -329,24 +354,28 @@ public class Dati {
 			
 			session.update(inserzione);
 			
-			for(ValutazioneInserzione valutazione : (Set<ValutazioneInserzione>)i.getValutazioneInserziones()){
-				for(ValutazioneInserzione v : setValutazioneInserzione){
-					if(v.equals(valutazione)){
-						setValutazioneInserzione.remove(v);
-						break;
-					}
+			
+			for(ValutazioneInserzione valutazione : setValutazioneInserzione){
+				if(valutazione.getInserzione().equals(iold)){
+					setValutazioneInserzione.remove(valutazione);
 				}
 			}
+			
 			for(ValutazioneInserzione valutazione : valutazioni){
 				setValutazioneInserzione.add(valutazione);
 			}
-		
+			
+			for(ArgomentiInserzione ai : setArgomentiInserzione){
+				if(ai.getInserzione().equals(iold))
+					setArgomentiInserzione.remove(ai);
+			}
+			
 			it.remove();
 			setInserzione.add(inserzione);
 			
 			for(Utente u : setUtente){
-				if(u.equals(i.getUtente())){
-					u.getInserziones().remove(i);
+				if(u.equals(iold.getUtente())){
+					u.getInserziones().remove(iold);
 					break;
 				}
 			}
@@ -359,8 +388,8 @@ public class Dati {
 			}
 			
 			for(Supermercato s : setSupermercato){
-				if(s.equals(i.getSupermercato())){
-					s.getInserziones().remove(i);
+				if(s.equals(iold.getSupermercato())){
+					s.getInserziones().remove(iold);
 					break;
 				}
 			}
@@ -372,8 +401,8 @@ public class Dati {
 			}
 			
 			for(Prodotto p : setProdotto){
-				if(p.equals(i.getProdotto())){
-					p.getInserziones().remove(i);
+				if(p.equals(iold.getProdotto())){
+					p.getInserziones().remove(iold);
 					break;
 				}
 			}
@@ -385,7 +414,9 @@ public class Dati {
 				}
 			}
 			
-			
+			for(ArgomentiInserzione ai : argins){
+				setArgomentiInserzione.add(ai);
+			}
 			
 			tx.commit();
 		}catch(Throwable ex){
@@ -994,26 +1025,25 @@ public class Dati {
 		return ls;
 	}
 	
-	public void insertProdotto(Sottocategoria sottocategoria,int codicebarre,String descrizione,int idarg,int arg1,int arg2){
+	public int insertProdotto(Sottocategoria sottocategoria,int codicebarre,String descrizione){
 		
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
-		
+		int idProdotto=-1;
 		try{
 			tx=session.beginTransaction();
 			
-			if(codicebarre <=0 || descrizione == null || idarg<=0 || arg1 <= 0|| arg2 <= 0 )
+			if(codicebarre <=0 || descrizione == null )
 				throw new RuntimeException("tutti gli argomenti devono essere non nulli");
 				
-			Prodotto prodotto = new Prodotto(sottocategoria,codicebarre, descrizione, idarg, arg1, arg2, new HashSet<Inserzione>(), new HashSet<ListaDesideriProdotti>(),new HashSet<ListaSpesaProdotti>());
-			
+			Prodotto prodotto = new Prodotto(sottocategoria,codicebarre, descrizione, new HashSet<Inserzione>(), new HashSet<ListaDesideriProdotti>(),new HashSet<ListaSpesaProdotti>());
 			
 			
 			session.save(prodotto);
 			
 			session.persist(prodotto);
 			
-			
+			idProdotto = prodotto.getIdProdotto();
 			setProdotto.add(prodotto);
 			
 			for(Sottocategoria s : setSottocategoria){
@@ -1035,6 +1065,7 @@ public class Dati {
 			}
 			session=null;
 		}
+		return idProdotto;
 	}
 	
 	public void modifyProdotto(Sottocategoria sottocategoria,int idprodotto,int codicebarre,String descrizione,int idarg,int arg1,int arg2,Set<Inserzione> inserzioni,Set<ListaDesideriProdotti> desideriprodotti,Set<ListaSpesaProdotti> spesaprodotti){
@@ -1047,7 +1078,7 @@ public class Dati {
 		if(idprodotto <= 0 || codicebarre<=0 || descrizione == null || idarg <= 0 || arg1<= 0 || arg2<=0 || inserzioni == null || desideriprodotti == null || spesaprodotti == null)
 			throw new RuntimeException("tutti gli argomenti devono essere immessi");
 		
-		Prodotto prodotto = new Prodotto(sottocategoria,codicebarre, descrizione, idarg, arg1, arg2, new HashSet<Inserzione>(), new HashSet<ListaDesideriProdotti>(), new HashSet<ListaSpesaProdotti>());
+		Prodotto prodotto = new Prodotto(sottocategoria,codicebarre, descrizione,new HashSet<Inserzione>(), new HashSet<ListaDesideriProdotti>(), new HashSet<ListaSpesaProdotti>());
 		prodotto.setIdProdotto(idprodotto);
 		
 		for(Inserzione inserzione : inserzioni){
@@ -1152,18 +1183,24 @@ public class Dati {
 				
 				session.delete(prodotto);
 				
-				for(Inserzione inserzione : (Set<Inserzione>) prodotto.getInserziones()){
-					inserzione.setProdotto(null);
+				
+				for(Inserzione i : setInserzione){
+					if(i.getProdotto().equals(prodotto)){
+						setInserzione.remove(i);
+					}
 				}
 				
-				for(ListaDesideriProdotti ldp : (Set<ListaDesideriProdotti>)prodotto.getListaDesideriProdottis()){
-					ldp.setProdotto(null);
+				for(ListaDesideriProdotti ldp : setListaDesideriProdotti){
+					if(ldp.getProdotto().equals(prodotto))
+						setListaDesideriProdotti.remove(ldp);
+				}
+				
+				for(ListaSpesaProdotti lsp : setListaSpesaProdotti){
+					if(lsp.getProdotto().equals(prodotto))
+						setListaSpesaProdotti.remove(lsp);
 				}
 				
 			
-				for(ListaSpesaProdotti lsp : (Set<ListaSpesaProdotti>)prodotto.getListaDesideriProdottis()){
-					lsp.setProdotto(null);
-				}
 			
 				tx.commit();
 				
@@ -1495,11 +1532,11 @@ public class Dati {
 		
 	}
 	
-	public void insertSupermercato(String nome,BigDecimal latitudine,BigDecimal longitudine){
+	public int insertSupermercato(String nome,float latitudine,float longitudine){
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
-		
-		if(nome == null || latitudine == null || longitudine == null)
+		int idSupermercato=-1;
+		if(nome == null )
 			throw new RuntimeException("tutti gli argomenti devono essere non nulli");
 		
 		Supermercato supermercato = new Supermercato(nome, latitudine, longitudine, new HashSet<Inserzione>());
@@ -1514,6 +1551,8 @@ public class Dati {
 			
 			setSupermercato.add(supermercato);
 			
+			idSupermercato=supermercato.getIdSupermercato();
+			
 			tx.commit();
 		}catch(Throwable ex){
 			if(tx!=null)
@@ -1525,15 +1564,15 @@ public class Dati {
 			}
 			session=null;
 		}
-		
+		return idSupermercato;
 	}
 	
-	public void modifySupermercato(int idsupermercato,String nome,BigDecimal latitudine,BigDecimal longitudine,Set<Inserzione> inserzioni){
+	public void modifySupermercato(int idsupermercato,String nome,float latitudine,float longitudine,Set<Inserzione> inserzioni){
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
 		Supermercato sold = null;
 		
-		if(idsupermercato<=0 || nome == null || latitudine == null || longitudine == null || inserzioni == null)
+		if(idsupermercato<=0 || nome == null  || inserzioni == null)
 			throw new RuntimeException("tutti gli argomenti devono essere non nulli");
 		
 		for(Supermercato s : setSupermercato){
@@ -1555,24 +1594,16 @@ public class Dati {
 			
 			session.update(supermercato);
 			
-			for(Inserzione i : (Set<Inserzione>) sold.getInserziones()){
-				for(Inserzione ins : setInserzione){
-					if(ins.equals(i)){
-						ins.setSupermercato(null);
-						break;
-					}
-				}
+			for(Inserzione i : setInserzione){
+				if(i.getSupermercato().equals(sold))
+					setInserzione.remove(i);
 			}
 			
 			setSupermercato.remove(sold);
 			
-			for(Inserzione i : (Set<Inserzione>) supermercato.getInserziones()){
-				for(Inserzione ins : setInserzione){
-					if(ins.equals(i)){
-						ins.setSupermercato(supermercato);
-						break;
-					}
-				}
+			for(Inserzione i : inserzioni){
+				i.setSupermercato(supermercato);
+				setInserzione.add(i);
 			}
 			
 			setSupermercato.add(supermercato);
@@ -1711,117 +1742,118 @@ public class Dati {
 			tx=session.beginTransaction();
 			
 			session.update(utente);
+			// in questo caso conviene, perchè l'inserzione ha sempre valore
+			for(Inserzione i : setInserzione){
+				if(i.getUtente().equals(uold))
+					i.setUtente(null);
+			}
 			
+			for(ValutazioneInserzione v : setValutazioneInserzione){
+				if(v.getUtenteByIdUtenteInserzionista().equals(uold)){
+					v.setUtenteByIdUtenteInserzionista(null);
+				}
+				if(v.getUtenteByIdUtenteValutatore().equals(uold))
+					v.setUtenteByIdUtenteValutatore(null);
+			}
 
-			for(Inserzione i : (Set<Inserzione>)uold.getInserziones()){
-				for(Inserzione ins : setInserzione){
-					if(ins.equals(i)){
-						ins.setUtente(null);
-						break;
-					}
-				}
+			for(ListaSpesa ls : setListaSpesa){
+				if(ls.getUtente().equals(uold))
+					setListaSpesa.remove(ls);
 			}
 			
-			for(ValutazioneInserzione v : (Set<ValutazioneInserzione>)uold.getValutazioneInserzionesForIdUtenteInserzionista()){
-				for(ValutazioneInserzione val : setValutazioneInserzione){
-					if(val.equals(v)){
-						val.setUtenteByIdUtenteInserzionista(null);
-						break;
-					}
-				}
-			}
-			for(ValutazioneInserzione v : (Set<ValutazioneInserzione>)uold.getValutazioneInserzionesForIdUtenteValutatore()){
-				for(ValutazioneInserzione val : setValutazioneInserzione){
-					if(val.equals(v)){
-						val.setUtenteByIdUtenteValutatore(null);
-						break;
-					}
-				}
+			for(ListaDesideri ld : setListaDesideri){
+				if(ld.getUtente().equals(uold))
+					setListaDesideri.remove(ld);
 			}
 			
-			for(ListaSpesa ls : (Set<ListaSpesa>)uold.getListaSpesas()){
-				for(ListaSpesa lis : setListaSpesa){
-					if(lis.equals(ls)){
-						lis.setUtente(null);
-						break;
-					}
-				}
+			for(Profilo p : setProfilo){
+				if(p.getUtente().equals(uold))
+					setProfilo.remove(p);
 			}
 			
-			for(ListaDesideri ld : (Set<ListaDesideri>)uold.getListaDesideris()){
-				for(ListaDesideri ldes : setListaDesideri){
-					if(ldes.equals(ld)){
-						ldes.setUtente(null);
-						break;
-					}
-				}
-			}
-			
-			for(Profilo p :(Set<Profilo>)uold.getProfilos()){
-				for(Profilo pro : setProfilo){
-					if(pro.equals(p)){
-						pro.setUtente(null);
-						break;
-					}
-				}
-			}
 			
 			setUtente.remove(uold);
 			
 			setUtente.add(utente);
+			boolean trovato = false;
 			
 			for(ValutazioneInserzione v : valutazioniinserzionista){
 				for(ValutazioneInserzione val : setValutazioneInserzione){
 					if(val.equals(v)){
 						val.setUtenteByIdUtenteInserzionista(utente);
+						trovato=true;
 						break;
 					}
 				}
+				if(!trovato){
+					setValutazioneInserzione.add(v);
+				}
+				trovato=false;
 			}
 			
 			for(ValutazioneInserzione v : valutazionivalutatore){
 				for(ValutazioneInserzione val : setValutazioneInserzione){
 					if(val.equals(v)){
 						val.setUtenteByIdUtenteValutatore(utente);
+						trovato=true;
 						break;
 					}
 				}
+				if(!trovato)
+					setValutazioneInserzione.add(v);
+				trovato=false;
 			}
 			
 			for(Inserzione i : inserzioni){
 				for(Inserzione ins : setInserzione){
 					if(ins.equals(i)){
 						ins.setUtente(utente);
+						trovato=true;
 						break;
 					}
 				}
+				if(!trovato)
+					setInserzione.add(i);
+				trovato=false;
 			}
 			
 			for(ListaDesideri l : listadesideris){
 				for(ListaDesideri ld : setListaDesideri){
 					if(ld.equals(l)){
 						ld.setUtente(utente);
+						trovato=true;
 						break;
 					}
 				}
+				if(!trovato)
+					setListaDesideri.add(l);
+				trovato=false;
 			}
 			
 			for(ListaSpesa l : listaspesas){
 				for(ListaSpesa ls : setListaSpesa){
 					if(ls.equals(l)){
 						ls.setUtente(utente);
+						trovato=true;
 						break;
 					}
 				}
+				if(!trovato)
+					setListaSpesa.add(l);
+				trovato=false;
 			}
 			
 			for(Profilo p : profili){
 				for(Profilo pro : setProfilo){
 					if(pro.equals(p)){
 						pro.setUtente(utente);
+						trovato=true;
 						break;
 					}
 				}
+				if(!trovato)
+					setProfilo.add(p);
+				trovato=false;
 			}
 			
 			
@@ -1860,57 +1892,32 @@ public class Dati {
 			
 			session.delete(uold);
 			
-			for(Inserzione i : (Set<Inserzione>)uold.getInserziones()){
-				for(Inserzione ins : setInserzione){
-					if(ins.equals(i)){
-						ins.setUtente(null);
-						break;
-					}
-				}
+			for(Inserzione i : setInserzione){
+				if(i.getUtente().equals(uold))
+					i.setUtente(null);
 			}
 			
-			for(ValutazioneInserzione v : (Set<ValutazioneInserzione>)uold.getValutazioneInserzionesForIdUtenteInserzionista()){
-				for(ValutazioneInserzione val : setValutazioneInserzione){
-					if(val.equals(v)){
-						val.setUtenteByIdUtenteInserzionista(null);
-						break;
-					}
+			for(ValutazioneInserzione v : setValutazioneInserzione){
+				if(v.getUtenteByIdUtenteInserzionista().equals(uold)){
+					v.setUtenteByIdUtenteInserzionista(null);
 				}
+				if(v.getUtenteByIdUtenteValutatore().equals(uold))
+					v.setUtenteByIdUtenteValutatore(null);
 			}
-			for(ValutazioneInserzione v : (Set<ValutazioneInserzione>)uold.getValutazioneInserzionesForIdUtenteValutatore()){
-				for(ValutazioneInserzione val : setValutazioneInserzione){
-					if(val.equals(v)){
-						val.setUtenteByIdUtenteValutatore(null);
-						break;
-					}
-				}
+
+			for(ListaSpesa ls : setListaSpesa){
+				if(ls.getUtente().equals(uold))
+					setListaSpesa.remove(ls);
 			}
 			
-			for(ListaSpesa ls : (Set<ListaSpesa>)uold.getListaSpesas()){
-				for(ListaSpesa lis : setListaSpesa){
-					if(lis.equals(ls)){
-						lis.setUtente(null);
-						break;
-					}
-				}
+			for(ListaDesideri ld : setListaDesideri){
+				if(ld.getUtente().equals(uold))
+					setListaDesideri.remove(ld);
 			}
 			
-			for(ListaDesideri ld : (Set<ListaDesideri>)uold.getListaDesideris()){
-				for(ListaDesideri ldes : setListaDesideri){
-					if(ldes.equals(ld)){
-						ldes.setUtente(null);
-						break;
-					}
-				}
-			}
-			
-			for(Profilo p :(Set<Profilo>)uold.getProfilos()){
-				for(Profilo pro : setProfilo){
-					if(pro.equals(p)){
-						pro.setUtente(null);
-						break;
-					}
-				}
+			for(Profilo p : setProfilo){
+				if(p.getUtente().equals(uold))
+					setProfilo.remove(p);
 			}
 			
 			setUtente.remove(uold);

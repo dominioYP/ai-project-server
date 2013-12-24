@@ -42,6 +42,7 @@
 	<td><form:input path="email"/></td>
 	</tr>
 	<tr>
+	
 	<td><input type="submit" value="Submit">
 	</td>
 	</tr>
