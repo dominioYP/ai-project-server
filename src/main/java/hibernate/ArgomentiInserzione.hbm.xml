@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 19-dic-2013 19.14.54 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="hibernate.ArgomentiInserzione" table="argomenti_inserzione" catalog="supermercati">
+        <composite-id name="id" class="hibernate.ArgomentiInserzioneId">
+            <key-property name="idArgomentiInserzione" type="int">
+                <column name="ID_Argomenti_Inserzione" />
+            </key-property>
+            <key-property name="idInsezione" type="int">
+                <column name="ID_Insezione" />
+            </key-property>
+            <key-property name="idArgomento" type="int">
+                <column name="ID_Argomento" />
+            </key-property>
+        </composite-id>
+        <many-to-one name="inserzione" class="hibernate.Inserzione" update="false" insert="false" fetch="select">
+            <column name="ID_Insezione" not-null="true" />
+        </many-to-one>
+        <many-to-one name="argomenti" class="hibernate.Argomenti" update="false" insert="false" fetch="select">
+            <column name="ID_Argomento" not-null="true" />
+        </many-to-one>
+        <property name="argVal" type="java.lang.Integer">
+            <column name="Arg_Val" />
+        </property>
+    </class>
+</hibernate-mapping>
