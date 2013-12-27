@@ -1,7 +1,28 @@
 /**
  * 
  */
-
+(function getSottocategorie(){
+	var selected=$('#categorie option:selected').text();
+	selected = $("#categorie option:selected").text();
+	path=window.location.pathname;
+	path=path+"/sottocategorie/"+selected;
+	
+    $.ajax({type:"GET",url: path,contentType:"application/json"}).done(function( data ) {
+    	var select = $("#sottoCategorie");
+    	var options;
+    	if(select.prop){
+    		options = select.prop('options');
+    	}else{
+    		options = select.attr('options');
+    	}
+    	$('option',select).remove();
+    	
+    	$.each(data,function(val,text){
+    		options[options.length] = new Option(text, text);
+    	});
+    	
+    });
+})();
 $('#categorie').change(function(){
 	var selected= "";
 	selected = $("#categorie option:selected").text();
@@ -121,7 +142,7 @@ function doneTyping(){
 	});
 }
 
-$('#submit').click(function(){
+$('#insertionForm').submit(function(event){
 	var supermercato = $('#supermercato').val();
 	supermercato = supermercato.split(/\s*-\s*/);
 	$('#supermercato').val(supermercato[0]);
@@ -132,10 +153,14 @@ $('#submit').click(function(){
 			$.ajax({
 				type:'POST',
 				url:window.location.pathname,
-				data: $("form").serialize() +"&lat="+results[0].geometry.location.lat()+"&lng"+results[0].geometry.location.lng(),
+				data: $("form").serialize() +"&lat="+results[0].geometry.location.lat()+"&lng="+results[0].geometry.location.lng(),
+				success:function(response){
+					$(":root").html(response);
+				}
 			});
 		}else{
 			alert("errore nel submit");
 		}
 	});
+	event.preventDefault();
 });

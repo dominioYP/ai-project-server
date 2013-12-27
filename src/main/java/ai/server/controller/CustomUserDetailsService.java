@@ -47,7 +47,7 @@ public class CustomUserDetailsService implements UserDetailsService{
 		
 		HashSet<GrantedAuthority> aut = new HashSet<GrantedAuthority>();
 		aut.add(new SimpleGrantedAuthority("ROLE_USER"));
-		return new User(utente.getNickname(), utente.getPassword(), true, true, true, true, aut);
+		return new User(utente.getMail(), utente.getPassword(), true, true, true, true, aut);
 		
 		// TODO Auto-generated method stub
 		

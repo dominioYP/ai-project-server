@@ -114,6 +114,7 @@ public class InserzioneController {
 	
 	@RequestMapping(value="/inserzione",method= RequestMethod.POST)
 	public ModelAndView processInserzione(@Valid InserzioneForm inserzioneForm,BindingResult result,Principal principal){
+		
 		boolean inserimentoSupermercato=false;
 		boolean inserimentoInserzione=false;
 		boolean inserimentoProdotto=false;
@@ -123,7 +124,7 @@ public class InserzioneController {
 		int idProdotto = -1;
 		int idSupermercato = -1;
 		try{	
-			inserzioneValidator.validate(inserzioneForm, result);
+			inserzioneValidator.validate(inserzioneForm, result,principal);
 			if(result.hasErrors()){
 				return new ModelAndView("inserzione");
 			}
@@ -134,13 +135,19 @@ public class InserzioneController {
 			for(Supermercato s : dati.getSupermercati()){
 				if(s.getNome().equals(inserzioneForm.getSupermercato())){
 					supermercato=s;
+					break;
 				}
 			}
 			
 			if(supermercato==null){
-				supermercato=new Supermercato(inserzioneForm.getSupermercato(), inserzioneForm.getLat(), inserzioneForm.getLng(), new HashSet<Inserzione>());
 				idSupermercato=dati.insertSupermercato(inserzioneForm.getSupermercato(), inserzioneForm.getLat(), inserzioneForm.getLng());
 				inserimentoSupermercato=true;
+				for(Supermercato s : dati.getSupermercati()){
+					if(s.getIdSupermercato().equals(idSupermercato)){
+						supermercato=s;
+						break;
+					}
+				}
 			}
 			for(Utente u : dati.getUtenti()){
 				if(u.getMail().equals(principal.getName())){
@@ -150,7 +157,6 @@ public class InserzioneController {
 			}
 			boolean trovato = false;
 			for(Prodotto p : dati.getProdotti()){
-				
 				if(p.getCodiceBarre()==inserzioneForm.getCodiceBarre()){
 					trovato=true;		
 						SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
@@ -159,13 +165,10 @@ public class InserzioneController {
 							idInsererzione=dati.insertInserzione(utente, supermercato, p, inserzioneForm.getPrezzo(), sdf.parse(inserzioneForm.getDataInizio()), sdf.parse(inserzioneForm.getDataFine()), inserzioneForm.getDescrizione(),null);
 							inserimentoInserzione=true;
 						}else{
-							
 							idInsererzione=dati.insertInserzione(utente, supermercato, p, inserzioneForm.getPrezzo(), sdf.parse(inserzioneForm.getDataInizio()), null, inserzioneForm.getDescrizione(), null);
 							inserimentoInserzione=true;
 						}
-					trovato=true;	
 				}
-				
 			}
 		
 			if(!trovato){
@@ -176,12 +179,25 @@ public class InserzioneController {
 						break;
 					}
 				}
-				
 				idProdotto=dati.insertProdotto(sottocategoria, inserzioneForm.getCodiceBarre(), inserzioneForm.getDescrizione());
 				inserimentoProdotto=true;
+				for(Prodotto p : dati.getProdotti()){
+					if(p.getIdProdotto().equals(idProdotto)){
+						SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+						if(inserzioneForm.getDataFine()!=null&&!(inserzioneForm.getDataFine().equals(""))){
+							
+							idInsererzione=dati.insertInserzione(utente, supermercato, p, inserzioneForm.getPrezzo(), sdf.parse(inserzioneForm.getDataInizio()), sdf.parse(inserzioneForm.getDataFine()), inserzioneForm.getDescrizione(),null);
+							inserimentoInserzione=true;
+						}else{
+							idInsererzione=dati.insertInserzione(utente, supermercato, p, inserzioneForm.getPrezzo(), sdf.parse(inserzioneForm.getDataInizio()), null, inserzioneForm.getDescrizione(), null);
+							inserimentoInserzione=true;
+						}
+						break;
+					}
+				}
 			}
 		}catch(Exception e){
-			System.out.println("inserzione : "+inserimentoInserzione+" prodotto : "+inserimentoProdotto+" supermercato : "+inserimentoSupermercato);
+			System.out.println(inserimentoInserzione+" "+inserimentoProdotto+" "+inserimentoSupermercato);
 			if(inserimentoInserzione){
 				dati.deleteInserzione(idInsererzione);
 			}
@@ -191,7 +207,8 @@ public class InserzioneController {
 			if(inserimentoSupermercato){
 				dati.deleteSupermercato(idSupermercato);
 			}
-			return new ModelAndView("inserzione","error",e.toString());
+			e.printStackTrace();
+			return new ModelAndView("inserzione","error","errore nell'immissione del form");
 		}
 		
 		return new ModelAndView("inserzionesuccess","inserzione",inserzioneForm);

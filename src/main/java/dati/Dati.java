@@ -1231,6 +1231,15 @@ public class Dati {
 		return prodotti;
 	}
 	
+	public Set<Inserzione> getInserzioni(){
+		HashSet<Inserzione> inserzioni = new HashSet<Inserzione>();
+		
+		for(Inserzione i : setInserzione){
+			inserzioni.add(i);
+		}
+		return inserzioni;
+	}
+	
 	public Set<Profilo> getProfili(){
 		HashSet<Profilo> profili = new HashSet<Profilo>();
 		
@@ -1560,6 +1569,7 @@ public class Dati {
 			throw new RuntimeException(ex);
 		}finally{
 			if(session!=null && session.isOpen()){
+				session.flush();
 				session.close();
 			}
 			session=null;

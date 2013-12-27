@@ -20,7 +20,7 @@
     </style>
 </head>
 <body>
-<form:form method="post" action="inserzione" commandName="inserzioneForm">
+<form:form id="insertionForm" method="post" action="inserzione" commandName="inserzioneForm">
 	<% String error = (String) request.getAttribute("error");
 	if(null != error ) {%>
 		<div id="hibernate.error" class="errors"><%= error %></div>
@@ -94,7 +94,7 @@
 	
 	<tr><td><div id="map-canvas"></div></td></tr>
 	<tr>
-	<td><form:button id="submit" >Invia</form:button>
+	<td><input type="submit" value="Invia">
 	</td>
 	
 	</tr>

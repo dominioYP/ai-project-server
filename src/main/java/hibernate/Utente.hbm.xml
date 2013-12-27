@@ -26,37 +26,37 @@
         <property name="numeroCasuale" type="string">
             <column name="NumeroCasuale" length="45" />
         </property>
-        <set name="valutazioneInserzionesForIdUtenteInserzionista" table="valutazione_inserzione" inverse="true" lazy="true" fetch="select">
+        <set name="valutazioneInserzionesForIdUtenteInserzionista" table="valutazione_inserzione" inverse="true" lazy="false" fetch="select">
             <key>
                 <column name="ID_UtenteInserzionista" />
             </key>
             <one-to-many class="hibernate.ValutazioneInserzione" />
         </set>
-        <set name="valutazioneInserzionesForIdUtenteValutatore" table="valutazione_inserzione" inverse="true" lazy="true" fetch="select">
+        <set name="valutazioneInserzionesForIdUtenteValutatore" table="valutazione_inserzione" inverse="true" lazy="false" fetch="select">
             <key>
                 <column name="ID_UtenteValutatore" />
             </key>
             <one-to-many class="hibernate.ValutazioneInserzione" />
         </set>
-        <set name="listaSpesas" table="lista_spesa" inverse="true" lazy="true" fetch="select">
+        <set name="listaSpesas" table="lista_spesa" inverse="true" lazy="false" fetch="select">
             <key>
                 <column name="ID_Utente" not-null="true" />
             </key>
             <one-to-many class="hibernate.ListaSpesa" />
         </set>
-        <set name="inserziones" table="inserzione" inverse="true" lazy="true" fetch="select">
+        <set name="inserziones" table="inserzione" inverse="true" lazy="false" fetch="select">
             <key>
                 <column name="ID_Utente" />
             </key>
             <one-to-many class="hibernate.Inserzione" />
         </set>
-        <set name="profilos" table="profilo" inverse="true" lazy="true" fetch="select">
+        <set name="profilos" table="profilo" inverse="true" lazy="false" fetch="select">
             <key>
                 <column name="ID_Utente" unique="true" />
             </key>
             <one-to-many class="hibernate.Profilo" />
         </set>
-        <set name="listaDesideris" table="lista_desideri" inverse="true" lazy="true" fetch="select">
+        <set name="listaDesideris" table="lista_desideri" inverse="true" lazy="false" fetch="select">
             <key>
                 <column name="ID_Utente" not-null="true" />
             </key>

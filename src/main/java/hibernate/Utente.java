@@ -128,7 +128,7 @@ public class Utente implements java.io.Serializable {
 		this.numeroCasuale = numeroCasuale;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "utenteByIdUtenteInserzionista")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "utenteByIdUtenteInserzionista")
 	public Set getValutazioneInserzionesForIdUtenteInserzionista() {
 		return this.valutazioneInserzionesForIdUtenteInserzionista;
 	}
@@ -138,7 +138,7 @@ public class Utente implements java.io.Serializable {
 		this.valutazioneInserzionesForIdUtenteInserzionista = valutazioneInserzionesForIdUtenteInserzionista;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "utenteByIdUtenteValutatore")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "utenteByIdUtenteValutatore")
 	public Set getValutazioneInserzionesForIdUtenteValutatore() {
 		return this.valutazioneInserzionesForIdUtenteValutatore;
 	}
@@ -148,7 +148,7 @@ public class Utente implements java.io.Serializable {
 		this.valutazioneInserzionesForIdUtenteValutatore = valutazioneInserzionesForIdUtenteValutatore;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "utente")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "utente")
 	public Set getListaSpesas() {
 		return this.listaSpesas;
 	}
@@ -157,7 +157,7 @@ public class Utente implements java.io.Serializable {
 		this.listaSpesas = listaSpesas;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "utente")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "utente")
 	public Set getInserziones() {
 		return this.inserziones;
 	}
@@ -166,7 +166,7 @@ public class Utente implements java.io.Serializable {
 		this.inserziones = inserziones;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "utente")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "utente")
 	public Set getProfilos() {
 		return this.profilos;
 	}
@@ -175,7 +175,7 @@ public class Utente implements java.io.Serializable {
 		this.profilos = profilos;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "utente")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "utente")
 	public Set getListaDesideris() {
 		return this.listaDesideris;
 	}
