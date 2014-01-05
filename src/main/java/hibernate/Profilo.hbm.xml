@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
-<!-- Generated 19-dic-2013 19.14.54 by Hibernate Tools 3.4.0.CR1 -->
+<!-- Generated 1-gen-2014 19.41.13 by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
     <class name="hibernate.Profilo" table="profilo" catalog="supermercati">
         <id name="idProfilo" type="java.lang.Integer">

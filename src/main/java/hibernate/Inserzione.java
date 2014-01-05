@@ -1,6 +1,6 @@
 package hibernate;
 
-// Generated 19-dic-2013 19.14.54 by Hibernate Tools 3.4.0.CR1
+// Generated 1-gen-2014 19.41.13 by Hibernate Tools 3.4.0.CR1
 
 import java.util.Date;
 import java.util.HashSet;
@@ -33,7 +33,7 @@ public class Inserzione implements java.io.Serializable {
 	private Date dataInizio;
 	private Date dataFine;
 	private String descrizione;
-	private byte[] foto;
+	private String foto;
 	private Integer numeroValutazioni;
 	private Float totaleVoti;
 	private Set valutazioneInserziones = new HashSet(0);
@@ -44,7 +44,7 @@ public class Inserzione implements java.io.Serializable {
 
 	public Inserzione(Utente utente, Supermercato supermercato,
 			Prodotto prodotto, Float prezzo, Date dataInizio, Date dataFine,
-			String descrizione, byte[] foto, Integer numeroValutazioni,
+			String descrizione, String foto, Integer numeroValutazioni,
 			Float totaleVoti, Set valutazioneInserziones,
 			Set argomentiInserziones) {
 		this.utente = utente;
@@ -72,7 +72,7 @@ public class Inserzione implements java.io.Serializable {
 		this.idInserzione = idInserzione;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "ID_Utente")
 	public Utente getUtente() {
 		return this.utente;
@@ -82,7 +82,7 @@ public class Inserzione implements java.io.Serializable {
 		this.utente = utente;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "ID_Supermercato")
 	public Supermercato getSupermercato() {
 		return this.supermercato;
@@ -92,7 +92,7 @@ public class Inserzione implements java.io.Serializable {
 		this.supermercato = supermercato;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "ID_Prodotto")
 	public Prodotto getProdotto() {
 		return this.prodotto;
@@ -140,12 +140,12 @@ public class Inserzione implements java.io.Serializable {
 		this.descrizione = descrizione;
 	}
 
-	@Column(name = "Foto")
-	public byte[] getFoto() {
+	@Column(name = "Foto", length = 200)
+	public String getFoto() {
 		return this.foto;
 	}
 
-	public void setFoto(byte[] foto) {
+	public void setFoto(String foto) {
 		this.foto = foto;
 	}
 
@@ -167,7 +167,7 @@ public class Inserzione implements java.io.Serializable {
 		this.totaleVoti = totaleVoti;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "inserzione")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "inserzione")
 	public Set getValutazioneInserziones() {
 		return this.valutazioneInserziones;
 	}
@@ -176,7 +176,7 @@ public class Inserzione implements java.io.Serializable {
 		this.valutazioneInserziones = valutazioneInserziones;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "inserzione")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "inserzione")
 	public Set getArgomentiInserziones() {
 		return this.argomentiInserziones;
 	}

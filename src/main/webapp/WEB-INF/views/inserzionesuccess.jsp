@@ -27,6 +27,10 @@
 		<td>Data Inserzione</td>
 		<td><%= inserzione.getDataInizio() %></td>
 	</tr>
+	<tr>
+		<td>Immagine</td>
+		<td><img alt="" src="<%= inserzione.getFoto() %>"></td>
+	</tr>
 	
 </table>
 

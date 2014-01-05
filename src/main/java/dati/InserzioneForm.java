@@ -10,8 +10,18 @@ public class InserzioneForm {
 	@Size(min= 5,max=50)
 	private String descrizione;
 	
-	private int codiceBarre;
+	private long codiceBarre;
 	
+	private String foto;
+	
+	public String getFoto() {
+		return foto;
+	}
+
+	public void setFoto(String foto) {
+		this.foto = foto;
+	}
+
 	@NotEmpty
 	private String categoria;
 	
@@ -77,11 +87,11 @@ public class InserzioneForm {
 		this.descrizione = descrizione;
 	}
 
-	public int getCodiceBarre() {
+	public long getCodiceBarre() {
 		return codiceBarre;
 	}
 
-	public void setCodiceBarre(int codiceBarre) {
+	public void setCodiceBarre(long codiceBarre) {
 		this.codiceBarre = codiceBarre;
 	}
 

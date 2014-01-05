@@ -1,6 +1,6 @@
 package hibernate;
 
-// Generated 19-dic-2013 19.14.54 by Hibernate Tools 3.4.0.CR1
+// Generated 1-gen-2014 19.41.13 by Hibernate Tools 3.4.0.CR1
 
 import java.util.HashSet;
 import java.util.Set;
@@ -25,7 +25,7 @@ public class Prodotto implements java.io.Serializable {
 
 	private Integer idProdotto;
 	private Sottocategoria sottocategoria;
-	private int codiceBarre;
+	private long codiceBarre;
 	private String descrizione;
 	private Set inserziones = new HashSet(0);
 	private Set listaDesideriProdottis = new HashSet(0);
@@ -34,14 +34,14 @@ public class Prodotto implements java.io.Serializable {
 	public Prodotto() {
 	}
 
-	public Prodotto(Sottocategoria sottocategoria, int codiceBarre,
+	public Prodotto(Sottocategoria sottocategoria, long codiceBarre,
 			String descrizione) {
 		this.sottocategoria = sottocategoria;
 		this.codiceBarre = codiceBarre;
 		this.descrizione = descrizione;
 	}
 
-	public Prodotto(Sottocategoria sottocategoria, int codiceBarre,
+	public Prodotto(Sottocategoria sottocategoria, long codiceBarre,
 			String descrizione, Set inserziones, Set listaDesideriProdottis,
 			Set listaSpesaProdottis) {
 		this.sottocategoria = sottocategoria;
@@ -63,7 +63,7 @@ public class Prodotto implements java.io.Serializable {
 		this.idProdotto = idProdotto;
 	}
 
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_SottoCategoria", nullable = false)
 	public Sottocategoria getSottocategoria() {
 		return this.sottocategoria;
@@ -74,11 +74,11 @@ public class Prodotto implements java.io.Serializable {
 	}
 
 	@Column(name = "CodiceBarre", unique = true, nullable = false)
-	public int getCodiceBarre() {
+	public long getCodiceBarre() {
 		return this.codiceBarre;
 	}
 
-	public void setCodiceBarre(int codiceBarre) {
+	public void setCodiceBarre(long codiceBarre) {
 		this.codiceBarre = codiceBarre;
 	}
 
@@ -91,7 +91,7 @@ public class Prodotto implements java.io.Serializable {
 		this.descrizione = descrizione;
 	}
 
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "prodotto")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "prodotto")
 	public Set getInserziones() {
 		return this.inserziones;
 	}
@@ -100,7 +100,7 @@ public class Prodotto implements java.io.Serializable {
 		this.inserziones = inserziones;
 	}
 
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "prodotto")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "prodotto")
 	public Set getListaDesideriProdottis() {
 		return this.listaDesideriProdottis;
 	}
@@ -109,7 +109,7 @@ public class Prodotto implements java.io.Serializable {
 		this.listaDesideriProdottis = listaDesideriProdottis;
 	}
 
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "prodotto")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "prodotto")
 	public Set getListaSpesaProdottis() {
 		return this.listaSpesaProdottis;
 	}

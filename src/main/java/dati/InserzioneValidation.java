@@ -31,10 +31,10 @@ public class InserzioneValidation {
 					"Descrizione troppo corta, deve essere almeno di 10 caratteri");
 		}
 		
-		if(Integer.toString(inserzione.getCodiceBarre()).length()<5){
+		if(Long.toString(inserzione.getCodiceBarre()).length()!=13){
 			errors.rejectValue("codiceBarre", 
 					"lengthOfCodiceBarre.InserzioneForm.codiceBarre", 
-					"Codice a barre troppo corto, deve essere almeno di 5 caratteri");
+					"Il codice a barre deve avere 13 cifre");
 		}
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		try{

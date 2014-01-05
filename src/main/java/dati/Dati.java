@@ -274,7 +274,7 @@ public class Dati {
 		
 	}
 	
-	public int insertInserzione(Utente utente,Supermercato supermercato,Prodotto prodotto,float prezzo,Date dataInizio,Date dataFine,String descrizione,byte [] foto){
+	public int insertInserzione(Utente utente,Supermercato supermercato,Prodotto prodotto,float prezzo,Date dataInizio,Date dataFine,String descrizione,String foto){
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
 		int idInserzione = -1;
@@ -326,7 +326,7 @@ public class Dati {
 		return idInserzione;
 	}
 	//in ingresso inserzione modificata con id dell'inserzione vecchia
-	public void modifyInserzione(int idinserzione,Utente utente,Supermercato supermercato,Prodotto prodotto,float prezzo,Date dataInizio,Date dataFine,String descrizione,byte[] foto,Set<ValutazioneInserzione> valutazioni,Set<ArgomentiInserzione> argins){
+	public void modifyInserzione(int idinserzione,Utente utente,Supermercato supermercato,Prodotto prodotto,float prezzo,Date dataInizio,Date dataFine,String descrizione,String foto,Set<ValutazioneInserzione> valutazioni,Set<ArgomentiInserzione> argins){
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
 		boolean trovato = false;
@@ -1025,7 +1025,7 @@ public class Dati {
 		return ls;
 	}
 	
-	public int insertProdotto(Sottocategoria sottocategoria,int codicebarre,String descrizione){
+	public int insertProdotto(Sottocategoria sottocategoria,long codicebarre,String descrizione){
 		
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;

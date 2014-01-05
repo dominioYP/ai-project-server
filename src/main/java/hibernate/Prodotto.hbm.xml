@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
-<!-- Generated 19-dic-2013 19.14.54 by Hibernate Tools 3.4.0.CR1 -->
+<!-- Generated 1-gen-2014 19.41.13 by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
     <class name="hibernate.Prodotto" table="prodotto" catalog="supermercati">
         <id name="idProdotto" type="java.lang.Integer">
@@ -11,25 +11,25 @@
         <many-to-one name="sottocategoria" class="hibernate.Sottocategoria" fetch="select">
             <column name="ID_SottoCategoria" not-null="true" />
         </many-to-one>
-        <property name="codiceBarre" type="int">
+        <property name="codiceBarre" type="long">
             <column name="CodiceBarre" not-null="true" unique="true" />
         </property>
         <property name="descrizione" type="string">
             <column name="Descrizione" length="45" not-null="true" />
         </property>
-        <set name="inserziones" table="inserzione" inverse="true" lazy="false" fetch="select">
+        <set name="inserziones" table="inserzione" inverse="true" lazy="true" fetch="select">
             <key>
                 <column name="ID_Prodotto" />
             </key>
             <one-to-many class="hibernate.Inserzione" />
         </set>
-        <set name="listaDesideriProdottis" table="lista_desideri_prodotti" inverse="true" lazy="false" fetch="select">
+        <set name="listaDesideriProdottis" table="lista_desideri_prodotti" inverse="true" lazy="true" fetch="select">
             <key>
                 <column name="ID_Prodotto" not-null="true" />
             </key>
             <one-to-many class="hibernate.ListaDesideriProdotti" />
         </set>
-        <set name="listaSpesaProdottis" table="lista_spesa_prodotti" inverse="true" lazy="false" fetch="select">
+        <set name="listaSpesaProdottis" table="lista_spesa_prodotti" inverse="true" lazy="true" fetch="select">
             <key>
                 <column name="ID_Prodotto" not-null="true" />
             </key>
