@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
-<!-- Generated 1-gen-2014 19.41.13 by Hibernate Tools 3.4.0.CR1 -->
+<!-- Generated 3-feb-2014 16.30.21 by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
     <class name="hibernate.ListaDesideriProdotti" table="lista_desideri_prodotti" catalog="supermercati">
         <composite-id name="id" class="hibernate.ListaDesideriProdottiId">
@@ -21,5 +21,8 @@
         <many-to-one name="listaDesideri" class="hibernate.ListaDesideri" update="false" insert="false" fetch="select">
             <column name="ID_ListaDesideri" not-null="true" />
         </many-to-one>
+        <property name="quantit&#224;" type="java.lang.Integer">
+            <column name="Quantit&#224;" />
+        </property>
     </class>
 </hibernate-mapping>

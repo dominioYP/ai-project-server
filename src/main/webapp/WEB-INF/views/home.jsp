@@ -4,6 +4,7 @@
 <%@page import="org.springframework.web.servlet.support.RequestContextUtils"%>
 <%@page import="org.springframework.context.ApplicationContext"%>
 <%@page import="dati.Dati" %>
+<%@page import="java.util.Map" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
@@ -25,18 +26,18 @@
 		<div id="utenti">
 	        <h1>Hello World!</h1>
 	        <p>This is the homepage!</p>
-	        <% for(Utente u : dati.getUtenti()){ %>
-	        <%= u.getNickname() %><br>
-	        <%= u.getMail() %><br>
-	        <%= u.getPassword() %><br>
-	        <%= u.getDataRegistrazione().toString() %><br>
-	        <% if(u.getConfermato()){ %>
+	        <% for(Map.Entry<String,Utente> u : dati.getUtenti().entrySet()){ %>
+	        <%= u.getValue().getNickname() %><br>
+	        <%= u.getValue().getMail() %><br>
+	        <%= u.getValue().getPassword() %><br>
+	        <%= u.getValue().getDataRegistrazione().toString() %><br>
+	        <% if(u.getValue().getConfermato()){ %>
 	        	Confermato
 	        <%}else{ %>
 	        	Non Confermato
 	        	<%} %>
 	        	<br>
-	        <%= u.getProfilos() %>
+	        <%= u.getValue().getProfilos() %>
 	        <br>
 	        <%} %>
 	        

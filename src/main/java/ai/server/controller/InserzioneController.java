@@ -93,17 +93,17 @@ public class InserzioneController {
 		model.put("inserzioneForm", inserzioneForm);
 		Set<String> categorie = new HashSet<String>();
 		
-		for(Categoria c : dati.getCategorie()){
-			categorie.add(c.getNome());
+		for(Map.Entry<Integer,Categoria> c : dati.getCategorie().entrySet()){
+			categorie.add(c.getValue().getNome());
 		}
 		
 		model.put("categorie", categorie);
 		
 		Set<String> argomenti = new HashSet<String>();
 		
-		for(Argomenti a : dati.getArgomenti()){
+		for(Map.Entry<Integer, Argomenti> a : dati.getArgomenti().entrySet()){
 			
-			argomenti.add(a.getArg1());
+			argomenti.add(a.getValue().getArg1());
 			
 		}
 		model.put("argomenti", argomenti);
@@ -114,9 +114,9 @@ public class InserzioneController {
 	public @ResponseBody Set<String> getSottoCategorie(@PathVariable String name){
 		
 		Set<String> sottocategorie = new HashSet<String>();
-		for(Categoria c : dati.getCategorie()){
-			if(c.getNome().equals(name)){
-				for(Sottocategoria s : (Set<Sottocategoria>) c.getSottocategorias()){
+		for(Map.Entry<Integer, Categoria> c : dati.getCategorie().entrySet()){
+			if(c.getValue().getNome().equals(name)){
+				for(Sottocategoria s : (Set<Sottocategoria>) c.getValue().getSottocategorias()){
 					sottocategorie.add(s.getNome());
 				}
 				break;
@@ -133,12 +133,12 @@ public class InserzioneController {
 		ArrayNode results = factory.arrayNode();
 		ObjectNode obj;
 		
-		for(Supermercato s : dati.getSupermercati()){
-			if(distFrom(Float.parseFloat(lat), Float.parseFloat(lng), s.getLatitudine().floatValue(), s.getLongitudine().floatValue())<50){
+		for(Map.Entry<String, Supermercato> s : dati.getSupermercati().entrySet()){
+			if(distFrom(Float.parseFloat(lat), Float.parseFloat(lng), s.getValue().getLatitudine().floatValue(), s.getValue().getLongitudine().floatValue())<3){
 				obj=factory.objectNode();
-				obj.put("nome", s.getNome());
-				obj.put("lat", s.getLatitudine());
-				obj.put("lng", s.getLongitudine());
+				obj.put("nome", s.getValue().getNome());
+				obj.put("lat", s.getValue().getLatitudine());
+				obj.put("lng", s.getValue().getLongitudine());
 				results.add(obj);
 			}
 		}
@@ -153,23 +153,20 @@ public class InserzioneController {
 		ArrayNode results = factory.arrayNode();
 		ObjectNode obj;
 		if(name.equals("prodotti")){
-			for(Prodotto prodotto : dati.getProdotti()){
-				if(prodotto.getDescrizione().contains(term)){
+			for(Map.Entry<Long, Prodotto> prodotto : dati.getProdotti().entrySet()){
+				if(prodotto.getValue().getDescrizione().toLowerCase().contains(term.toLowerCase())){
 					obj=factory.objectNode();
-					obj.put(Long.toString(prodotto.getCodiceBarre()),prodotto.getDescrizione());
+					obj.put(Long.toString(prodotto.getValue().getCodiceBarre()),prodotto.getValue().getDescrizione());
 					results.add(obj);
 				}
 			}
 		}
-		if(name.equals("supermercatiNames")){
-			for(Supermercato s : dati.getSupermercati()){
-				if(s.getNome().contains(term)){	
-					results.add(s.getNome());
+		if(name.equals("supermercati")){
+			for(Map.Entry<String, Supermercato> s : dati.getSupermercati().entrySet()){
+				if(s.getValue().getNome().toLowerCase().contains(term.toLowerCase())){	
+					results.add(s.getValue().getNome());
 				}
 			}
-		}
-		if(name.equals("supermercatiLoc")){
-			
 		}
 		return results;
 		
@@ -194,17 +191,17 @@ public class InserzioneController {
 				
 				Set<String> categorie = new HashSet<String>();
 				
-				for(Categoria c : dati.getCategorie()){
-					categorie.add(c.getNome());
+				for(Map.Entry<Integer,Categoria> c : dati.getCategorie().entrySet()){
+					categorie.add(c.getValue().getNome());
 				}
 				
 				model.put("categorie", categorie);
 				
 				Set<String> argomenti = new HashSet<String>();
 				
-				for(Argomenti a : dati.getArgomenti()){
+				for(Map.Entry<Integer,Argomenti> a : dati.getArgomenti().entrySet()){
 					
-					argomenti.add(a.getArg1());
+					argomenti.add(a.getValue().getArg1());
 					
 				}
 				model.put("argomenti", argomenti);
@@ -220,82 +217,68 @@ public class InserzioneController {
 			    ImageIO.write(image, "png", file);
 			    
 			}
-			
+			System.out.println(inserzioneForm.getFile());
+			if(inserzioneForm.getFile()!=null){
+				System.out.println("fatto");
+			}
 		
-			for(Supermercato s : dati.getSupermercati()){
-				if(s.getNome().equals(inserzioneForm.getSupermercato())){
-					supermercato=s;
-					break;
+			supermercato = dati.getSupermercati().get(inserzioneForm.getSupermercato());
+			
+			
+			
+			if(supermercato == null){
+				idSupermercato=dati.inserisciSupermercato(inserzioneForm.getSupermercato(), inserzioneForm.getLat(), inserzioneForm.getLng());
+				inserimentoSupermercato = true;
+				supermercato = dati.getSupermercati().get(inserzioneForm.getSupermercato());				
+			}
+			
+			utente = dati.getUtenti().get(principal.getName());
+			
+			boolean trovato = false;
+			Prodotto prodotto = dati.getProdotti().get(inserzioneForm.getCodiceBarre());
+			
+			//Bisogna ancora inserire gli argomenti usati
+			if(prodotto != null){
+				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+				if(inserzioneForm.getDataFine()!=null&&!(inserzioneForm.getDataFine().equals(""))){				
+					idInsererzione=dati.inserisciInserzione(utente, supermercato, prodotto, inserzioneForm.getPrezzo(), sdf.parse(inserzioneForm.getDataInizio()), sdf.parse(inserzioneForm.getDataFine()), inserzioneForm.getDescrizione(),path,new HashSet<Argomenti>());
+					inserimentoInserzione=true;
+				}else{
+					idInsererzione=dati.inserisciInserzione(utente, supermercato, prodotto, inserzioneForm.getPrezzo(), sdf.parse(inserzioneForm.getDataInizio()), null, inserzioneForm.getDescrizione(), path,new HashSet<Argomenti>());
+					inserimentoInserzione=true;
 				}
 			}
 			
-			if(supermercato==null){
-				idSupermercato=dati.insertSupermercato(inserzioneForm.getSupermercato(), inserzioneForm.getLat(), inserzioneForm.getLng());
-				inserimentoSupermercato=true;
-				for(Supermercato s : dati.getSupermercati()){
-					if(s.getIdSupermercato().equals(idSupermercato)){
-						supermercato=s;
-						break;
-					}
-				}
-			}
-			for(Utente u : dati.getUtenti()){
-				if(u.getMail().equals(principal.getName())){
-					utente=u;
-					break;
-				}
-			}
-			boolean trovato = false;
-			for(Prodotto p : dati.getProdotti()){
-				if(p.getCodiceBarre()==inserzioneForm.getCodiceBarre()){
-					trovato=true;		
-						SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-						if(inserzioneForm.getDataFine()!=null&&!(inserzioneForm.getDataFine().equals(""))){
-							
-							idInsererzione=dati.insertInserzione(utente, supermercato, p, inserzioneForm.getPrezzo(), sdf.parse(inserzioneForm.getDataInizio()), sdf.parse(inserzioneForm.getDataFine()), inserzioneForm.getDescrizione(),path);
-							inserimentoInserzione=true;
-						}else{
-							idInsererzione=dati.insertInserzione(utente, supermercato, p, inserzioneForm.getPrezzo(), sdf.parse(inserzioneForm.getDataInizio()), null, inserzioneForm.getDescrizione(), path);
-							inserimentoInserzione=true;
-						}
-				}
-			}
 		
 			if(!trovato){
 				Sottocategoria sottocategoria=null;
-				for(Sottocategoria s : dati.getSottocategorie()){
-					if(s.getNome().equals(inserzioneForm.getSottoCategoria())){
-						sottocategoria=s;
-						break;
+				sottocategoria = dati.getSottocategorie().get(inserzioneForm.getSottoCategoria());
+				idProdotto=dati.inserisciProdotto(sottocategoria, inserzioneForm.getCodiceBarre(), inserzioneForm.getDescrizione());
+				inserimentoProdotto = true;
+				Prodotto p = dati.getProdotti().get(inserzioneForm.getCodiceBarre());
+				//Si devono inserire gli argomenti usati
+				if(p.getIdProdotto().equals(idProdotto)){
+					SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+					if(inserzioneForm.getDataFine()!=null&&!(inserzioneForm.getDataFine().equals(""))){						
+						idInsererzione=dati.inserisciInserzione(utente, supermercato, p, inserzioneForm.getPrezzo(), sdf.parse(inserzioneForm.getDataInizio()), sdf.parse(inserzioneForm.getDataFine()), inserzioneForm.getDescrizione(),path, new HashSet<Argomenti>());
+						inserimentoInserzione=true;
+					}else{
+						idInsererzione=dati.inserisciInserzione(utente, supermercato, p, inserzioneForm.getPrezzo(), sdf.parse(inserzioneForm.getDataInizio()), null, inserzioneForm.getDescrizione(), path, new HashSet<Argomenti>());
+						inserimentoInserzione=true;
 					}
 				}
-				idProdotto=dati.insertProdotto(sottocategoria, inserzioneForm.getCodiceBarre(), inserzioneForm.getDescrizione());
-				inserimentoProdotto=true;
-				for(Prodotto p : dati.getProdotti()){
-					if(p.getIdProdotto().equals(idProdotto)){
-						SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-						if(inserzioneForm.getDataFine()!=null&&!(inserzioneForm.getDataFine().equals(""))){
-							
-							idInsererzione=dati.insertInserzione(utente, supermercato, p, inserzioneForm.getPrezzo(), sdf.parse(inserzioneForm.getDataInizio()), sdf.parse(inserzioneForm.getDataFine()), inserzioneForm.getDescrizione(),path);
-							inserimentoInserzione=true;
-						}else{
-							idInsererzione=dati.insertInserzione(utente, supermercato, p, inserzioneForm.getPrezzo(), sdf.parse(inserzioneForm.getDataInizio()), null, inserzioneForm.getDescrizione(), path);
-							inserimentoInserzione=true;
-						}
-						break;
-					}
-				}
+				
 			}
 		}catch(Exception e){
 			System.out.println(inserimentoInserzione+" "+inserimentoProdotto+" "+inserimentoSupermercato);
 			if(inserimentoInserzione){
-				dati.deleteInserzione(idInsererzione);
+				dati.eliminaInserzione(idInsererzione);
 			}
 			if(inserimentoProdotto){
-				dati.deleteProdotto(idProdotto);
+				dati.eliminaProdotto(idProdotto);
 			}
 			if(inserimentoSupermercato){
-				dati.deleteSupermercato(idSupermercato);
+				dati.eliminaSupermercato(idSupermercato);
 			}
 			e.printStackTrace();
 			return new ModelAndView("inserzione","error","errore nell'immissione del form");

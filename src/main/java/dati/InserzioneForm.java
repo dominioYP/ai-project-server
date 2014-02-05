@@ -4,6 +4,7 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.multipart.MultipartFile;
 
 public class InserzioneForm {
 	@NotEmpty
@@ -12,6 +13,16 @@ public class InserzioneForm {
 	
 	private long codiceBarre;
 	
+	private MultipartFile file;
+	
+	public MultipartFile getFile() {
+		return file;
+	}
+
+	public void setFile(MultipartFile file) {
+		this.file = file;
+	}
+
 	private String foto;
 	
 	public String getFoto() {

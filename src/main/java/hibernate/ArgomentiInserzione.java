@@ -1,6 +1,6 @@
 package hibernate;
 
-// Generated 1-gen-2014 19.41.13 by Hibernate Tools 3.4.0.CR1
+// Generated 3-feb-2014 16.30.21 by Hibernate Tools 3.4.0.CR1
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
@@ -44,8 +44,7 @@ public class ArgomentiInserzione implements java.io.Serializable {
 
 	@EmbeddedId
 	@AttributeOverrides({
-			@AttributeOverride(name = "idArgomentiInserzione", column = @Column(name = "ID_Argomenti_Inserzione", nullable = false)),
-			@AttributeOverride(name = "idInsezione", column = @Column(name = "ID_Insezione", nullable = false)),
+			@AttributeOverride(name = "idInserzione", column = @Column(name = "ID_Inserzione", nullable = false)),
 			@AttributeOverride(name = "idArgomento", column = @Column(name = "ID_Argomento", nullable = false)) })
 	public ArgomentiInserzioneId getId() {
 		return this.id;
@@ -56,7 +55,7 @@ public class ArgomentiInserzione implements java.io.Serializable {
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "ID_Insezione", nullable = false, insertable = false, updatable = false)
+	@JoinColumn(name = "ID_Inserzione", nullable = false, insertable = false, updatable = false)
 	public Inserzione getInserzione() {
 		return this.inserzione;
 	}

@@ -2,6 +2,7 @@ package dati;
 
 import java.security.Principal;
 import java.text.SimpleDateFormat;
+import java.util.Set;
 
 import hibernate.Inserzione;
 
@@ -16,7 +17,7 @@ public class InserzioneValidation {
 	private Dati dati;
 	
 	public void setDati(Dati dati){
-		this.dati=dati;
+		this.dati = dati;
 	}
 	
 	
@@ -38,13 +39,11 @@ public class InserzioneValidation {
 		}
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		try{
-			for(Inserzione i : dati.getInserzioni() ){
-				System.out.println(i.getProdotto().getCodiceBarre()+" "+inserzione.getCodiceBarre());
+			for(Inserzione i : (Set<Inserzione>) dati.getUtenti().get(principal.getName()).getInserziones() ){
 				if(i.getProdotto().getCodiceBarre()==inserzione.getCodiceBarre()&&
 						i.getDataInizio().equals(sdf.parse(inserzione.getDataInizio()))&&
 						i.getSupermercato().getLatitudine().intValue()==(int)inserzione.getLat()&&
-						i.getSupermercato().getLongitudine().intValue()==(int)inserzione.getLng()&&
-						i.getUtente().getMail().equals(principal.getName())){
+						i.getSupermercato().getLongitudine().intValue()==(int)inserzione.getLng()){
 					errors.rejectValue("dataInizio", "invalidDate.InserzioneForm.dataInizio", 
 							"è gia presente una tua inserzione con la stessa data");
 					break;

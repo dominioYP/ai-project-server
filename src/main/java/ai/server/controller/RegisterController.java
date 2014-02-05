@@ -56,7 +56,7 @@ public class RegisterController {
 			return new ModelAndView("register");
 		}
 		try{
-			dati.insertUtente(registration.getEmail(), registration.getUserName(), registration.getPassword(),new Date(),numerocasuale);
+			dati.inserisciUtente(registration.getEmail(), registration.getUserName(), registration.getPassword(),new Date(),numerocasuale);
 		}catch(Exception e){
 			
 			return new ModelAndView("register","error",e.toString());
@@ -67,24 +67,25 @@ public class RegisterController {
 		String [] temp = request.getRequestURL().toString().split("/");
 		String url = temp[0]+"//"+temp[1]+temp[2]+"/"+temp[3]+"/";
 		
-		mail.sendMail("giorgio.ciacchella@gmail.com", registration.getEmail(), "Registration Confirmation", "Click the link above to confirm your registration\n\n\n"+"<a href='"+url+"confirmregistration?id="+numerocasuale+"' />");
+		mail.sendMail("giorgio.ciacchella@gmail.com", registration.getEmail(), "Registration Confirmation", "Click the link above to confirm your registration\n\n\n"+"<a href='"+url+"confirmregistration?numeroCasuale="+numerocasuale+"&email="+registration.getEmail()+"' />");
 		return new ModelAndView("registersuccess","registration",registration);
 	}
 	
 	@RequestMapping(value="/confirmregistration",method=RequestMethod.GET)
-	public ModelAndView confirmRegistration(String id){
+	public ModelAndView confirmRegistration(String numeroCasuale,String email){
 		
 	
 		boolean trovato = false;
-		for(Utente u : dati.getUtenti()){
-			if(u.getNumeroCasuale().equals(id)){
-				dati.modifyUtente(u.getIdUtente(), u.getMail(), u.getNickname(), u.getPassword(), u.getDataRegistrazione(), u.getValutazioneInserzionesForIdUtenteInserzionista(), u.getValutazioneInserzionesForIdUtenteValutatore(), u.getListaSpesas(), u.getInserziones(), u.getProfilos(), u.getListaDesideris(), true, "-1");
-				trovato = true;
-				break;
-			}
-		}
-		if(!trovato)
+		Utente utente = dati.getUtenti().get(email);
+		if(utente == null)
 			return new ModelAndView("confirmregistration","error","Si è verificato un errore");
+		
+		if(utente.getNumeroCasuale().equals(numeroCasuale)){
+			dati.modificaUtente(utente.getIdUtente(), utente.getMail(), utente.getNickname(), utente.getPassword(), utente.getDataRegistrazione(), true, "-1");
+			trovato = true;			
+		}
+		
+		
 		return new ModelAndView("confirmregistration");
 		
 	}

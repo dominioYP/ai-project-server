@@ -5,7 +5,7 @@
 var risposta;
 var i = 0;
 
-
+var supermercati_markers = [];
 
 (function getSottocategorie(){
 	var selected=$('#categorie option:selected').text();
@@ -68,7 +68,10 @@ $("#descrizione").autocomplete({
 			}				
 		});
 		$.each(codici_prodotti,function(index,value){
-			risp.push(value);
+			
+			$.each(value,function(index,value){
+				risp.push(value);
+			});
 		});
 		response(risp);	
 	},
@@ -105,24 +108,44 @@ var geocoder = new google.maps.Geocoder();
 				center: currentLocation,
 				zoom: 15,
 			});
-			google.maps.event.addListener(map, 'idle', function(){
+			google.maps.event.addListener(map, 'tilesloaded', function(){
 				var latLng = map.getCenter();
 				$.ajax({type:"GET",
 					url: window.location.pathname+"/getSupermercati",
 					contentType:"application/json",
 					data:{"lat":latLng.lat(),"lng":latLng.lng()},
 					success:function(data){
+						for(var i=0;i<supermercati_markers.length;i++){
+							supermercati_markers[i].setMap(null);
+						}
 						$.each(data,function(index,value){
 							var latLng = new google.maps.LatLng(value.lat,value.lng);
 							var marker = new google.maps.Marker({
 							    map: map,
 							    position: latLng,
 							});	
-
+							
 							google.maps.event.addListener(marker, 'click', function() {
-							infowindow.setContent(value.name);
-							infowindow.open(map,marker);
+								var string = "<a class ='infowindow' id='Si'>Si</a> o <a class ='infowindow' id='No'>No</a>";
+								infowindow.setContent("<div class='infowindow 'id='nome'>"+value.nome+"</div>\n<div class='infowindow' id='domanda'> E' questo?\n"+string+"</div>");
+								infowindow.open(map,this);
+								$('a.infowindow').click(function(){
+									if($(this).attr('id')=="Si"){
+										var strs = $('#nome.infowindow').text().split(/\s-\s/);
+										$('#supermercato').val(strs[0]);
+										$('#indirizzo').val(strs[1]);
+										$('#domanda.infowindow').empty();
+										$('#nome.infowindow').after("risposta ricevuta");
+									}else{
+										$('#domanda.infowindow').empty();
+										$('#nome.infowindow').after("risposta ricevuta");
+									}
+								}).css({'cursor':'pointer',
+					    			'background-color':'skyblue',
+					    			'color':'blue',
+					    		});
 							});
+							supermercati_markers.push(marker);
 						});
 					}				
 				});
@@ -313,10 +336,22 @@ $('#insertionForm').submit(function(event){
 	var geocoder = new google.maps.Geocoder();
 	geocoder.geocode({'address':$("#indirizzo").val()},function(results,status){
 		if(status == google.maps.GeocoderStatus.OK){
+			var form = new FormData();
+			$.each($("form").serialize(),function(index,value){
+				alert(index+":"+value);
+				form.append(index,value);
+			});
+			form.append("lat",results[0].geometry.location.lat());
+			form.append("lng",results[0].geometry.location.lng());
+			form.append("foto",$('#preview').attr("src"));
+			form.append("file",$("#file.input").files[0]);
 			$.ajax({
 				type:'POST',
 				url:window.location.pathname,
-				data: $("form").serialize() +"&lat="+results[0].geometry.location.lat()+"&lng="+results[0].geometry.location.lng()+"&foto="+$('#preview').attr("src"),
+				cache:false,
+				contentType:false,
+				processData:false,
+				data: form,
 				success:function(response){
 					$(":root").html(response);
 				}

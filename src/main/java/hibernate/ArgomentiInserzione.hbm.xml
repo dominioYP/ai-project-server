@@ -1,22 +1,19 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
-<!-- Generated 1-gen-2014 19.41.13 by Hibernate Tools 3.4.0.CR1 -->
+<!-- Generated 3-feb-2014 16.30.21 by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
     <class name="hibernate.ArgomentiInserzione" table="argomenti_inserzione" catalog="supermercati">
         <composite-id name="id" class="hibernate.ArgomentiInserzioneId">
-            <key-property name="idArgomentiInserzione" type="int">
-                <column name="ID_Argomenti_Inserzione" />
-            </key-property>
-            <key-property name="idInsezione" type="int">
-                <column name="ID_Insezione" />
+            <key-property name="idInserzione" type="int">
+                <column name="ID_Inserzione" />
             </key-property>
             <key-property name="idArgomento" type="int">
                 <column name="ID_Argomento" />
             </key-property>
         </composite-id>
         <many-to-one name="inserzione" class="hibernate.Inserzione" update="false" insert="false" fetch="select">
-            <column name="ID_Insezione" not-null="true" />
+            <column name="ID_Inserzione" not-null="true" />
         </many-to-one>
         <many-to-one name="argomenti" class="hibernate.Argomenti" update="false" insert="false" fetch="select">
             <column name="ID_Argomento" not-null="true" />

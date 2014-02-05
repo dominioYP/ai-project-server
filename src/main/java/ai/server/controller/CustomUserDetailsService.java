@@ -1,7 +1,9 @@
 package ai.server.controller;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
 
 
 import hibernate.Utente;
@@ -28,19 +30,12 @@ public class CustomUserDetailsService implements UserDetailsService{
 	
 	@Override
 	public UserDetails loadUserByUsername(String arg0)
-			throws UsernameNotFoundException {
+			throws UsernameNotFoundException {		
 		
-		
-		
-		Set<Utente> utenti = dati.getUtenti();
-		Utente utente = null;
-		for(Utente u : utenti){
-			
-			if(u.getMail().equals(arg0)&&u.getConfermato()==true){
-				utente = u;
-				break;
-			}
-			
+		Utente utente = dati.getUtenti().get(arg0);
+		if(utente != null){
+			if(!utente.getConfermato())
+				utente = null;
 		}
 		if(utente == null)
 			throw new UsernameNotFoundException("User "+arg0+" not found");

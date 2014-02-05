@@ -25,7 +25,7 @@
     </style>
 </head>
 <body>
-<form:form id="insertionForm" method="post" action="inserzione" commandName="inserzioneForm">
+<form:form id="insertionForm" method="post" action="inserzione" commandName="inserzioneForm" enctype="multipart/form-data">
 	<% String error = (String) request.getAttribute("error");
 	if(null != error ) {%>
 		<div id="hibernate.error" class="errors"><%= error %></div>
@@ -100,9 +100,15 @@
 	
 	<tr><td><div id="map-canvas"></div></td></tr>
 	<tr>
+	<td><form:errors path="*" cssClass="errorblock" element="div" />
+ 
+		Carica una foto se non trovata : <input id="file" type="file" name="file" />
+		<span><form:errors path="file" cssClass="error" />
+		</span>
+		</td></tr>
+	<tr>
 	<td><input type="submit" value="Invia">
-	</td>
-	
+	</td>	
 	</tr>
 	</table>
 </form:form>

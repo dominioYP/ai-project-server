@@ -5,6 +5,7 @@ package dati;
 
 import hibernate.Argomenti;
 import hibernate.ArgomentiInserzione;
+import hibernate.ArgomentiInserzioneId;
 import hibernate.Categoria;
 import hibernate.Inserzione;
 import hibernate.ListaDesideri;
@@ -22,11 +23,20 @@ import hibernate.ValutazioneInserzione;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+
+
+
+
+
+
 
 
 
@@ -43,26 +53,38 @@ import org.hibernate.service.ServiceRegistryBuilder;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+/**
+ * @author ciakky
+ *
+ */
+/**
+ * @author ciakky
+ *
+ */
+/**
+ * @author ciakky
+ *
+ */
 @Service("dati")
 @Scope("singleton")
 public class Dati {
 
 	private static volatile Dati istanza;
-
-	private volatile Set<Utente> setUtente = new CopyOnWriteArraySet<Utente>();
-	private volatile Set<ArgomentiInserzione> setArgomentiInserzione = new CopyOnWriteArraySet<ArgomentiInserzione>();
-	private volatile Set<Categoria> setCategoria = new CopyOnWriteArraySet<Categoria>();
-	private volatile Set<ListaSpesaProdotti> setListaSpesaProdotti = new CopyOnWriteArraySet<ListaSpesaProdotti>();
-	private volatile Set<ListaDesideriProdotti> setListaDesideriProdotti = new CopyOnWriteArraySet<ListaDesideriProdotti>();
-	private volatile Set<Argomenti> setArgomenti = new CopyOnWriteArraySet<Argomenti>();
-	private volatile Set<Inserzione> setInserzione = new CopyOnWriteArraySet<Inserzione>();
-	private volatile Set<ListaDesideri> setListaDesideri = new CopyOnWriteArraySet<ListaDesideri>();
-	private volatile Set<ListaSpesa> setListaSpesa = new CopyOnWriteArraySet<ListaSpesa>();
-	private volatile Set<Prodotto> setProdotto = new CopyOnWriteArraySet<Prodotto>();
-	private volatile Set<Profilo> setProfilo = new CopyOnWriteArraySet<Profilo>();
-	private volatile Set<Sottocategoria> setSottocategoria = new CopyOnWriteArraySet<Sottocategoria>();
-	private volatile Set<Supermercato> setSupermercato = new CopyOnWriteArraySet<Supermercato>();
-	private volatile Set<ValutazioneInserzione> setValutazioneInserzione = new CopyOnWriteArraySet<ValutazioneInserzione>();
+	
+	private volatile Map<String,Utente> mappaUtente = new ConcurrentHashMap<String, Utente>();
+	private volatile Map<Integer,ArgomentiInserzione> mappaArgomentiInserzione = new ConcurrentHashMap<Integer, ArgomentiInserzione>();
+	private volatile Map<Integer,Categoria> mappaCategorie = new ConcurrentHashMap<Integer, Categoria>();
+	private volatile Map<Integer,ListaSpesaProdotti> mappaListaSpesaProdotti = new ConcurrentHashMap<Integer, ListaSpesaProdotti>();
+	private volatile Map<Integer,ListaDesideriProdotti> mappaListaDesideriProdotti = new ConcurrentHashMap<Integer, ListaDesideriProdotti>();
+	private volatile Map<Integer,Argomenti> mappaArgomenti = new ConcurrentHashMap<Integer, Argomenti>();
+	private volatile Map<Integer,Inserzione> mappaInserzioni = new ConcurrentHashMap<Integer, Inserzione>();
+	private volatile Map<Integer,ListaDesideri> mappaListaDesideri = new ConcurrentHashMap<Integer, ListaDesideri>();
+	private volatile Map<Integer,ListaSpesa> mappaListaSpesa = new ConcurrentHashMap<Integer, ListaSpesa>();
+	private volatile Map<Long,Prodotto> mappaProdotti = new ConcurrentHashMap<Long, Prodotto>();
+	private volatile Map<Integer,Profilo> mappaProfili = new ConcurrentHashMap<Integer, Profilo>();
+	private volatile Map<String,Sottocategoria> mappaSottocategorie = new ConcurrentHashMap<String, Sottocategoria>();
+	private volatile Map<String,Supermercato> mappaSupermercati = new ConcurrentHashMap<String, Supermercato>();
+	private volatile Map<Integer,ValutazioneInserzione> mappaValutazioneInserzione = new ConcurrentHashMap<Integer, ValutazioneInserzione>();
 
 	private static SessionFactory factory;
 
@@ -87,21 +109,65 @@ public class Dati {
 			tx=session.beginTransaction();
 
 			List<Utente> result = session.createQuery("from Utente").list();
-			setUtente.addAll(result);
-			setArgomentiInserzione.addAll(session.createQuery("from ArgomentiInserzione").list());
-			setCategoria.addAll(session.createQuery("from Categoria").list());
-			setListaSpesaProdotti.addAll(session.createQuery("from ListaSpesaProdotti").list());
-			setListaDesideriProdotti.addAll(session.createQuery("from ListaDesideriProdotti").list());
-			setArgomenti.addAll(session.createQuery("from Argomenti").list());
-			setInserzione.addAll(session.createQuery("from Inserzione").list());
-			setListaDesideri.addAll(session.createQuery("from ListaDesideri").list());
-			setListaSpesa.addAll(session.createQuery("from ListaSpesa").list());
-			setProdotto.addAll(session.createQuery("from Prodotto").list());
-			setProfilo.addAll(session.createQuery("from Profilo").list());
-			setSottocategoria.addAll(session.createQuery("from Sottocategoria").list());
-			setSupermercato.addAll(session.createQuery("from Supermercato").list());
-			setValutazioneInserzione.addAll(session.createQuery("from ValutazioneInserzione").list());
+			for(Utente u : result){
+				mappaUtente.put(u.getMail(), u);
+			}
+			for(ArgomentiInserzione ai : (List<ArgomentiInserzione>)session.createQuery("from ArgomentiInserzione").list()){
+				mappaArgomentiInserzione.put(ai.getId().hashCode(), ai);
+			}
+			for(Categoria c : (List<Categoria>)session.createQuery("from Categoria").list())
+			{
+				mappaCategorie.put(c.getIdCategoria(), c);
+			}
 			
+			for(ListaSpesaProdotti lsp : (List<ListaSpesaProdotti>)session.createQuery("from ListaSpesaProdotti").list())
+			{
+				mappaListaSpesaProdotti.put(lsp.getId().hashCode(), lsp);
+			}
+			for(ListaDesideriProdotti ldp :(List<ListaDesideriProdotti>)session.createQuery("from ListaDesideriProdotti").list())
+			{
+				mappaListaDesideriProdotti.put(ldp.getId().hashCode(), ldp);
+			}
+			for(Argomenti a : (List<Argomenti>)session.createQuery("from Argomenti").list())
+			{
+				mappaArgomenti.put(a.getIdArgomenti(), a);
+			}
+			
+			for(Inserzione i : (List<Inserzione>)session.createQuery("from Inserzione").list())
+			{
+				mappaInserzioni.put(i.getIdInserzione(), i);
+			}
+			
+			for(ListaDesideri ld :(List<ListaDesideri>)session.createQuery("from ListaDesideri").list())
+			{
+				mappaListaDesideri.put(ld.getIdListaDesideri(), ld);
+			}
+			
+			for(ListaSpesa ls : (List<ListaSpesa>)session.createQuery("from ListaSpesa").list())
+			{
+				mappaListaSpesa.put(ls.getIdSpesa(), ls);
+			}
+			for(Prodotto p : (List<Prodotto>)session.createQuery("from Prodotto").list())
+			{
+				mappaProdotti.put(p.getCodiceBarre(), p);
+			}
+			for(Profilo p : (List<Profilo>)session.createQuery("from Profilo").list())
+			{
+				mappaProfili.put(p.getIdProfilo(), p);
+			}
+			for(Sottocategoria s : (List<Sottocategoria>)session.createQuery("from Sottocategoria").list())
+			{
+				mappaSottocategorie.put(s.getNome(), s);
+			}
+			
+			for(Supermercato s : (List<Supermercato>)session.createQuery("from Supermercato").list())
+			{
+				mappaSupermercati.put(s.getNome(), s);
+			}
+			for(ValutazioneInserzione vi : (List<ValutazioneInserzione>)session.createQuery("from ValutazioneInserzione").list())
+			{
+				mappaValutazioneInserzione.put(vi.getIdValutazioneInserzione(), vi);
+			}
 			
 			tx.commit();
 		}catch(RuntimeException e){
@@ -120,391 +186,42 @@ public class Dati {
 			istanza = new Dati();
 		return istanza; 
 	}
+
 	
-	public Set<Argomenti> getArgomenti(){
-		HashSet<Argomenti> argomenti = new HashSet<Argomenti>();
-		for(Argomenti a : setArgomenti){
-			argomenti.add(a);
-		}
+	/**metodo get per ottenere tutti i vari argomenti delle inserzioni 
+	 * Es : litri, grammi etc etc
+	 * @return
+	 */
+	public Map<Integer,Argomenti> getArgomenti(){
+		
+		HashMap<Integer,Argomenti> argomenti = new HashMap<Integer, Argomenti>();
+		
+		argomenti.putAll(mappaArgomenti);
+		
 		return argomenti;
 	}
+
 	
-	public void insertArgomenti(String arg1){
+	
+	/**Inserimento di un argomento
+	 * @param arg1 nome dell'argomento
+	 */
+	public void inserisciArgomento (String arg1) {
+		if(arg1 == null)
+			throw new RuntimeException("tutti gli argomenti devono essere non nulli");
+		
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
-		try{
-			tx=session.beginTransaction();
-			if(arg1==null )
-				throw new RuntimeException("tutti gli argomenti devono essere non nulli");
+		try {
+			tx=session.beginTransaction();			
 			Argomenti arg = new Argomenti(arg1,new HashSet<ArgomentiInserzione>());
-			session.save(arg);
+			Integer idArgomento=(Integer) session.save(arg);
 			
-			session.persist(arg);
-			
-			
-				setArgomenti.add(arg);
-			
-			
-			
+			mappaArgomenti.put(idArgomento, arg);
+
 			tx.commit();
-		}catch(Throwable ex){
-			if(tx!=null)
-				tx.rollback();
-			throw new RuntimeException(ex);
-		}finally{
-			if(session!=null && session.isOpen()){
-				session.close();
-			}
-			session=null;
 		}
-	}
-	
-	public Argomenti getArgomenti(int IdArgomenti){
-		
-		
-		Argomenti argomenti = null;
-		
-		Iterator<Argomenti> it = setArgomenti.iterator();
-		
-		for(;it.hasNext();){
-			Argomenti a = it.next();
-			if(a.getIdArgomenti().equals(IdArgomenti)){
-				argomenti=a;
-				break;
-			}
-		}
-		if(argomenti == null)
-			throw new RuntimeException("Elemento non trovato");
-		return argomenti;
-	}
-	// si deve fornire l'oggetto settando l'id del vecchio oggetto
-	public void modifyArgomenti(int idargomenti,String arg1,Set<ArgomentiInserzione> argomentiinserzione){
-		Session session = factory.getCurrentSession();
-		Transaction tx = null;
-		if(idargomenti <= 0 || arg1 == null )
-			throw new RuntimeException("tutti gli argomenti devono essere non nulli");
-		Argomenti argomenti = new Argomenti(arg1,argomentiinserzione);
-		argomenti.setIdArgomenti(idargomenti);
-		try{
-			tx=session.beginTransaction();
-			
-			Iterator<Argomenti> it = setArgomenti.iterator();
-			Argomenti argold=null;
-			for(;it.hasNext();){
-				Argomenti a = it.next();
-				if(a.getIdArgomenti().equals(idargomenti)){
-					argold=a;
-					it.remove();
-					setArgomenti.add(argomenti);
-					break;
-				}
-			}
-			
-			if(argold==null)
-				throw new RuntimeException("elemento non trovato");
-			session.update(argomenti);
-			
-			for(ArgomentiInserzione ai : setArgomentiInserzione){
-				if(ai.getArgomenti().equals(argold)){
-					setArgomentiInserzione.remove(ai);
-				}
-			}
-			for(ArgomentiInserzione ai : argomentiinserzione){
-				
-				setArgomentiInserzione.add(ai);
-				
-			}
-			
-			
-			tx.commit();
-		}catch(Throwable ex){
-			if(tx!=null)
-				tx.rollback();
-			throw new RuntimeException(ex);
-		}finally{
-			if(session!=null && session.isOpen()){
-				session.close();
-			}
-			session=null;
-		}
-		
-		
-	}
-	
-	
-	public void insertCategoria(String nome,Set<Sottocategoria> sottocategorie,Set<Prodotto> prodotti){
-		Session session = factory.getCurrentSession();
-		Transaction tx = null;
-		try{
-			tx=session.beginTransaction();
-			if(nome == null || sottocategorie == null)
-				throw new RuntimeException("tutti gli argomenti devono essere non nulli");
-			Categoria categoria = new Categoria(nome, sottocategorie);
-			
-			session.save(categoria);
-			
-			session.persist(categoria);
-			
-			
-			setCategoria.add(categoria);
-			
-			tx.commit();
-		}catch(Throwable ex){
-			if(tx!=null)
-				tx.rollback();
-			throw new RuntimeException(ex);
-		}finally{
-			if(session!=null && session.isOpen()){
-				session.close();
-			}
-			session=null;
-		}
-		
-		
-	}
-	
-	public Set<Categoria> getCategorie(){
-		
-		Set<Categoria> categorie = new HashSet<Categoria>();
-		for(Categoria c : setCategoria){
-			categorie.add(c);
-		}
-		
-		return categorie;
-		
-	}
-	
-	public int insertInserzione(Utente utente,Supermercato supermercato,Prodotto prodotto,float prezzo,Date dataInizio,Date dataFine,String descrizione,String foto){
-		Session session = factory.getCurrentSession();
-		Transaction tx = null;
-		int idInserzione = -1;
-		try{
-			tx=session.beginTransaction();
-			if(utente == null || supermercato == null || prodotto == null || prezzo<=0 || dataInizio == null )
-				throw new RuntimeException("errore nell'immissione dei parametri");
-			Inserzione inserzione = new Inserzione(utente, supermercato, prodotto, prezzo, dataInizio, dataFine, descrizione, foto,0,(float)0.0,new HashSet<ValutazioneInserzione>(),new HashSet<ArgomentiInserzione>());
-			
-			session.save(inserzione);
-			
-			session.persist(inserzione);
-			
-			idInserzione=inserzione.getIdInserzione();
-			setInserzione.add(inserzione);
-			
-			for(Utente u : setUtente){
-				if(u.equals(utente)){
-					u.getInserziones().add(inserzione);
-					break;
-				}
-			}
-			
-			for(Supermercato s : setSupermercato){
-				if(s.equals(supermercato)){
-					s.getInserziones().add(inserzione);
-					break;
-				}
-			}
-			
-			for(Prodotto p : setProdotto){
-				if(p.equals(prodotto)){
-					p.getInserziones().add(inserzione);
-					break;
-				}
-			}
-			
-			tx.commit();
-		}catch(Throwable ex){
-			if(tx!=null)
-				tx.rollback();
-			throw new RuntimeException(ex);
-		}finally{
-			if(session!=null && session.isOpen()){
-				session.close();
-			}
-			session=null;
-		}
-		return idInserzione;
-	}
-	//in ingresso inserzione modificata con id dell'inserzione vecchia
-	public void modifyInserzione(int idinserzione,Utente utente,Supermercato supermercato,Prodotto prodotto,float prezzo,Date dataInizio,Date dataFine,String descrizione,String foto,Set<ValutazioneInserzione> valutazioni,Set<ArgomentiInserzione> argins){
-		Session session = factory.getCurrentSession();
-		Transaction tx = null;
-		boolean trovato = false;
-		if(idinserzione <= 0 || utente == null || supermercato == null || prodotto == null || prezzo <= 0 || dataInizio == null || dataFine == null || descrizione == null || foto == null || argins == null || valutazioni == null)
-			throw new RuntimeException("tutti gli argomenti devono essere non nulli");
-		Inserzione inserzione = new Inserzione(utente, supermercato, prodotto, prezzo, dataInizio, dataFine, descrizione, foto,0,(float)0.0,valutazioni,argins);
-		inserzione.setIdInserzione(idinserzione);
-		try{
-			tx=session.beginTransaction();
-			
-			Iterator<Inserzione> it = setInserzione.iterator();
-			Inserzione iold = null;
-			for(;it.hasNext();){
-				iold = it.next();
-				if(iold.getIdInserzione().equals(idinserzione)){
-				//	it.remove();
-			//		setInserzione.add(inserzione);
-					trovato= true;
-					break;
-				}
-			}
-	
-			if(!trovato)
-				throw new RuntimeException("elemento non trovato");
-			
-			session.update(inserzione);
-			
-			
-			for(ValutazioneInserzione valutazione : setValutazioneInserzione){
-				if(valutazione.getInserzione().equals(iold)){
-					setValutazioneInserzione.remove(valutazione);
-				}
-			}
-			
-			for(ValutazioneInserzione valutazione : valutazioni){
-				setValutazioneInserzione.add(valutazione);
-			}
-			
-			for(ArgomentiInserzione ai : setArgomentiInserzione){
-				if(ai.getInserzione().equals(iold))
-					setArgomentiInserzione.remove(ai);
-			}
-			
-			it.remove();
-			setInserzione.add(inserzione);
-			
-			for(Utente u : setUtente){
-				if(u.equals(iold.getUtente())){
-					u.getInserziones().remove(iold);
-					break;
-				}
-			}
-			
-			for(Utente u : setUtente){
-				if(u.equals(inserzione.getUtente())){
-					u.getInserziones().add(inserzione);
-					break;
-				}
-			}
-			
-			for(Supermercato s : setSupermercato){
-				if(s.equals(iold.getSupermercato())){
-					s.getInserziones().remove(iold);
-					break;
-				}
-			}
-			for(Supermercato s : setSupermercato){
-				if(s.equals(inserzione.getSupermercato())){
-					s.getInserziones().add(inserzione);
-					break;
-				}
-			}
-			
-			for(Prodotto p : setProdotto){
-				if(p.equals(iold.getProdotto())){
-					p.getInserziones().remove(iold);
-					break;
-				}
-			}
-			
-			for(Prodotto p : setProdotto){
-				if(p.equals(inserzione.getProdotto())){
-					p.getInserziones().add(inserzione);
-					break;
-				}
-			}
-			
-			for(ArgomentiInserzione ai : argins){
-				setArgomentiInserzione.add(ai);
-			}
-			
-			tx.commit();
-		}catch(Throwable ex){
-			if(tx!=null)
-				tx.rollback();
-			throw new RuntimeException(ex);
-		}finally{
-			if(session!=null && session.isOpen()){
-				session.close();
-			}
-			session=null;
-		}
-	}
-	
-	public void deleteInserzione(int IdInserzione){
-		Session session = factory.getCurrentSession();
-		Transaction tx = null;
-		Inserzione inserzione = getInserzione(IdInserzione);
-		boolean trovato = false;
-		try{
-			tx=session.beginTransaction();
-			
-			Iterator<Inserzione> it;
-			session.delete(inserzione);
-			
-			for(ValutazioneInserzione v : (Set<ValutazioneInserzione>)inserzione.getValutazioneInserziones()){
-				for(ValutazioneInserzione val : setValutazioneInserzione){
-					if(val.equals(v)){
-						setValutazioneInserzione.remove(v);
-						break;
-					}
-				}
-			}
-			
-			for(Utente u : setUtente){
-				if(u.equals(inserzione.getUtente())){
-					trovato = true;
-					u.getInserziones().remove(inserzione);
-					break;
-				}
-			}
-			
-			if(!trovato)
-				throw new RuntimeException("elemento non trovato nell'utente");
-			trovato=false;
-			
-			
-			for(Supermercato s : setSupermercato){
-				if(s.equals(inserzione.getSupermercato())){
-					s.getInserziones().remove(inserzione);
-					trovato=true;
-					break;
-				}
-			}
-			
-			if(!trovato)
-				throw new RuntimeException("elemento non trovato nel supermercato");
-			trovato=false;
-		
-			for(Prodotto p : setProdotto){
-				if(p.equals(inserzione.getProdotto())){
-					p.getInserziones().remove(inserzione);
-					trovato=true;
-					break;
-				}
-			}
-			
-			
-			if(!trovato)
-				throw new RuntimeException("elemento non trovato nel prodotto");
-			trovato=false;
-			it = setInserzione.iterator();
-			
-			for(;it.hasNext();){
-				Inserzione a = it.next();
-				if(a.getIdInserzione().equals(inserzione.getIdInserzione())){
-					it.remove();
-					trovato= true;
-					break;
-				}
-			}
-			
-			if(!trovato)
-				throw new RuntimeException("elemento non trovato nelle inserzioni");
-			
-			
-			tx.commit();
-		}catch(Throwable ex){
+		catch(Throwable ex){
 			if(tx!=null)
 				tx.rollback();
 			throw new RuntimeException(ex);
@@ -516,177 +233,53 @@ public class Dati {
 		}
 	}
 
-	public Inserzione getInserzione(int IdInserzione){
+	/**metodo get di un argomento
+	 * @param IdArgomento
+	 * @return
+	 */
+	public Argomenti getArgomento(int IdArgomento){
+
+
+		Argomenti argomento = null;
+
+		mappaArgomenti.get(IdArgomento);
 		
-		Inserzione inserzione = null;
-		
-		Iterator<Inserzione> it = setInserzione.iterator();
-		
-		for(;it.hasNext();){
-			Inserzione a = it.next();
-			if(a.getIdInserzione().equals(IdInserzione)){
-				inserzione=a;
-				break;
-			}
-		}
-		
-		if(inserzione == null)
+		if(argomento == null)
 			throw new RuntimeException("Elemento non trovato");
-		return inserzione;
+		return argomento;
 	}
 	
-	public void insertListaDesideri(Utente utente,Set<Prodotto> prodotti,String nomeListaDesideri,String descrizione){
-		Session session = factory.getCurrentSession();
-		Transaction tx = null;
-		
-		try{
-			tx=session.beginTransaction();
-			int idListaDesideri=1;
-			
-			if(utente == null || prodotti == null || nomeListaDesideri == null || descrizione == null)
-				throw new RuntimeException("tutti gli argomenti devono essere non nulli");
-			
-			ListaDesideri listadesideri = new ListaDesideri(utente, nomeListaDesideri, new HashSet<ListaDesideriProdotti>());
-			
-			for(Prodotto prodotto : prodotti){
-				ListaDesideriProdottiId id = new ListaDesideriProdottiId(listadesideri.getIdListaDesideri(), prodotto.getIdProdotto(), prodotto.getDescrizione());
-				ListaDesideriProdotti ldp = new ListaDesideriProdotti(id , prodotto, listadesideri);
-				listadesideri.getListaDesideriProdottis().add(ldp);
-		
-			}
-			session.save(listadesideri);
-			
-			
-				
-			for(ListaDesideriProdotti ldp : (Set<ListaDesideriProdotti>)listadesideri.getListaDesideriProdottis()){
-				
-				for(Prodotto p : setProdotto){
-					if(p.equals(ldp.getProdotto())){
-						p.getListaDesideriProdottis().add(ldp);
-						break;
-					}
-				}
-			}
-				
-		
-				
-		
-			setListaDesideri.add(listadesideri);
-			
-			
-			for(Utente u : setUtente){
-				if(u.equals(utente)){
-					u.getListaDesideris().add(listadesideri);
-					break;
-				}
-			}
-			
-			
-			tx.commit();
-		}catch(Throwable ex){
-			if(tx!=null)
-				tx.rollback();
-			throw new RuntimeException(ex);
-		}finally{
-			if(session!=null && session.isOpen()){
-				session.close();
-			}
-			session=null;
-		}
-	}
 	
-	public void modifyListaDesideri(int idlistadesideri,Utente utente,String nomeListaDesideri,Set<Prodotto> prodotti){
+	/**modifica dell'argomento
+	 * @param idArgomento
+	 * @param arg1
+	 * @param argomentiInserzione Set delle inserzioni che usano tale argomento
+	 */
+	public void modificaArgomento(int idArgomento,String arg1){
 		Session session = factory.getCurrentSession();
-		
 		Transaction tx = null;
-		if(idlistadesideri <= 0 || utente == null || nomeListaDesideri == null || prodotti == null)
+		if(idArgomento <= 0 || arg1 == null)
 			throw new RuntimeException("tutti gli argomenti devono essere non nulli");
-		ListaDesideri listadesideri = new ListaDesideri(utente, nomeListaDesideri,new HashSet<ListaDesideriProdotti>());
-		listadesideri.setIdListaDesideri(idlistadesideri);
 		
-		for(Prodotto prodotto : prodotti){
-			ListaDesideriProdottiId id = new ListaDesideriProdottiId(listadesideri.getIdListaDesideri(), prodotto.getIdProdotto(), prodotto.getDescrizione());
-			ListaDesideriProdotti ldp = new ListaDesideriProdotti(id , prodotto, listadesideri);
-			listadesideri.getListaDesideriProdottis().add(ldp);
+		Argomenti argomentoVecchio=null;
+		argomentoVecchio = mappaArgomenti.get(idArgomento);		
 		
-		}
+		if(argomentoVecchio==null)
+			throw new RuntimeException("elemento non trovato");
 		
-		boolean trovato = false;
+		Argomenti argomento = new Argomenti(arg1,argomentoVecchio.getArgomentiInserziones());
+		argomento.setIdArgomenti(idArgomento);
 		
 		try{
-			tx=session.beginTransaction();
-			
-			
-			
-			session.update(listadesideri);
-			
-			
-			
-			ListaDesideri ldtemp = null;
-			
-			for(ListaDesideri ld : setListaDesideri){
-				
-				if(ld.getIdListaDesideri()==idlistadesideri){
-				
-					trovato = true;
-					ldtemp = ld;
-					//si cancellano i vari collegamenti inter object
-					setListaDesideri.remove(ld);
-					setListaDesideri.add(listadesideri);
-				
-					//si aggiungono i nuovi collegamenti inter-object
-					
-					break;
-				}
-			}
-			
-			
-			if(!trovato){
-				throw new RuntimeException("elemento non trovato");
-			}else{
-				
-				for(ListaDesideriProdotti ldp :(Set<ListaDesideriProdotti>) ldtemp.getListaDesideriProdottis()){
-				
-					for(Prodotto p : setProdotto){
-						if(p.equals(ldp.getProdotto())){
-							p.getListaDesideriProdottis().remove(ldp);
-							break;
-						}
-					}
-				}
-				
-				for(ListaDesideriProdotti ldp : (Set<ListaDesideriProdotti>)listadesideri.getListaDesideriProdottis()){
-					
-					for(Prodotto p : setProdotto){
-						if(p.equals(ldp.getProdotto())){
-							p.getListaDesideriProdottis().add(ldp);
-							break;
-						}
-					}
-				}
-					
-				for(Utente u : setUtente){
-					if(u.equals(ldtemp.getUtente())){
-						u.getListaDesideris().remove(ldtemp);
-						break;
-					}
-				}
-				
-				for(Utente u : setUtente){
-					if(u.equals(listadesideri.getUtente())){
-						u.getListaDesideris().add(listadesideri);
-						break;
-					}
-				}
-				
-				
-			}
-			
+			tx=session.beginTransaction();			
+			session.update(argomento);
+			argomentoVecchio.setArg1(arg1);
 			tx.commit();
-		}catch(Throwable ex){
+		}catch(Throwable ex){			
 			if(tx!=null)
 				tx.rollback();
-			throw new RuntimeException(ex);
+			
+			throw new RuntimeException(ex);			
 		}finally{
 			if(session!=null && session.isOpen()){
 				session.close();
@@ -694,51 +287,32 @@ public class Dati {
 			session=null;
 		}
 	}
-	
-	public void deleteListaDesideri(int idlistadesideri){
+
+
+	/**Inserimento di una categoria
+	 * @param nome
+	 * @param sottocategorie 
+	 * Set delle SottoCategorie di questa Categoria
+	 * @param prodotti 
+	 * Set dei prodotti di questa categoria
+	 */
+	public void inserisciCategoria(String nome,Set<Sottocategoria> sottocategorie,Set<Prodotto> prodotti){
+		if(nome == null || sottocategorie == null || prodotti == null)
+			throw new RuntimeException("tutti gli argomenti devono essere non nulli");
+		
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
-		boolean trovato = false;
 		try{
 			tx=session.beginTransaction();
-		
-			if(idlistadesideri<=0)
-				throw new RuntimeException("id non valido");
-			ListaDesideri ld = null;
 			
-			for(ListaDesideri listadesideri : setListaDesideri){
-				if(listadesideri.getIdListaDesideri()==idlistadesideri){
-					trovato = true;
-					ld=listadesideri;
-					
-					break;
-				}
-			}
-		
-			if(trovato){
-				session.delete(ld);
-				setListaDesideri.remove(ld);
+			Categoria categoria = new Categoria(nome, sottocategorie);
+
+			Integer idCategoria= (Integer)session.save(categoria);
+
+
+			mappaCategorie.put(idCategoria, categoria);
 			
-				for(ListaDesideriProdotti ldp : (Set<ListaDesideriProdotti>)ld.getListaDesideriProdottis()){
-					ldp.getProdotto().getListaDesideriProdottis().remove(ld);
-					for(Prodotto p : setProdotto){
-						if(p.equals(ldp.getProdotto())){
-							p.getListaDesideriProdottis().remove(ld);
-							break;
-						}
-					}
-				}
-				
-				for(Utente u : setUtente){
-					if(u.equals(ld.getUtente())){
-						u.getListaDesideris().remove(ld);
-						break;
-					}
-				}
-				
-			}else{
-				throw new RuntimeException("elemento non trovato");
-			}
+			
 			tx.commit();
 		}catch(Throwable ex){
 			if(tx!=null)
@@ -750,40 +324,512 @@ public class Dati {
 			}
 			session=null;
 		}
+
+
+	}
+
+	/**metodo get della mappa categorie
+	 * @return
+	 */
+	public Map<Integer,Categoria> getCategorie(){
+		
+		HashMap<Integer, Categoria> categorie = new HashMap<Integer, Categoria>();
+		
+		categorie.putAll(mappaCategorie);
+
+		return categorie;
+
+	}
+
+	/**Inserimento di un'inserzione
+	 * @param utente
+	 * @param supermercato
+	 * @param prodotto
+	 * @param prezzo
+	 * @param dataInizio
+	 * @param dataFine
+	 * @param descrizione
+	 * @param foto uri della foto all'interno del server
+	 * @return
+	 */
+	public int inserisciInserzione(Utente utente,Supermercato supermercato,Prodotto prodotto,float prezzo,Date dataInizio,Date dataFine,String descrizione,String foto,Set<Argomenti> argomenti) {
+		if(utente == null || supermercato == null || prodotto == null || prezzo <= 0 || dataInizio == null )
+			throw new RuntimeException("errore nell'immissione dei parametri");
+		
+		Session session = factory.getCurrentSession();
+		Transaction tx = null;
+		int idInserzione = -1;
+		boolean salvataggioArgomentiInserzione = false;
+		Set<ArgomentiInserzione> argomentiInserzioneSalvati = new HashSet<ArgomentiInserzione>();
+		try {
+			
+			tx=session.beginTransaction();	
+			
+			Inserzione inserzione = new Inserzione(utente, supermercato, prodotto, prezzo, dataInizio, dataFine, descrizione, foto,0,(float)0.0,new HashSet<ValutazioneInserzione>(),new HashSet<ArgomentiInserzione>());
+			idInserzione=(Integer)session.save(inserzione);
+			for(Argomenti a : argomenti){
+				ArgomentiInserzioneId id = new ArgomentiInserzioneId(idInserzione, a.getIdArgomenti());
+				ArgomentiInserzione ai = new ArgomentiInserzione(id, inserzione, a);
+				Integer idArgomentoInserzione = (Integer)session.save(ai);
+				mappaArgomentiInserzione.put(idArgomentoInserzione, ai);
+				mappaArgomenti.get(a.getIdArgomenti()).getArgomentiInserziones().add(ai);
+				argomentiInserzioneSalvati.add(ai);
+				if(!salvataggioArgomentiInserzione)
+					salvataggioArgomentiInserzione = true;
+			}
+			inserzione.setArgomentiInserziones(argomentiInserzioneSalvati);
+			mappaInserzioni.put(idInserzione,inserzione);			
+			mappaUtente.get(utente.getMail()).getInserziones().add(inserzione);
+			mappaSupermercati.get(supermercato.getNome()).getInserziones().add(inserzione);
+			mappaProdotti.get(prodotto.getCodiceBarre()).getInserziones().add(inserzione);
+			tx.commit();
+		}catch(Throwable ex){
+			if(tx!=null)
+				tx.rollback();
+			if(salvataggioArgomentiInserzione){
+				for(ArgomentiInserzione ai : argomentiInserzioneSalvati){
+					mappaArgomentiInserzione.remove(ai.getId().hashCode());
+					mappaArgomenti.get(ai.getArgomenti().getIdArgomenti()).getArgomentiInserziones().remove(ai);
+				}
+			}
+			throw new RuntimeException(ex);
+		}finally{
+			if(session!=null && session.isOpen()){
+				session.close();
+			}
+			session=null;
+		}
+		return idInserzione;
 	}
 	
-	public ListaDesideri getListaDesideri(int idlistadesideri){
+	/**modifica di un'inserzione
+	 * @param idInserzione
+	 * @param utente
+	 * @param supermercato
+	 * @param prodotto
+	 * @param prezzo
+	 * @param dataInizio
+	 * @param dataFine
+	 * @param descrizione
+	 * @param foto
+	 * @param valutazioni
+	 * @param argomenti gli argomenti usati per quella inserzione
+	 */
+	public void modificaInserzione(int idInserzione,Utente utente,Supermercato supermercato,Prodotto prodotto,float prezzo,Date dataInizio,Date dataFine,String descrizione,String foto,Set<Argomenti> argomenti){
 		Session session = factory.getCurrentSession();
+		Transaction tx = null;
+		boolean eliminazioneArgomentiInserzione = false;
+		boolean inserimentoArgomentiInserzione = false;
 		
-		ListaDesideri ld = null;
-		for(ListaDesideri listadesideri : setListaDesideri){
-			if(listadesideri.getIdListaDesideri().equals(idlistadesideri)){
-				ld=listadesideri;
-				break;
-			}
+		if(idInserzione <= 0 || utente == null || supermercato == null || prodotto == null || prezzo <= 0 || dataInizio == null || dataFine == null || descrizione == null || foto == null || argomenti == null)
+			throw new RuntimeException("tutti gli argomenti devono essere non nulli");
+		
+		Inserzione inserzioneVecchia = null;
+		inserzioneVecchia=mappaInserzioni.get(idInserzione);
+		Set<ArgomentiInserzione> argomentiInserzione = new HashSet<ArgomentiInserzione>();
+		Set<ArgomentiInserzione> argomentiInserzioneEliminati = new HashSet<ArgomentiInserzione>();
+		Set<ArgomentiInserzione> argomentiInserzioneInseriti = new HashSet<ArgomentiInserzione>();
+		
+		for(Argomenti a : argomenti){
+			ArgomentiInserzioneId id = new ArgomentiInserzioneId(idInserzione, a.getIdArgomenti());
+			ArgomentiInserzione ai = new ArgomentiInserzione(id, inserzioneVecchia, a);
+			argomentiInserzione.add(ai);
 		}
+		
+		if(inserzioneVecchia == null)
+			throw new RuntimeException("elemento non trovato");
+		Inserzione inserzione = new Inserzione(utente, supermercato, prodotto, prezzo, dataInizio, dataFine, descrizione, foto,0,(float)0.0,inserzioneVecchia.getValutazioneInserziones(),argomenti);
+		inserzione.setIdInserzione(idInserzione);
+		
+		try{
+			tx=session.beginTransaction();
+			session.update(inserzione);			
+			
+			for(ArgomentiInserzione ai : (Set<ArgomentiInserzione>)inserzioneVecchia.getArgomentiInserziones()){
+				if(!argomentiInserzione.contains(ai)){
+					session.delete(ai);
+					mappaArgomentiInserzione.remove(ai.getId().hashCode());
+					mappaArgomenti.get(ai.getArgomenti().getIdArgomenti()).getArgomentiInserziones().remove(ai);
+					argomentiInserzioneEliminati.add(ai);
+					if(!eliminazioneArgomentiInserzione)
+						eliminazioneArgomentiInserzione = true;
+				}
+			}
+			
+			for(ArgomentiInserzione ai : argomentiInserzione){				
+				ai.setInserzione(inserzioneVecchia);
+				if(!inserzioneVecchia.getArgomentiInserziones().contains(ai)){
+					session.save(ai);
+					mappaArgomentiInserzione.put(ai.getId().hashCode(),ai);
+					mappaArgomenti.get(ai.getArgomenti().getIdArgomenti()).getArgomentiInserziones().add(ai);
+					argomentiInserzioneInseriti.add(ai);
+					if(!inserimentoArgomentiInserzione)
+						inserimentoArgomentiInserzione = true;
+					
+				}
+			}
+			if(!utente.equals(inserzioneVecchia.getUtente())){
+				inserzioneVecchia.setUtente(utente);
+				mappaUtente.get(inserzioneVecchia.getUtente().getMail()).getInserziones().remove(inserzioneVecchia);
+				mappaUtente.get(utente.getMail()).getInserziones().add(inserzioneVecchia);
+			}
+			if(!supermercato.equals(inserzioneVecchia.getSupermercato())){				
+				inserzioneVecchia.setSupermercato(supermercato);
+				mappaSupermercati.get(inserzioneVecchia.getSupermercato().getNome()).getInserziones().remove(inserzioneVecchia);
+				mappaSupermercati.get(supermercato.getNome()).getInserziones().add(inserzioneVecchia);
+			}
+			if(!prodotto.equals(inserzioneVecchia.getProdotto())){
+				inserzioneVecchia.setProdotto(prodotto);
+				mappaProdotti.get(inserzioneVecchia.getProdotto().getCodiceBarre()).getInserziones().remove(inserzioneVecchia);
+				mappaProdotti.get(prodotto.getCodiceBarre()).getInserziones().add(inserzioneVecchia);		
+			}
+			
+
+			tx.commit();
+		}catch(Throwable ex){
+			if(tx!=null)
+				tx.rollback();
+			if(eliminazioneArgomentiInserzione && !inserimentoArgomentiInserzione){
+				for(ArgomentiInserzione ai : argomentiInserzioneEliminati){
+					mappaArgomentiInserzione.put(ai.getId().hashCode(), ai);
+					mappaArgomenti.get(ai.getArgomenti().getIdArgomenti()).getArgomentiInserziones().add(ai);
+				}
+			}
+			if(inserimentoArgomentiInserzione){
+				for(ArgomentiInserzione ai : argomentiInserzioneEliminati){
+					mappaArgomentiInserzione.put(ai.getId().hashCode(), ai);
+					mappaArgomenti.get(ai.getArgomenti().getIdArgomenti()).getArgomentiInserziones().add(ai);
+				}
+				for(ArgomentiInserzione ai : argomentiInserzioneInseriti){
+					mappaArgomentiInserzione.remove(ai.getId().hashCode());
+					mappaArgomenti.get(ai.getArgomenti().getIdArgomenti()).getArgomentiInserziones().remove(ai);
+				}
+			}
+			throw new RuntimeException(ex);
+		}finally{
+			if(session!=null && session.isOpen()){
+				session.close();
+			}
+			session=null;
+		}
+	}
+
+	/**Eliminazione di un'inserzione
+	 * @param IdInserzione
+	 */
+	public void eliminaInserzione(int IdInserzione){
+		Session session = factory.getCurrentSession();
+		Transaction tx = null;
+		Inserzione inserzioneDaEliminare = mappaInserzioni.get(IdInserzione);
+		boolean eliminazioneValutazioneInserzione = false;
+		boolean eliminazioneArgomentiInserzione = false;
+		if(inserzioneDaEliminare == null)
+			throw new RuntimeException("elemento non trovato nelle inserzioni");
+		Set<ValutazioneInserzione> valutazioniEliminate = new HashSet<ValutazioneInserzione>();
+		Set<ArgomentiInserzione> argomentiInserzioneEliminati = new HashSet<ArgomentiInserzione>();
+		
+		try{
+			tx=session.beginTransaction();
+			session.delete(inserzioneDaEliminare);
+			
+			for(ValutazioneInserzione v : (Set<ValutazioneInserzione>)inserzioneDaEliminare.getValutazioneInserziones()){
+				session.delete(v);
+				mappaValutazioneInserzione.remove(v.getIdValutazioneInserzione());
+				valutazioniEliminate.add(v);
+				if(!eliminazioneValutazioneInserzione)
+					eliminazioneValutazioneInserzione = true;
+			}
+			
+			for(ArgomentiInserzione ai : (Set<ArgomentiInserzione>)inserzioneDaEliminare.getArgomentiInserziones()){
+				
+				session.delete(ai);
+				mappaArgomentiInserzione.remove(ai.getId().hashCode());
+				mappaArgomenti.get(ai.getArgomenti().getIdArgomenti()).getArgomentiInserziones().remove(ai);
+				argomentiInserzioneEliminati.add(ai);
+				if(!eliminazioneArgomentiInserzione)
+					eliminazioneArgomentiInserzione = true;
+				
+			}
+			
+			mappaUtente.get(inserzioneDaEliminare.getUtente().getMail()).getInserziones().remove(inserzioneDaEliminare);
+			mappaSupermercati.get(inserzioneDaEliminare.getSupermercato().getNome()).getInserziones().remove(inserzioneDaEliminare);
+			mappaProdotti.get(inserzioneDaEliminare.getProdotto().getCodiceBarre()).getInserziones().remove(inserzioneDaEliminare);
+			mappaInserzioni.remove(IdInserzione);
+			tx.commit();
+		}catch(Throwable ex){
+			if(tx!=null)
+				tx.rollback();
+			if(eliminazioneValutazioneInserzione && !eliminazioneArgomentiInserzione){
+				for(ValutazioneInserzione vi : valutazioniEliminate){
+					mappaValutazioneInserzione.put(vi.getIdValutazioneInserzione(), vi);
+				}
+			}
+			if(eliminazioneArgomentiInserzione){
+				for(ValutazioneInserzione vi : valutazioniEliminate){
+					mappaValutazioneInserzione.put(vi.getIdValutazioneInserzione(), vi);
+				}
+				for(ArgomentiInserzione ai : argomentiInserzioneEliminati){
+					mappaArgomentiInserzione.put(ai.getId().hashCode(), ai);
+					mappaArgomenti.get(ai.getArgomenti().getIdArgomenti()).getArgomentiInserziones().add(ai);
+				}				
+			}
+			throw new RuntimeException(ex);
+		}finally{
+			if(session!=null && session.isOpen()){
+				session.close();
+			}
+			session=null;
+		}
+	}
+
+	
+	/**Inserimento di una lista desideri
+	 * @param utente
+	 * @param prodottiQuantita 
+	 * Set di ListaDesideriProdotti con id nulli e con la quantità del prodotto
+	 * @param nomeListaDesideri
+	 * @param descrizione
+	 */
+	public void inserisciListaDesideri(Utente utente,Set<ListaDesideriProdotti> prodottiQuantita,String nomeListaDesideri,String descrizione){
+		if(utente == null || prodottiQuantita == null || nomeListaDesideri == null || descrizione == null)
+			throw new RuntimeException("tutti gli argomenti devono essere non nulli");
+		Session session = factory.getCurrentSession();
+		Transaction tx = null;
+		boolean salvataggioListaDesideriProdotti = false;
+		Set<ListaDesideriProdotti> listaDesideriProdotti = new HashSet<ListaDesideriProdotti>();
+		try {
+			tx=session.beginTransaction();		
+
+			ListaDesideri listaDesideri = new ListaDesideri(utente, nomeListaDesideri, new HashSet<ListaDesideriProdotti>());
+			Integer idListaDesideri=(Integer)session.save(listaDesideri);
+			
+			for(ListaDesideriProdotti listaDesideriProdotto : prodottiQuantita){
+				ListaDesideriProdottiId id = new ListaDesideriProdottiId(listaDesideri.getIdListaDesideri(), listaDesideriProdotto.getProdotto().getIdProdotto(), listaDesideriProdotto.getProdotto().getDescrizione());
+				listaDesideriProdotto.setId(id);
+				listaDesideri.getListaDesideriProdottis().add(listaDesideriProdotto);
+				session.save(listaDesideriProdotto);
+				mappaListaDesideriProdotti.put(id.hashCode(), listaDesideriProdotto);
+				listaDesideriProdotti.add(listaDesideriProdotto);
+				
+				if(!salvataggioListaDesideriProdotti)
+					salvataggioListaDesideriProdotti=true;
+			}
+			
+			for(ListaDesideriProdotti ldp : (Set<ListaDesideriProdotti>)listaDesideri.getListaDesideriProdottis()){				
+				mappaProdotti.get(ldp.getProdotto().getCodiceBarre()).getListaDesideriProdottis().add(ldp);
+			}
+			
+			mappaListaDesideri.put(idListaDesideri,listaDesideri);
+			mappaUtente.get(utente.getMail()).getListaDesideris().add(listaDesideri);
+			tx.commit();
+		}catch(Throwable ex){
+			if(tx!=null)
+				tx.rollback();
+			if(salvataggioListaDesideriProdotti == true){
+				for(ListaDesideriProdotti ldp : listaDesideriProdotti){
+					mappaListaDesideriProdotti.remove(ldp.getId().hashCode());
+				}
+			}
+				
+			throw new RuntimeException(ex);
+		}finally{
+			if(session!=null && session.isOpen()){
+				session.close();
+			}
+			session=null;
+		}
+	}
+
+	/**modifica di una lista desideri
+	 * @param idListaDesideri
+	 * @param utente
+	 * @param nomeListaDesideri
+	 * @param prodottiQuantita
+	 * Set di ListaDesideriProdotti con id nulli e con Prodotti e quantità
+	 */
+	public void modificaListaDesideri(int idListaDesideri,Utente utente,String nomeListaDesideri,Set<ListaDesideriProdotti> prodottiQuantita){
+		Session session = factory.getCurrentSession();
+
+		Transaction tx = null;
+		if(idListaDesideri <= 0 || utente == null || nomeListaDesideri == null || prodottiQuantita == null)
+			throw new RuntimeException("tutti gli argomenti devono essere non nulli");
+		
+		ListaDesideri listaDesideri = new ListaDesideri(utente, nomeListaDesideri,new HashSet<ListaDesideriProdotti>());
+		listaDesideri.setIdListaDesideri(idListaDesideri);
+		boolean salvataggioListaDesideriProdotti = false;
+		boolean eliminazioneListaDesideriProdotti = false;
+		ListaDesideri listaDesideriVecchia = mappaListaDesideri.get(idListaDesideri);
+		if(listaDesideriVecchia == null) 
+			throw new RuntimeException("elemento non trovato");
+		Set<ListaDesideriProdotti> listaDesideriProdottiNuovi = new HashSet<ListaDesideriProdotti>();
+		Set<ListaDesideriProdotti> listaDesideriProdottiVecchia = new HashSet<ListaDesideriProdotti>();
+		listaDesideriProdottiVecchia.addAll(listaDesideriVecchia.getListaDesideriProdottis());
+		Set<ListaDesideriProdotti> listaDesideriProdottiAggiunti = new HashSet<ListaDesideriProdotti>();
+		Set<ListaDesideriProdotti> listaDesideriProdottiRimossi = new HashSet<ListaDesideriProdotti>();
+		try {
+			tx=session.beginTransaction();
+			session.update(listaDesideri);	
+			
+			for(ListaDesideriProdotti listaDesideriProdotto : prodottiQuantita) {
+				ListaDesideriProdottiId id = new ListaDesideriProdottiId(idListaDesideri, listaDesideriProdotto.getProdotto().getIdProdotto(), listaDesideriProdotto.getProdotto().getDescrizione());
+				ListaDesideriProdotti listaDesideriProdottiTrovato = mappaListaDesideriProdotti.get(id.hashCode());
+				if(listaDesideriProdottiTrovato != null){
+					listaDesideriProdottiNuovi.add(listaDesideriProdottiTrovato);
+				}else{
+					listaDesideriProdotto.setId(id);
+					listaDesideriVecchia.getListaDesideriProdottis().add(listaDesideriProdotto);		
+					listaDesideriProdottiNuovi.add(listaDesideriProdotto);
+				}
+			}
+		
+			
+			for(ListaDesideriProdotti ldp : (Set<ListaDesideriProdotti>) listaDesideriVecchia.getListaDesideriProdottis()){
+				if(!listaDesideriProdottiNuovi.contains(ldp)){
+					session.delete(ldp);
+					mappaProdotti.get(ldp.getProdotto().getCodiceBarre()).getListaDesideriProdottis().remove(ldp);
+					mappaListaDesideriProdotti.remove(ldp.getId().hashCode());
+					listaDesideriProdottiRimossi.add(ldp);
+					
+					if(!eliminazioneListaDesideriProdotti)
+						eliminazioneListaDesideriProdotti = true;
+				}
+			}				
+			
+			for(ListaDesideriProdotti ldp : listaDesideriProdottiNuovi){
+				if(!listaDesideriProdottiVecchia.contains(ldp)){	
+					session.save(ldp);
+					mappaProdotti.get(ldp.getProdotto().getCodiceBarre()).getListaDesideriProdottis().add(ldp);					
+					mappaListaDesideriProdotti.put(listaDesideri.getIdListaDesideri().hashCode(), ldp);
+					listaDesideriProdottiAggiunti.add(ldp);
+					
+					if(!salvataggioListaDesideriProdotti)
+						salvataggioListaDesideriProdotti = true;
+				}
+			}
+			
+			tx.commit();
+		}catch(Throwable ex){
+			if(tx!=null)
+				tx.rollback();			
+			
+			if(eliminazioneListaDesideriProdotti && !salvataggioListaDesideriProdotti) {
+				mappaListaDesideri.remove(idListaDesideri);
+				mappaListaDesideri.put(idListaDesideri, listaDesideriVecchia);
+				
+				for(ListaDesideriProdotti ldp : listaDesideriProdottiRimossi){					
+					mappaProdotti.get(ldp.getProdotto().getCodiceBarre()).getListaDesideriProdottis().add(ldp);
+					mappaListaDesideriProdotti.put(ldp.getId().hashCode(),ldp);
+				}
+			}
+			
+			if(salvataggioListaDesideriProdotti){
+				mappaListaDesideri.remove(idListaDesideri);
+				mappaListaDesideri.put(idListaDesideri, listaDesideriVecchia);
+				
+				for(ListaDesideriProdotti ldp : listaDesideriProdottiAggiunti){
+					mappaProdotti.get(ldp.getProdotto().getCodiceBarre()).getListaDesideriProdottis().remove(ldp);
+					mappaListaDesideriProdotti.remove(listaDesideri.getIdListaDesideri().hashCode());
+				}
+				
+				for(ListaDesideriProdotti ldp : listaDesideriProdottiRimossi){					
+					mappaProdotti.get(ldp.getProdotto().getCodiceBarre()).getListaDesideriProdottis().add(ldp);
+					mappaListaDesideriProdotti.put(ldp.getId().hashCode(),ldp);
+				}				
+			}
+			throw new RuntimeException(ex);
+		}finally{
+			if(session!=null && session.isOpen()){
+				session.close();
+			}
+			session=null;
+		}
+	}
+
+	/**Eliminazione di una lista desideri
+	 * @param idListaDesideri
+	 */
+	public void eliminaListaDesideri(int idListaDesideri) {
+		if(idListaDesideri <= 0)
+			throw new RuntimeException("id non valido");	
+		Session session = factory.getCurrentSession();
+		Transaction tx = null;
+		boolean eliminazioneListaDesideriProdotti = false;
+		ListaDesideri listaDesideri = null;
+		Set<ListaDesideriProdotti> listaDesideriProdotti = new HashSet<ListaDesideriProdotti>();
+		listaDesideri=mappaListaDesideri.get(idListaDesideri);
+		if(listaDesideri == null)
+			throw new RuntimeException("elemento non trovato");
+		try {
+			tx=session.beginTransaction();			
+				
+			for(ListaDesideriProdotti ldp : (Set<ListaDesideriProdotti>)listaDesideri.getListaDesideriProdottis()) {					
+				session.delete(ldp);
+				mappaListaDesideriProdotti.remove(ldp.getId().hashCode());
+				mappaProdotti.get(ldp.getProdotto().getCodiceBarre()).getListaDesideriProdottis().remove(ldp);
+				listaDesideriProdotti.add(ldp);
+				
+				if(!eliminazioneListaDesideriProdotti)
+					eliminazioneListaDesideriProdotti = true;
+			}
+			
+			session.delete(listaDesideri);
+			mappaListaDesideri.remove(listaDesideri.getIdListaDesideri());
+			mappaUtente.get(listaDesideri.getUtente().getMail()).getListaDesideris().remove(listaDesideri);			
+			
+			tx.commit();
+		}catch(Throwable ex){
+			if(tx!=null)
+				tx.rollback();
+			if(eliminazioneListaDesideriProdotti){
+				for(ListaDesideriProdotti ldp : listaDesideriProdotti) {					
+					mappaListaDesideriProdotti.put(ldp.getId().hashCode(),ldp);
+					mappaProdotti.get(ldp.getProdotto().getCodiceBarre()).getListaDesideriProdottis().add(ldp);
+				}
+			}
+			throw new RuntimeException(ex);
+		}finally{
+			if(session!=null && session.isOpen()){
+				session.close();
+			}
+			session=null;
+		}
+	}
+
+	/**metodo get di una ListaDesideri
+	 * @param idListaDesideri
+	 * @return
+	 */
+	public ListaDesideri getListaDesideri(int idListaDesideri){
+		Session session = factory.getCurrentSession();
+
+		ListaDesideri ld = mappaListaDesideri.get(idListaDesideri);
 		if(ld==null)
 			throw new RuntimeException("elemento non trovato");
 		return ld;
 	}
-	
-	
-	public void insertListaSpesa(Utente utente,Set<Prodotto> prodotti,String nomeListaSpesa){
+
+
+	/**Inserimento di una inserzione
+	 * @param utente
+	 * @param prodottiQuantita
+	 * Set di listaSpesaProdotti con id nulli e con prodotto e quantità
+	 * @param nomeListaSpesa
+	 */
+	public void inserimentoListaSpesa(Utente utente,Set<ListaSpesaProdotti> prodottiQuantita,String nomeListaSpesa){
+		if(utente == null || prodottiQuantita == null || nomeListaSpesa == null )
+			throw new RuntimeException("tutti gli argomenti devono essere non nulli");
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
 		float prezzo = 0;
 		Inserzione inserzione,ultima;
 		ultima = null;
-		
+		Set<ListaSpesaProdotti> listaSpesaProdotti = new HashSet<ListaSpesaProdotti>();
+		boolean salvataggioListaSpesaProdotti = false;
 		try{
-			tx=session.beginTransaction();
-			
-			if(utente == null || prodotti == null || nomeListaSpesa == null )
-				throw new RuntimeException("tutti gli argomenti devono essere non nulli");
+			tx=session.beginTransaction();			
 			Iterator <Inserzione> it;
-			for(Prodotto prodotto : prodotti){
-				
-				it=prodotto.getInserziones().iterator();
+			for(ListaSpesaProdotti lsp : prodottiQuantita){
+				it=lsp.getProdotto().getInserziones().iterator();
 				for(;it.hasNext();){
 					if(ultima==null){
 						ultima = it.next();
@@ -798,40 +844,38 @@ public class Dati {
 					prezzo+=ultima.getPrezzo();
 				}
 			}
-			
+
 			ListaSpesa listaspesa = new ListaSpesa(utente, nomeListaSpesa,prezzo, new HashSet<ListaSpesaProdotti>());
+			Integer idListaSpesa =(Integer) session.save(listaspesa);
 			
-			for(Prodotto prodotto : prodotti){
-				ListaSpesaProdottiId id = new ListaSpesaProdottiId(listaspesa.getIdSpesa(), prodotto.getIdProdotto(), prodotto.getDescrizione());
-				ListaSpesaProdotti ldp = new ListaSpesaProdotti(id , prodotto, listaspesa);
-				listaspesa.getListaSpesaProdottis().add(ldp);
-			
+			for(ListaSpesaProdotti listaSpesaProdotto : prodottiQuantita){
+				ListaSpesaProdottiId id = new ListaSpesaProdottiId(listaspesa.getIdSpesa(), listaSpesaProdotto.getProdotto().getIdProdotto(), listaSpesaProdotto.getProdotto().getDescrizione());
+				listaSpesaProdotto.setId(id);
+				listaspesa.getListaSpesaProdottis().add(listaSpesaProdotto);
+				session.save(listaSpesaProdotto);
+				mappaListaSpesaProdotti.put(id.hashCode(), listaSpesaProdotto);
+				listaSpesaProdotti.add(listaSpesaProdotto);
+				if(!salvataggioListaSpesaProdotti)
+					salvataggioListaSpesaProdotti=true;
+
 			}
-			session.save(listaspesa);
-			
-			for(ListaSpesaProdotti lsp : (Set<ListaSpesaProdotti>)listaspesa.getListaSpesaProdottis()){
-				
-				for(Prodotto p : setProdotto){
-					if(p.equals(lsp.getProdotto())){
-						p.getListaSpesaProdottis().add(lsp);
-						break;
-					}
-				}
+
+			for(ListaSpesaProdotti lsp : listaSpesaProdotti){				
+				mappaProdotti.get(lsp.getProdotto().getCodiceBarre()).getListaSpesaProdottis().add(lsp);				
 			}
-				
-			setListaSpesa.add(listaspesa);
-				
-			for(Utente u : setUtente){
-				if(u.equals(utente)){
-					u.getListaSpesas().add(listaspesa);
-					break;
-				}
-			}
+
+			mappaListaSpesa.put(idListaSpesa,listaspesa);
+			mappaUtente.get(utente.getMail()).getListaSpesas().add(listaspesa);
 			
 			tx.commit();
 		}catch(Throwable ex){
 			if(tx!=null)
 				tx.rollback();
+			if(salvataggioListaSpesaProdotti){
+				for(ListaSpesaProdotti lsp : listaSpesaProdotti){
+					mappaListaSpesaProdotti.remove(lsp.getId().hashCode());
+				}
+			}
 			throw new RuntimeException(ex);
 		}finally{
 			if(session!=null && session.isOpen()){
@@ -840,22 +884,28 @@ public class Dati {
 			session=null;
 		}
 	}
+
+	/**Modifica di una ListaSpesa
+	 * @param idSpesa
+	 * @param utente
+	 * @param nomeListaSpesa
+	 * @param prodottiQuantita
+	 * Set di listaSpesaProdotti con id nulli e con prodotto e quantità
+	 */
+	public void modificaListaSpesa(int idSpesa,Utente utente,String nomeListaSpesa,Set<ListaSpesaProdotti> prodottiQuantita){
+		if(utente == null || prodottiQuantita == null || nomeListaSpesa == null )
+			throw new RuntimeException("tutti gli argomenti devono essere non nulli");
 		
-	public void modifyListaSpesa(int idspesa,Utente utente,String nomeListaSpesa,Set<Prodotto> prodotti){
 		Session session = factory.getCurrentSession();
-		
 		Transaction tx = null;
-		boolean trovato = false;
 		Iterator <Inserzione> it;
 		Inserzione ultima = null;
 		Inserzione inserzione;
-		float prezzo = 0;
-		if(utente == null || prodotti == null || nomeListaSpesa == null )
-			throw new RuntimeException("tutti gli argomenti devono essere non nulli");
-		
-		for(Prodotto prodotto : prodotti){
-			
-			it=prodotto.getInserziones().iterator();
+		float prezzo = 0;		
+
+		for(ListaSpesaProdotti listaSpesaProdotto : prodottiQuantita){
+
+			it=listaSpesaProdotto.getProdotto().getInserziones().iterator();
 			for(;it.hasNext();){
 				if(ultima==null){
 					ultima = it.next();
@@ -871,73 +921,47 @@ public class Dati {
 			}
 		}
 		
+		Set<ListaSpesaProdotti> listaSpesaProdotti = new HashSet<ListaSpesaProdotti>();
+		Set<ListaSpesaProdotti> listaSpesaProdottiVecchia = new HashSet<ListaSpesaProdotti>();
+		Set<ListaSpesaProdotti> listaSpesaProdottiNuovi = new HashSet<ListaSpesaProdotti>();
+		boolean salvataggioListaSpesaProdotti = false;
+		boolean eliminazioneListaSpesaProdottiVecchia = false;
 		ListaSpesa listaspesa = new ListaSpesa(utente, nomeListaSpesa,prezzo, new HashSet<ListaSpesaProdotti>());
-		listaspesa.setIdSpesa(idspesa);
-		for(Prodotto prodotto : prodotti){
-			ListaSpesaProdottiId id = new ListaSpesaProdottiId(listaspesa.getIdSpesa(), prodotto.getIdProdotto(), prodotto.getDescrizione());
-			ListaSpesaProdotti ldp = new ListaSpesaProdotti(id , prodotto, listaspesa);
-			listaspesa.getListaSpesaProdottis().add(ldp);
+		listaspesa.setIdSpesa(idSpesa);
+		ListaSpesa listaSpesaVecchia = mappaListaSpesa.get(idSpesa);
 		
-		}
-		
+		if(listaSpesaVecchia == null)
+			throw new RuntimeException("elemento non trovato");
+
 		try{
 			tx=session.beginTransaction();
-			
-			session.update(listaspesa);
-			
-			ListaSpesa ldtemp = null;
-			
-			for(ListaSpesa ls : setListaSpesa){
-				
-				if(ls.getIdSpesa()==listaspesa.getIdSpesa()){
-				
-					trovato = true;
-					ldtemp = ls;
-					//si cancellano i vari collegamenti inter object
-					setListaSpesa.remove(ls);
-					setListaSpesa.add(listaspesa);
-				
-					//si aggiungono i nuovi collegamenti inter-object
-					
-					break;
+			session.update(listaspesa);					
+			for(ListaSpesaProdotti listaSpesaProdotto : prodottiQuantita){
+				ListaSpesaProdottiId id = new ListaSpesaProdottiId(listaspesa.getIdSpesa(), listaSpesaProdotto.getProdotto().getIdProdotto(), listaSpesaProdotto.getProdotto().getDescrizione());
+				ListaSpesaProdotti listaSpesaProdottiTrovato = mappaListaSpesaProdotti.get(id.hashCode());
+				if(listaSpesaProdottiTrovato != null){	
+					listaSpesaProdottiNuovi.add(listaSpesaProdottiTrovato);
+				}else{
+					ListaSpesaProdotti lsp = new ListaSpesaProdotti(id , listaSpesaProdotto.getProdotto(), listaspesa);
+					listaSpesaVecchia.getListaSpesaProdottis().add(lsp);	
+					session.save(lsp);
+					mappaListaSpesaProdotti.put(lsp.getId().hashCode(), lsp);
+					listaSpesaProdotti.add(lsp);	
+					listaSpesaProdottiNuovi.add(lsp);
+					mappaProdotti.get(listaSpesaProdotto.getProdotto().getCodiceBarre()).getListaSpesaProdottis().add(lsp);
+					if(!salvataggioListaSpesaProdotti)
+						salvataggioListaSpesaProdotti=true;
 				}
 			}
 			
-			
-			if(!trovato){
-				throw new RuntimeException("elemento non trovato");
-			}else{
-				
-				for(ListaSpesaProdotti lsp :(Set<ListaSpesaProdotti>) ldtemp.getListaSpesaProdottis()){
-				
-					for(Prodotto p : setProdotto){
-						if(p.equals(lsp.getProdotto())){
-							p.getListaSpesaProdottis().remove(lsp);
-							break;
-						}
-					}
-				}
-				for(ListaSpesaProdotti lsp :(Set<ListaSpesaProdotti>)listaspesa.getListaSpesaProdottis()){
-				
-					for(Prodotto p : setProdotto){
-						if(p.equals(lsp.getProdotto())){
-							p.getListaSpesaProdottis().add(lsp);
-							break;
-						}
-					}
-					
-				}
-				
-				for(Utente u : setUtente){
-					if(u.equals(ldtemp.getUtente())){
-						u.getListaSpesas().remove(ldtemp);
-						break;
-					}
-				}
-				for(Utente u : setUtente){
-					if(u.equals(listaspesa.getUtente())){
-						u.getListaSpesas().add(listaspesa);
-					}
+			for(ListaSpesaProdotti lsp :(Set<ListaSpesaProdotti>) listaSpesaVecchia.getListaSpesaProdottis()){
+				if(!listaSpesaProdottiNuovi.contains(lsp)){
+					session.delete(lsp);
+					mappaListaSpesaProdotti.remove(lsp.getId().hashCode());
+					listaSpesaProdottiVecchia.add(lsp);
+					mappaProdotti.get(lsp.getProdotto().getCodiceBarre()).getListaSpesaProdottis().remove(lsp);
+					if(!eliminazioneListaSpesaProdottiVecchia)
+						eliminazioneListaSpesaProdottiVecchia = true;
 				}
 			}
 			
@@ -945,6 +969,27 @@ public class Dati {
 		}catch(Throwable ex){
 			if(tx!=null)
 				tx.rollback();
+			if(eliminazioneListaSpesaProdottiVecchia && !salvataggioListaSpesaProdotti){
+				mappaListaSpesa.remove(idSpesa);
+				mappaListaSpesa.put(idSpesa, listaSpesaVecchia);
+				
+				for(ListaSpesaProdotti lsp : listaSpesaProdottiVecchia){
+					mappaListaSpesaProdotti.put(lsp.getId().hashCode(), lsp);
+				}
+			}
+			if(salvataggioListaSpesaProdotti){
+				mappaListaSpesa.remove(idSpesa);
+				mappaListaSpesa.put(idSpesa, listaSpesaVecchia);
+
+				for(ListaSpesaProdotti lsp : listaSpesaProdotti){
+					mappaListaSpesaProdotti.remove(lsp.getId().hashCode());
+				}
+				
+				for(ListaSpesaProdotti lsp : listaSpesaProdottiVecchia){
+					mappaListaSpesaProdotti.put(lsp.getId().hashCode(), lsp);
+				}
+				
+			}
 			throw new RuntimeException(ex);
 		}finally{
 			if(session!=null && session.isOpen()){
@@ -953,56 +998,54 @@ public class Dati {
 			session=null;
 		}
 	}
-	
-	public void deleteListaSpesa(int idspesa){
+
+	/**eliminazione di una ListaSpesa
+	 * @param idSpesa
+	 */
+	public void eliminaListaSpesa(int idSpesa){
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
-		boolean trovato = false;
+		
+		if(idSpesa<=0)
+			throw new RuntimeException("id non valido");
+		
+		ListaSpesa listaSpesaDaEliminare = mappaListaSpesa.get(idSpesa);
+		
+		if(listaSpesaDaEliminare == null)
+			throw new RuntimeException("elemento non trovato");
+		
+		Set<ListaSpesaProdotti> listaSpesaProdotti = new HashSet<ListaSpesaProdotti>();
+		boolean eliminazioneListaSpesaProdotti = false;
 		try{
 			tx=session.beginTransaction();
-		
-			if(idspesa<=0)
-				throw new RuntimeException("id non valido");
-			ListaSpesa ls = null;
 			
-			for(ListaSpesa listaspesa : setListaSpesa){
-				if(listaspesa.getIdSpesa()==idspesa){
-					trovato = true;
-					ls=listaspesa;
-					
-					break;
-				}
+			session.delete(listaSpesaDaEliminare);
+			mappaListaSpesa.remove(listaSpesaDaEliminare);
+
+			for(ListaSpesaProdotti lsp : (Set<ListaSpesaProdotti>)listaSpesaDaEliminare.getListaSpesaProdottis()){
+				session.delete(lsp);
+				mappaListaSpesaProdotti.remove(lsp.getId().hashCode());
+				mappaProdotti.get(lsp.getProdotto().getCodiceBarre()).getListaSpesaProdottis().remove(lsp);
+				listaSpesaProdotti.add(lsp);
+				if(!eliminazioneListaSpesaProdotti)
+					eliminazioneListaSpesaProdotti = true;
 			}
+
+			mappaUtente.get(listaSpesaDaEliminare.getUtente().getMail()).getListaSpesas().remove(listaSpesaDaEliminare);
 			
-			if(trovato){
-				session.delete(ls);
-				setListaSpesa.remove(ls);
-				
-				
-				for(ListaSpesaProdotti lsp : (Set<ListaSpesaProdotti>)ls.getListaSpesaProdottis()){
-					
-					for(Prodotto p : setProdotto){
-						if(p.equals(lsp.getProdotto())){
-							p.getListaSpesaProdottis().remove(ls);
-							break;
-						}
-					}
-				}
-				
-				for(Utente u : setUtente){
-					if(u.equals(ls.getUtente())){
-						u.getListaSpesas().remove(ls);
-						break;
-					}
-				}
-				
-			}else{
-				throw new RuntimeException("elemento non trovato");
-			}
 			tx.commit();
 		}catch(Throwable ex){
+			
 			if(tx!=null)
 				tx.rollback();
+			
+			if(eliminazioneListaSpesaProdotti){
+				mappaListaSpesa.put(listaSpesaDaEliminare.getIdSpesa(), listaSpesaDaEliminare);
+				for(ListaSpesaProdotti lsp : listaSpesaProdotti){
+					mappaListaSpesaProdotti.put(lsp.getId().hashCode(), lsp);
+					mappaProdotti.get(lsp.getProdotto().getCodiceBarre()).getListaSpesaProdottis().add(lsp);
+				}
+			}
 			throw new RuntimeException(ex);
 		}finally{
 			if(session!=null && session.isOpen()){
@@ -1011,49 +1054,40 @@ public class Dati {
 			session=null;
 		}
 	}
-	
-	public ListaSpesa getListaSpesa(int idspesa){
-		ListaSpesa ls = null;
-		for(ListaSpesa listaspesa : setListaSpesa){
-			if(listaspesa.getIdSpesa().equals(idspesa)){
-				ls=listaspesa;
-				break;
-			}
-		}
-		if(ls==null)
-			throw new RuntimeException("elemento non trovato");
-		return ls;
-	}
-	
-	public int insertProdotto(Sottocategoria sottocategoria,long codicebarre,String descrizione){
+
+	/**metodo get per una listaSpesa
+	 * @param idSpesa
+	 * @return
+	 */
+	public ListaSpesa getListaSpesa(int idSpesa){
+		ListaSpesa listaSpesa = mappaListaSpesa.get(idSpesa);
 		
+		if(listaSpesa==null)
+			throw new RuntimeException("elemento non trovato");
+		
+		return listaSpesa;
+	}
+
+	/**Inserimento di un prodotto
+	 * @param sottoCategoria
+	 * @param codiceBarre
+	 * @param descrizione
+	 * @return
+	 */
+	public int inserisciProdotto(Sottocategoria sottoCategoria,long codiceBarre,String descrizione){
+		
+		if(codiceBarre <=0 || descrizione == null )
+			throw new RuntimeException("tutti gli argomenti devono essere non nulli");
+
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
 		int idProdotto=-1;
 		try{
 			tx=session.beginTransaction();
-			
-			if(codicebarre <=0 || descrizione == null )
-				throw new RuntimeException("tutti gli argomenti devono essere non nulli");
-				
-			Prodotto prodotto = new Prodotto(sottocategoria,codicebarre, descrizione, new HashSet<Inserzione>(), new HashSet<ListaDesideriProdotti>(),new HashSet<ListaSpesaProdotti>());
-			
-			
-			session.save(prodotto);
-			
-			session.persist(prodotto);
-			
-			idProdotto = prodotto.getIdProdotto();
-			setProdotto.add(prodotto);
-			
-			for(Sottocategoria s : setSottocategoria){
-				if(s.equals(sottocategoria)){
-					s.getProdottos().add(prodotto);
-					break;
-				}
-			}
-			
-			
+			Prodotto prodotto = new Prodotto(sottoCategoria,codiceBarre, descrizione, new HashSet<Inserzione>(), new HashSet<ListaDesideriProdotti>(),new HashSet<ListaSpesaProdotti>());			
+			idProdotto = (Integer)session.save(prodotto);
+			mappaProdotti.put(codiceBarre,prodotto);
+			mappaSottocategorie.get(sottoCategoria.getNome()).getProdottos().add(prodotto);
 			tx.commit();
 		}catch(Throwable ex){
 			if(tx!=null)
@@ -1067,86 +1101,45 @@ public class Dati {
 		}
 		return idProdotto;
 	}
-	
-	public void modifyProdotto(Sottocategoria sottocategoria,int idprodotto,int codicebarre,String descrizione,int idarg,int arg1,int arg2,Set<Inserzione> inserzioni,Set<ListaDesideriProdotti> desideriprodotti,Set<ListaSpesaProdotti> spesaprodotti){
+
+	/**modifica di un Prodotto
+	 * @param sottoCategoria
+	 * @param idProdotto
+	 * @param codiceBarre
+	 * @param descrizione
+	 */
+	public void modificaProdotto(Sottocategoria sottoCategoria,int idProdotto,long codiceBarre,String descrizione){
+		Prodotto prodottoVecchio = mappaProdotti.get(codiceBarre);
+		
+		if(prodottoVecchio == null)
+			throw new RuntimeException("elemento non trovato");
 		
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
-		boolean trovato = false;
 		
-		
-		if(idprodotto <= 0 || codicebarre<=0 || descrizione == null || idarg <= 0 || arg1<= 0 || arg2<=0 || inserzioni == null || desideriprodotti == null || spesaprodotti == null)
+		if(idProdotto <= 0 || codiceBarre<=0 || descrizione == null)
 			throw new RuntimeException("tutti gli argomenti devono essere immessi");
 		
-		Prodotto prodotto = new Prodotto(sottocategoria,codicebarre, descrizione,new HashSet<Inserzione>(), new HashSet<ListaDesideriProdotti>(), new HashSet<ListaSpesaProdotti>());
-		prodotto.setIdProdotto(idprodotto);
-		
-		for(Inserzione inserzione : inserzioni){
-			prodotto.getInserziones().add(inserzione);
-			//inserzione.setProdotto(prodotto);
-		}
-		for(ListaDesideriProdotti dp : desideriprodotti){
-			prodotto.getListaDesideriProdottis().add(dp);
-			//dp.setProdotto(prodotto);
-		}
-		for(ListaSpesaProdotti sp : spesaprodotti){
-			prodotto.getListaSpesaProdottis().add(sp);
-			//sp.setProdotto(prodotto);
-		}
+		long codiceBarreVecchio = prodottoVecchio.getCodiceBarre();
+		Sottocategoria sottoCategoriaVecchia = prodottoVecchio.getSottocategoria();
+		String descrizioneVecchia = prodottoVecchio.getDescrizione();
+		Prodotto prodotto = new Prodotto(sottoCategoria, codiceBarre, descrizione, prodottoVecchio.getInserziones(), prodottoVecchio.getListaDesideriProdottis(), prodottoVecchio.getListaSpesaProdottis());
+		prodotto.setIdProdotto(idProdotto);
 		
 		try{
 			tx=session.beginTransaction();
-			
-			session.update(prodotto);
-			
-			
-			for(Prodotto p : setProdotto){
-				
-				if(p.getIdProdotto().equals(idprodotto)){
-					trovato= true;
-					
-					for(Sottocategoria s : setSottocategoria){
-						if(s.equals(sottocategoria)){
-							s.getProdottos().remove(p);
-							s.getProdottos().add(prodotto);
-							break;
-						}
-					}
-					
-					setProdotto.remove(p);
-					setProdotto.add(prodotto);
-					break;
-				}
-				
-			}				
-			
-			
-				
-			
-			if(!trovato){
-				throw new RuntimeException("elemento non trovato");
-			}else{
-				
-				for(Inserzione inserzione : inserzioni){
-					inserzione.setProdotto(prodotto);
-				}
-			
-			
-				for(ListaDesideriProdotti dp : desideriprodotti){
-					dp.setProdotto(prodotto);
-				}
-				
-				
-				for(ListaSpesaProdotti sp : spesaprodotti){
-					sp.setProdotto(prodotto);
-				}
-				
-			}
+			session.update(prodotto);	
+			prodottoVecchio.setCodiceBarre(codiceBarre);
+			prodottoVecchio.setDescrizione(descrizione);
+			prodottoVecchio.setSottocategoria(sottoCategoria);		
 			tx.commit();
-			
+
 		}catch(Throwable ex){
 			if(tx!=null)
 				tx.rollback();
+			prodottoVecchio.setCodiceBarre(codiceBarreVecchio);
+			prodottoVecchio.setDescrizione(descrizioneVecchia);
+			prodottoVecchio.setSottocategoria(sottoCategoriaVecchia);
 			throw new RuntimeException(ex);
 		}finally{
 			if(session!=null && session.isOpen()){
@@ -1154,59 +1147,88 @@ public class Dati {
 			}
 			session=null;
 		}
-		
-		
+
+
 	}
-	
-	public void deleteProdotto(int idprodotto){
+
+	/**Eliminazione di un Prodotto
+	 * @param codiceBarre
+	 */
+	public void eliminaProdotto(long codiceBarre){
+
+		if(codiceBarre <= 0)
+			throw new RuntimeException("idprodotto non valido");
+
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
-		
-		Prodotto prodotto = null;
-		
-		if(idprodotto<=0)
-			throw new RuntimeException("idprodotto non valido");
-		
-		
-		for(Prodotto p : setProdotto){
-			if(p.getIdProdotto().equals(idprodotto)){
-				prodotto = p;
-				
-				break;
-			}
-		}
-		
+		Prodotto prodotto = mappaProdotti.get(codiceBarre);
+		boolean eliminazioneInserzione = false;
+		boolean eliminazioneListaDesideriProdotti = false;
+		boolean eliminazioneListaSpesaProdotti = false;
+		Set<Inserzione> inserzioni = new HashSet<Inserzione>();
+		Set<ListaDesideriProdotti> listaDesideriProdotti = new HashSet<ListaDesideriProdotti>();
+		Set<ListaSpesaProdotti> listaSpesaProdotti = new HashSet<ListaSpesaProdotti>();
 		
 		if(prodotto!=null){
 			try{
 				tx=session.beginTransaction();
-				
 				session.delete(prodotto);
 				
-				
-				for(Inserzione i : setInserzione){
-					if(i.getProdotto().equals(prodotto)){
-						setInserzione.remove(i);
-					}
+				for(Inserzione i : (Set<Inserzione>)prodotto.getInserziones()){
+					session.delete(i);
+					mappaInserzioni.remove(i.getIdInserzione());
+					inserzioni.add(i);
+					
+					if(!eliminazioneInserzione)
+						eliminazioneInserzione = true;
 				}
 				
-				for(ListaDesideriProdotti ldp : setListaDesideriProdotti){
-					if(ldp.getProdotto().equals(prodotto))
-						setListaDesideriProdotti.remove(ldp);
+				for(ListaDesideriProdotti ldp : (Set<ListaDesideriProdotti>)prodotto.getListaDesideriProdottis()){
+					session.delete(ldp);
+					mappaListaDesideriProdotti.remove(ldp.getId().hashCode());		
+					listaDesideriProdotti.add(ldp);
+					
+					if(!eliminazioneListaDesideriProdotti)
+						eliminazioneListaDesideriProdotti = true;
 				}
-				
-				for(ListaSpesaProdotti lsp : setListaSpesaProdotti){
-					if(lsp.getProdotto().equals(prodotto))
-						setListaSpesaProdotti.remove(lsp);
+
+				for(ListaSpesaProdotti lsp : (Set<ListaSpesaProdotti>)prodotto.getListaSpesaProdottis()){
+					session.delete(lsp);
+					mappaListaSpesaProdotti.remove(lsp.getId().hashCode());
+					listaSpesaProdotti.add(lsp);
+					
+					if(!eliminazioneListaSpesaProdotti)
+						eliminazioneListaSpesaProdotti = true;
 				}
-				
-			
-			
 				tx.commit();
-				
+
 			}catch(Throwable ex){
 				if(tx!=null)
 					tx.rollback();
+				if(eliminazioneInserzione && !eliminazioneListaDesideriProdotti){
+					for(Inserzione i : inserzioni){
+						mappaInserzioni.put(i.getIdInserzione(),i);
+					}
+				}
+				if(eliminazioneListaDesideriProdotti && !eliminazioneListaSpesaProdotti){
+					for(ListaDesideriProdotti lsp : listaDesideriProdotti){
+						mappaListaDesideriProdotti.put(lsp.getId().hashCode(), lsp);
+					}
+					for(Inserzione i : inserzioni){
+						mappaInserzioni.put(i.getIdInserzione(),i);
+					}
+				}
+				if(eliminazioneListaSpesaProdotti){
+					for(ListaSpesaProdotti lsp : listaSpesaProdotti){
+						mappaListaSpesaProdotti.put(lsp.getId().hashCode(), lsp);
+					}
+					for(ListaDesideriProdotti lsp : listaDesideriProdotti){
+						mappaListaDesideriProdotti.put(lsp.getId().hashCode(), lsp);
+					}
+					for(Inserzione i : inserzioni){
+						mappaInserzioni.put(i.getIdInserzione(),i);
+					}
+				}
 				throw new RuntimeException(ex);
 			}finally{
 				if(session!=null && session.isOpen()){
@@ -1217,65 +1239,64 @@ public class Dati {
 		}else{
 			throw new RuntimeException("elemento non trovato");
 		}
-		
+
 	}
-	
-	public Set<Prodotto> getProdotti(){
-		
-		HashSet<Prodotto> prodotti = new HashSet<Prodotto>();
-		
-		for(Prodotto p : setProdotto){
-			prodotti.add(p);
-		}
+
+	/**Metodo get della mappa prodotti
+	 * @return
+	 */
+	public Map<Long,Prodotto> getProdotti(){
+
+		HashMap<Long,Prodotto> prodotti = new HashMap<Long,Prodotto>();
+		prodotti.putAll(mappaProdotti);
 		
 		return prodotti;
 	}
-	
-	public Set<Inserzione> getInserzioni(){
-		HashSet<Inserzione> inserzioni = new HashSet<Inserzione>();
+
+	/**Metodo get della mappa Inserzioni
+	 * @return
+	 */
+	public Map<Integer,Inserzione> getInserzioni(){
+		Map<Integer,Inserzione> inserzioni = new HashMap<Integer,Inserzione>();
 		
-		for(Inserzione i : setInserzione){
-			inserzioni.add(i);
-		}
+		inserzioni.putAll(mappaInserzioni);
+		
 		return inserzioni;
 	}
-	
-	public Set<Profilo> getProfili(){
-		HashSet<Profilo> profili = new HashSet<Profilo>();
+
+	/**metodo get della mappa profili
+	 * @return
+	 */
+	public Map<Integer,Profilo> getProfili(){
+		HashMap<Integer,Profilo> profili = new HashMap<Integer,Profilo>();
 		
-		
-			for(Profilo profilo : setProfilo){
-				profili.add(profilo);
-			}
-		
+		profili.putAll(mappaProfili);
+
 		return profili;
-		
+
 	}
-	
-	public void insertProfilo(Utente utente,int creditiacquisiti,int creditipendenti,int reputazione,boolean premium,int contatoreinfrazioni){
-		Session session = factory.getCurrentSession();
-		Transaction tx = null;
-		
-		if(utente == null || creditiacquisiti<0 || creditipendenti<0  || contatoreinfrazioni<0)
+
+	/**Inserimento di un Profilo
+	 * @param utente
+	 * @param creditiAcquisiti
+	 * @param creditiPendenti
+	 * @param reputazione
+	 * @param premium
+	 * @param contatoreInfrazioni
+	 */
+	public void inserisciProfilo(Utente utente,int creditiAcquisiti,int creditiPendenti,int reputazione,boolean premium,int contatoreInfrazioni){
+		if(utente == null || creditiAcquisiti<0 || creditiPendenti<0  || contatoreInfrazioni<0)
 			throw new RuntimeException("parametro/i non validi");
 		
-		Profilo profilo = new Profilo(utente, creditiacquisiti, creditipendenti, reputazione, premium, contatoreinfrazioni);
-		
+		Session session = factory.getCurrentSession();
+		Transaction tx = null;
+		Profilo profilo = new Profilo(utente, creditiAcquisiti, creditiPendenti, reputazione, premium, contatoreInfrazioni);
+
 		try{
 			tx=session.beginTransaction();
-			
-			session.save(profilo);
-			
-			session.persist(profilo);
-			
-			for(Utente u : setUtente){
-				if(u.equals(profilo.getUtente())){
-					u.getProfilos().add(profilo);
-					break;
-				}
-			}
-			setProfilo.add(profilo);
-			
+			Integer idProfilo=(Integer)session.save(profilo);
+			mappaUtente.get(utente.getMail()).getProfilos().add(profilo);	
+			mappaProfili.put(idProfilo,profilo);
 			tx.commit();
 		}catch(Throwable ex){
 			if(tx!=null)
@@ -1288,44 +1309,37 @@ public class Dati {
 			session=null;
 		}
 	}
-	
-	public void modifyProfilo(int idprofilo,Utente utente,int creditiacquisiti,int creditipendenti,int reputazione,boolean premium,int contatoreinfrazioni){
-		Session session = factory.getCurrentSession();
-		Transaction tx = null;
-		Profilo pold=null;
-		
-		if(idprofilo <0 || utente == null || creditiacquisiti<0 || creditipendenti<0 ||  contatoreinfrazioni<0)
+
+	/**Modifica di un profilo
+	 * @param idProfilo
+	 * @param utente
+	 * @param creditiAcquisiti
+	 * @param creditiPendenti
+	 * @param reputazione
+	 * @param premium
+	 * @param contatoreInfrazioni
+	 */
+	public void modificaProfilo(int idProfilo,int creditiAcquisiti,int creditiPendenti,int reputazione,boolean premium,int contatoreInfrazioni){
+		if(idProfilo <0 || creditiAcquisiti<0 || creditiPendenti<0 ||  contatoreInfrazioni<0)
 			throw new RuntimeException("parametro/i non validi");
 		
-		for(Profilo p : setProfilo){
-			if(p.getIdProfilo().equals(idprofilo)){
-				pold=p;
-				break;
-			}
-		}
-		
-		if(pold!=null){
-			
-			Profilo profilo = new Profilo(utente, creditiacquisiti, creditipendenti, reputazione, premium, contatoreinfrazioni);
-			profilo.setIdProfilo(idprofilo);
-			
-			
+		Session session = factory.getCurrentSession();
+		Transaction tx = null;
+		Profilo profiloVecchio = mappaProfili.get(idProfilo);
+
+		if(profiloVecchio != null){
+
+			Profilo profilo = new Profilo(profiloVecchio.getUtente(), creditiAcquisiti, creditiPendenti, reputazione, premium, contatoreInfrazioni);
+			profilo.setIdProfilo(idProfilo);
+
 			try{
 				tx=session.beginTransaction();
-				
 				session.update(profilo);
-				
-				setProfilo.add(profilo);
-				
-				for(Utente u : setUtente){
-					if(u.equals(pold.getUtente())){
-						u.getProfilos().remove(pold);
-						break;
-					}
-				}
-				
-				setProfilo.remove(pold);
-				
+				profiloVecchio.setContatoreInfrazioni(contatoreInfrazioni);
+				profiloVecchio.setCreditiAcquisiti(creditiAcquisiti);
+				profiloVecchio.setCreditiPendenti(creditiPendenti);
+				profiloVecchio.setPremium(premium);
+				profiloVecchio.setReputazione(reputazione);
 				tx.commit();
 			}catch(Throwable ex){
 				if(tx!=null)
@@ -1341,39 +1355,26 @@ public class Dati {
 			throw new RuntimeException("elemento non trovato");
 		}
 	}
-	
-	public void deleteProfilo(int idprofilo){
-		Session session = factory.getCurrentSession();
-		Transaction tx = null;
-		Profilo pold=null;
-		
-		if(idprofilo<0)
+
+	/**metodo per eliminare un profilo
+	 * @param idProfilo
+	 */
+	public void eliminaProfilo(int idProfilo){
+		if(idProfilo < 0)
 			throw new RuntimeException("id non valido");
 		
-		for(Profilo p : setProfilo){
-			if(p.getIdProfilo().equals(idprofilo)){
-				pold=p;
-				break;
-			}
-		}
-		
-		if(pold==null)
+		Session session = factory.getCurrentSession();
+		Transaction tx = null;
+		Profilo profiloVecchio = mappaProfili.get(idProfilo);
+
+		if(profiloVecchio == null)
 			throw new RuntimeException("elemento non trovato");
-		
+
 		try{
 			tx=session.beginTransaction();
-			
-			session.delete(pold);
-			
-			for(Utente u : setUtente){
-				if(u.equals(pold.getUtente())){
-					u.getProfilos().remove(pold);
-					break;
-				}
-			}
-			
-			setProfilo.remove(pold);
-			
+			session.delete(profiloVecchio);
+			mappaUtente.get(profiloVecchio.getUtente().getMail()).getProfilos().remove(profiloVecchio);
+			mappaProfili.remove(idProfilo);
 			tx.commit();
 		}catch(Throwable ex){
 			if(tx!=null)
@@ -1385,37 +1386,27 @@ public class Dati {
 			}
 			session=null;
 		}
-			
+
 	}
-	
-	public void insertSottocategoria(Categoria categoria,String nome,Set<Prodotto> prodotti){
-		Session session = factory.getCurrentSession();
-		Transaction tx = null;
-		
+
+	/**Inserimento di una SottoCategoria
+	 * @param categoria
+	 * @param nome
+	 * @param prodotti
+	 */
+	public void inserisciSottocategoria(Categoria categoria,String nome){
 		if(categoria == null || nome == null)
 			throw new RuntimeException("tutti i parametri devono essere non nulli");
 		
-		Sottocategoria sottocategoria = new Sottocategoria(categoria, nome,prodotti);
-		
-		
+		Session session = factory.getCurrentSession();
+		Transaction tx = null;
+		Sottocategoria sottoCategoria = new Sottocategoria(categoria, nome,new HashSet<Prodotto>());
+
 		try{
 			tx=session.beginTransaction();
-			
-			session.save(sottocategoria);
-			
-			session.persist(sottocategoria);
-			
-			for(Categoria c : setCategoria){
-				
-				if(c.equals(categoria)){
-					c.getSottocategorias().add(sottocategoria);
-					break;
-				}
-				
-			}
-			
-			setSottocategoria.add(sottocategoria);
-			
+			Integer idSottoCategoria = (Integer)session.save(sottoCategoria);
+			mappaCategorie.get(categoria.getIdCategoria()).getSottocategorias().add(sottoCategoria);			
+			mappaSottocategorie.put(nome,sottoCategoria);
 			tx.commit();
 		}catch(Throwable ex){
 			if(tx!=null)
@@ -1428,49 +1419,33 @@ public class Dati {
 			session=null;
 		}
 	}
-	
-	public void modifySottocategoria(int idsottocategoria,Categoria categoria,String nome,Set<Prodotto> prodotti){
-		
-		Session session = factory.getCurrentSession();
-		Transaction tx = null;
-		Sottocategoria scold = null;
-		
-		if(idsottocategoria <=0 || categoria == null || nome == null)
+
+	/**modifica SottoCategoria
+	 * @param idSottoCategoria
+	 * @param categoria
+	 * @param nome
+	 */
+	public void modificaSottocategoria(int idSottoCategoria,Categoria categoria,String nome){
+		if(idSottoCategoria <=0 || categoria == null || nome == null)
 			throw new RuntimeException("parametri non corretti");
 		
-		for(Sottocategoria s : setSottocategoria){
-			if(s.getIdSottocategoria().equals(idsottocategoria)){
-				scold=s;
-				break;
-			}
-		}
+		Session session = factory.getCurrentSession();
+		Transaction tx = null;
+		Sottocategoria sottoCategoriaVecchia = mappaSottocategorie.get(idSottoCategoria);
 		
-		Sottocategoria sottocategoria = new Sottocategoria(categoria, nome,prodotti);
-		sottocategoria.setIdSottocategoria(idsottocategoria);
+		if(sottoCategoriaVecchia == null)
+			throw new RuntimeException("elemento non trovato");
 		
+		Sottocategoria sottoCategoria = new Sottocategoria(categoria, nome,sottoCategoriaVecchia.getProdottos());
+		sottoCategoria.setIdSottocategoria(idSottoCategoria);
+
 		try{
 			tx=session.beginTransaction();
-		
-			session.update(sottocategoria);
-			
-			for(Categoria c : setCategoria){
-				if(c.equals(scold.getCategoria())){
-					c.getSottocategorias().remove(scold);
-					break;
-				}
-			}
-			
-			setSottocategoria.remove(scold);
-			
-			setSottocategoria.add(sottocategoria);
-			
-			for(Categoria c : setCategoria){
-				if(c.equals(categoria)){
-					c.getSottocategorias().add(sottocategoria);
-					break;
-				}
-			}
-			
+			session.update(sottoCategoria);
+			sottoCategoriaVecchia.setCategoria(categoria);
+			sottoCategoriaVecchia.setNome(nome);	
+			if(!categoria.equals(sottoCategoriaVecchia.getCategoria()))
+				mappaCategorie.get(categoria.getIdCategoria()).getSottocategorias().add(sottoCategoriaVecchia);
 			tx.commit();
 		}catch(Throwable ex){
 			if(tx!=null)
@@ -1483,38 +1458,29 @@ public class Dati {
 			session=null;
 		}
 	}
-	
-	public void deleteSottocategoria(int idsottocategoria){
-		Session session = factory.getCurrentSession();
-		Transaction tx = null;
-		Sottocategoria scold = null;
-		
-		if(idsottocategoria<=0)
+
+	/**Elimina una SottoCategoria (mette nei prodotti associati un oggetto vuoto)
+	 * @param idSottoCategoria
+	 */
+	public void eliminaSottocategoria(int idSottoCategoria){
+		if(idSottoCategoria<=0)
 			throw new RuntimeException("id non valido");
 		
-		for(Sottocategoria s : setSottocategoria){
-			if(s.getIdSottocategoria().equals(idsottocategoria)){
-				scold=s;
-				break;
-			}
-		}
-		
-		if(scold==null)
+		Session session = factory.getCurrentSession();
+		Transaction tx = null;
+		Sottocategoria sottoCategoriaVecchia = mappaSottocategorie.get(idSottoCategoria);	
+
+		if(sottoCategoriaVecchia == null)
 			throw new RuntimeException("elemento non trovato");
-		
+
 		try{
 			tx=session.beginTransaction();
-		
-			session.delete(scold);
-			
-			for(Categoria c : setCategoria){
-				if(c.equals(scold.getCategoria())){
-					c.getSottocategorias().remove(scold);
-					break;
-				}
+			session.delete(sottoCategoriaVecchia);
+			mappaCategorie.get(sottoCategoriaVecchia.getCategoria().getIdCategoria()).getSottocategorias().remove(sottoCategoriaVecchia);
+			for(Prodotto p : (Set<Prodotto>)sottoCategoriaVecchia.getProdottos()){
+				p.setSottocategoria(new Sottocategoria());
 			}
-			
-			setSottocategoria.remove(scold);
+			mappaSottocategorie.remove(sottoCategoriaVecchia.getNome());
 
 			tx.commit();
 		}catch(Throwable ex){
@@ -1528,40 +1494,35 @@ public class Dati {
 			session=null;
 		}
 	}
-	
-	public Set<Sottocategoria> getSottocategorie(){
-		
-		HashSet<Sottocategoria> sottocategorie = new HashSet<Sottocategoria>();
-		
-		for(Sottocategoria s : setSottocategoria){
-			sottocategorie.add(s);
-		}
-		
-		return sottocategorie;
-		
+
+	public Map<String,Sottocategoria> getSottocategorie(){
+
+		HashMap<String,Sottocategoria> sottoCategorie = new HashMap<String,Sottocategoria>();
+		sottoCategorie.putAll(mappaSottocategorie);
+		return sottoCategorie;
+
 	}
-	
-	public int insertSupermercato(String nome,float latitudine,float longitudine){
+
+	/**Inserimento di SuperMercato
+	 * @param nome
+	 * @param latitudine
+	 * @param longitudine
+	 * @return
+	 */
+	public int inserisciSupermercato(String nome,float latitudine,float longitudine){
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
-		int idSupermercato=-1;
 		if(nome == null )
 			throw new RuntimeException("tutti gli argomenti devono essere non nulli");
-		
+
 		Supermercato supermercato = new Supermercato(nome, latitudine, longitudine, new HashSet<Inserzione>());
-		
-		
+		Integer idSuperMercato ;
+
 		try{
 			tx=session.beginTransaction();
-			
-			session.save(supermercato);
-			
-			session.persist(supermercato);
-			
-			setSupermercato.add(supermercato);
-			
-			idSupermercato=supermercato.getIdSupermercato();
-			
+			idSuperMercato = (Integer)session.save(supermercato);
+			mappaSupermercati.put(nome,supermercato);
+
 			tx.commit();
 		}catch(Throwable ex){
 			if(tx!=null)
@@ -1574,99 +1535,35 @@ public class Dati {
 			}
 			session=null;
 		}
-		return idSupermercato;
+		return idSuperMercato;
 	}
-	
-	public void modifySupermercato(int idsupermercato,String nome,float latitudine,float longitudine,Set<Inserzione> inserzioni){
-		Session session = factory.getCurrentSession();
-		Transaction tx = null;
-		Supermercato sold = null;
-		
-		if(idsupermercato<=0 || nome == null  || inserzioni == null)
+
+	/**Modifica di un SuperMercato
+	 * @param idSuperMercato
+	 * @param nome
+	 * @param latitudine
+	 * @param longitudine
+	 */
+	public void modificaSupermercato(int idSuperMercato,String nome,float latitudine,float longitudine){
+		if(idSuperMercato <=0 || nome == null)
 			throw new RuntimeException("tutti gli argomenti devono essere non nulli");
 		
-		for(Supermercato s : setSupermercato){
-			if(s.getIdSupermercato().equals(idsupermercato)){
-				sold=s;
-				break;
-			}
-		}
-		
-		if(sold==null)
-			throw new RuntimeException("elemento non trovato");
-		
-		Supermercato supermercato = new Supermercato(nome, latitudine, longitudine, new HashSet<Inserzione>());
-		supermercato.setIdSupermercato(idsupermercato);
-		
-		
-		try{
-			tx=session.beginTransaction();
-			
-			session.update(supermercato);
-			
-			for(Inserzione i : setInserzione){
-				if(i.getSupermercato().equals(sold))
-					setInserzione.remove(i);
-			}
-			
-			setSupermercato.remove(sold);
-			
-			for(Inserzione i : inserzioni){
-				i.setSupermercato(supermercato);
-				setInserzione.add(i);
-			}
-			
-			setSupermercato.add(supermercato);
-			
-			tx.commit();
-		}catch(Throwable ex){
-			if(tx!=null)
-				tx.rollback();
-			throw new RuntimeException(ex);
-		}finally{
-			if(session!=null && session.isOpen()){
-				session.close();
-			}
-			session=null;
-		}
-		
-			
-	}
-	
-	public void deleteSupermercato(int idsupermercato){
-		
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
-		Supermercato sold = null;
-		
-		for(Supermercato s : setSupermercato){
-			if(s.getIdSupermercato().equals(idsupermercato)){
-				sold=s;
-				break;
-			}
-		}
-		
-		if(sold==null)
-			throw new RuntimeException("elemento non trovato");
-		
-		try{
-			tx=session.beginTransaction();
-		
-			session.delete(sold);/*
-			si vuole lasciare la traccia del supermercato eliminato?
-			
-			for(Inserzione i : (Set<Inserzione>) sold.getInserziones()){
-				for(Inserzione ins : setInserzione){
-					if(ins.equals(i)){
-						ins.setSupermercato(null);
-						break;
-					}
-				}
-			}*/
-			
-			setSupermercato.remove(sold);
-			
+		Supermercato superMercatoVecchio = mappaSupermercati.get(idSuperMercato);			
 
+		if(superMercatoVecchio==null)
+			throw new RuntimeException("elemento non trovato");
+
+		Supermercato superMercato = new Supermercato(nome, latitudine, longitudine, new HashSet<Inserzione>());
+		superMercato.setIdSupermercato(idSuperMercato);
+		superMercato.getInserziones().addAll(superMercatoVecchio.getInserziones());
+
+		try{
+			tx=session.beginTransaction();			
+			session.update(superMercato);
+			mappaSupermercati.remove(idSuperMercato);
+			mappaSupermercati.put(nome,superMercato);
 			tx.commit();
 		}catch(Throwable ex){
 			if(tx!=null)
@@ -1678,43 +1575,67 @@ public class Dati {
 			}
 			session=null;
 		}
-		
+
+
 	}
-	
-	public Set<Supermercato> getSupermercati(){
-		
-		Set<Supermercato> supermercati = new HashSet<Supermercato>();
-		
-		for(Supermercato s : setSupermercato){
-			supermercati.add(s);
+
+	/**Eliminazione di un Supermercato
+	 * @param idSuperMercato
+	 */
+	public void eliminaSupermercato(int idSuperMercato){
+
+		Session session = factory.getCurrentSession();
+		Transaction tx = null;
+		Supermercato superMercatoVecchio = mappaSupermercati.get(idSuperMercato);		
+
+		if(superMercatoVecchio==null)
+			throw new RuntimeException("elemento non trovato");
+
+		try{
+			tx=session.beginTransaction();
+			session.delete(superMercatoVecchio);
+			
+			for(Inserzione i : (Set<Inserzione>)superMercatoVecchio.getInserziones()){
+				eliminaInserzione(i.getIdInserzione());
+			}
+			
+			mappaSupermercati.remove(superMercatoVecchio);
+			tx.commit();
+		}catch(Throwable ex){
+			if(tx!=null)
+				tx.rollback();
+			throw new RuntimeException(ex);
+		}finally{
+			if(session!=null && session.isOpen()){
+				session.close();
+			}
+			session=null;
 		}
+
+	}
+
+	/**Metodo get della mappa dei Supermercati
+	 * @return
+	 */
+	public Map<String,Supermercato> getSupermercati(){
+		Map<String,Supermercato> supermercati = new HashMap<String,Supermercato>();
+		supermercati.putAll(mappaSupermercati);			
 		return supermercati;
 	}
-	
-	public void insertUtente(String mail,String nickname,String password,Date dataregistrazione,String numerocasuale){
-		Session session = factory.getCurrentSession();
-		Transaction tx = null;
-		
-		if(mail == null || nickname == null || password == null || dataregistrazione == null)
+
+	public int inserisciUtente(String email,String nickname,String password,Date dataRegistrazione,String numeroCasuale){
+		if(email == null || nickname == null || password == null || dataRegistrazione == null || numeroCasuale == null)
 			throw new RuntimeException("i parametri devono essere non nulli");
 		
-		Utente utente = new Utente(mail, nickname, password, dataregistrazione,false,numerocasuale,new HashSet<ValutazioneInserzione>(), new HashSet<ValutazioneInserzione>(), new HashSet<ListaSpesa>(), new HashSet<Inserzione>(), new HashSet<Profilo>(), new HashSet<ListaDesideri>());
-		Profilo profilo = new Profilo(utente, 0, 0, 0, false, 0);
-		utente.getProfilos().add(profilo);
+		Session session = factory.getCurrentSession();
+		Transaction tx = null;	
+		Utente utente = new Utente(email, nickname, password, dataRegistrazione,false,numeroCasuale,new HashSet<ValutazioneInserzione>(), new HashSet<ValutazioneInserzione>(), new HashSet<ListaSpesa>(), new HashSet<Inserzione>(), new HashSet<Profilo>(), new HashSet<ListaDesideri>());		
+		int idUtente,idProfilo;
 		try{
 			tx=session.beginTransaction();
-			
-			session.save(utente);
-			
-			session.persist(utente);
-			
-			session.save(profilo);
-			
-			session.persist(profilo);
-			
-			
-			setUtente.add(utente);
-			
+			idUtente = (Integer)session.save(utente);
+			inserisciProfilo(utente, 0, 0, 0, false, 0);
+			mappaUtente.put(email,utente);
 			tx.commit();
 		}catch(Throwable ex){
 			if(tx!=null)
@@ -1726,147 +1647,45 @@ public class Dati {
 			}
 			session=null;
 		}
+		return idUtente;
 	}
-	
-	public void modifyUtente(int idutente,String mail,String nickname,String password,Date dataregistrazione,Set<ValutazioneInserzione> valutazioniinserzionista,Set<ValutazioneInserzione> valutazionivalutatore,Set<ListaSpesa> listaspesas,Set<Inserzione> inserzioni, Set<Profilo> profili,Set<ListaDesideri> listadesideris,boolean confermato,String numerocasuale){
+
+	/**Modifica di un utente
+	 * @param idUtente
+	 * @param email
+	 * @param nickname
+	 * @param password
+	 * @param dataRegistrazione
+	 * @param confermato
+	 * @param numeroCasuale
+	 */
+	public void modificaUtente(int idUtente,String email,String nickname,String password,Date dataRegistrazione,boolean confermato,String numeroCasuale){
+		if(email == null || nickname == null || password == null || dataRegistrazione == null || numeroCasuale == null)
+			throw new RuntimeException("i parametri devono essere non nulli");
+		
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
-		Utente uold = null;
-		
-		for(Utente u : setUtente){
-			if(u.getIdUtente().equals(idutente)){
-				uold=u;
-				break;
-			}
-		}
-		
-		if(uold==null)
-			throw new RuntimeException("elemento non trovato");
-		
-		Utente utente = new Utente(mail, nickname, password, dataregistrazione,confermato,numerocasuale, valutazioniinserzionista,valutazionivalutatore, listaspesas, inserzioni, profili, listadesideris);
-		utente.setIdUtente(idutente);
-		
-		
+		Utente utenteVecchio = mappaUtente.get(idUtente);
+
+		if(utenteVecchio==null)
+			throw new RuntimeException("elemento non trovato");		
+
+		Utente utente = new Utente(email, nickname, password, dataRegistrazione,confermato,numeroCasuale, 
+				utenteVecchio.getValutazioneInserzionesForIdUtenteInserzionista(),
+				utenteVecchio.getValutazioneInserzionesForIdUtenteValutatore(), 
+				utenteVecchio.getListaSpesas(), utenteVecchio.getInserziones(), 
+				utenteVecchio.getProfilos(), utenteVecchio.getListaDesideris());
+		utente.setIdUtente(idUtente);
 		
 		try{
 			tx=session.beginTransaction();
-			
 			session.update(utente);
-			// in questo caso conviene, perchè l'inserzione ha sempre valore
-			for(Inserzione i : setInserzione){
-				if(i.getUtente().equals(uold))
-					i.setUtente(null);
-			}
-			
-			for(ValutazioneInserzione v : setValutazioneInserzione){
-				if(v.getUtenteByIdUtenteInserzionista().equals(uold)){
-					v.setUtenteByIdUtenteInserzionista(null);
-				}
-				if(v.getUtenteByIdUtenteValutatore().equals(uold))
-					v.setUtenteByIdUtenteValutatore(null);
-			}
-
-			for(ListaSpesa ls : setListaSpesa){
-				if(ls.getUtente().equals(uold))
-					setListaSpesa.remove(ls);
-			}
-			
-			for(ListaDesideri ld : setListaDesideri){
-				if(ld.getUtente().equals(uold))
-					setListaDesideri.remove(ld);
-			}
-			
-			for(Profilo p : setProfilo){
-				if(p.getUtente().equals(uold))
-					setProfilo.remove(p);
-			}
-			
-			
-			setUtente.remove(uold);
-			
-			setUtente.add(utente);
-			boolean trovato = false;
-			
-			for(ValutazioneInserzione v : valutazioniinserzionista){
-				for(ValutazioneInserzione val : setValutazioneInserzione){
-					if(val.equals(v)){
-						val.setUtenteByIdUtenteInserzionista(utente);
-						trovato=true;
-						break;
-					}
-				}
-				if(!trovato){
-					setValutazioneInserzione.add(v);
-				}
-				trovato=false;
-			}
-			
-			for(ValutazioneInserzione v : valutazionivalutatore){
-				for(ValutazioneInserzione val : setValutazioneInserzione){
-					if(val.equals(v)){
-						val.setUtenteByIdUtenteValutatore(utente);
-						trovato=true;
-						break;
-					}
-				}
-				if(!trovato)
-					setValutazioneInserzione.add(v);
-				trovato=false;
-			}
-			
-			for(Inserzione i : inserzioni){
-				for(Inserzione ins : setInserzione){
-					if(ins.equals(i)){
-						ins.setUtente(utente);
-						trovato=true;
-						break;
-					}
-				}
-				if(!trovato)
-					setInserzione.add(i);
-				trovato=false;
-			}
-			
-			for(ListaDesideri l : listadesideris){
-				for(ListaDesideri ld : setListaDesideri){
-					if(ld.equals(l)){
-						ld.setUtente(utente);
-						trovato=true;
-						break;
-					}
-				}
-				if(!trovato)
-					setListaDesideri.add(l);
-				trovato=false;
-			}
-			
-			for(ListaSpesa l : listaspesas){
-				for(ListaSpesa ls : setListaSpesa){
-					if(ls.equals(l)){
-						ls.setUtente(utente);
-						trovato=true;
-						break;
-					}
-				}
-				if(!trovato)
-					setListaSpesa.add(l);
-				trovato=false;
-			}
-			
-			for(Profilo p : profili){
-				for(Profilo pro : setProfilo){
-					if(pro.equals(p)){
-						pro.setUtente(utente);
-						trovato=true;
-						break;
-					}
-				}
-				if(!trovato)
-					setProfilo.add(p);
-				trovato=false;
-			}
-			
-			
+			utenteVecchio.setConfermato(confermato);
+			utenteVecchio.setDataRegistrazione(dataRegistrazione);
+			utenteVecchio.setMail(email);
+			utenteVecchio.setNickname(nickname);
+			utenteVecchio.setNumeroCasuale(numeroCasuale);
+			utenteVecchio.setPassword(password);
 			tx.commit();
 		}catch(Throwable ex){
 			if(tx!=null)
@@ -1878,61 +1697,51 @@ public class Dati {
 			}
 			session=null;
 		}
-			
+
 	}
-	
-	
-	public void deleteUtente(int idutente){
+
+
+	/**eliminazione Utente
+	 * @param idUtente
+	 */
+	public void eliminaUtente(int idUtente){
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
-		Utente uold = null;
+		Utente utenteVecchio = mappaUtente.get(idUtente);
 		
-		for(Utente u : setUtente){
-			if(u.getIdUtente().equals(idutente)){
-				uold=u;
-				break;
-			}
-		}
-		
-		if(uold==null)
+		if(utenteVecchio==null)
 			throw new RuntimeException("elemento non trovato");
-		
+
 		try{
 			tx=session.beginTransaction();
-			
-			session.delete(uold);
-			
-			for(Inserzione i : setInserzione){
-				if(i.getUtente().equals(uold))
-					i.setUtente(null);
-			}
-			
-			for(ValutazioneInserzione v : setValutazioneInserzione){
-				if(v.getUtenteByIdUtenteInserzionista().equals(uold)){
-					v.setUtenteByIdUtenteInserzionista(null);
-				}
-				if(v.getUtenteByIdUtenteValutatore().equals(uold))
-					v.setUtenteByIdUtenteValutatore(null);
+			session.delete(utenteVecchio);
+
+			for(Inserzione i : (Set<Inserzione>)utenteVecchio.getInserziones()){
+				mappaInserzioni.get(i.getIdInserzione()).setUtente(null);
 			}
 
-			for(ListaSpesa ls : setListaSpesa){
-				if(ls.getUtente().equals(uold))
-					setListaSpesa.remove(ls);
+			for(ValutazioneInserzione v : (Set<ValutazioneInserzione>) utenteVecchio.getValutazioneInserzionesForIdUtenteInserzionista()){
+				v.setUtenteByIdUtenteInserzionista(null);
 			}
 			
-			for(ListaDesideri ld : setListaDesideri){
-				if(ld.getUtente().equals(uold))
-					setListaDesideri.remove(ld);
+			for(ValutazioneInserzione v : (Set<ValutazioneInserzione>) utenteVecchio.getValutazioneInserzionesForIdUtenteValutatore()){
+				v.setUtenteByIdUtenteValutatore(null);
 			}
-			
-			for(Profilo p : setProfilo){
-				if(p.getUtente().equals(uold))
-					setProfilo.remove(p);
+
+			for(ListaSpesa ls : (Set<ListaSpesa>) utenteVecchio.getListaSpesas()){
+				mappaListaSpesa.remove(ls);
 			}
-			
-			setUtente.remove(uold);
-			
-			
+
+			for(ListaDesideri ld : (Set<ListaDesideri>) utenteVecchio.getListaDesideris()){
+				mappaListaDesideri.remove(ld);
+			}
+
+			for(Profilo p : (Set<Profilo>) utenteVecchio.getProfilos()){
+				mappaProfili.remove(p);
+			}
+
+			mappaUtente.remove(utenteVecchio);
+
 			tx.commit();
 		}catch(Throwable ex){
 			if(tx!=null)
@@ -1944,53 +1753,39 @@ public class Dati {
 			}
 			session=null;
 		}
-			
 	}
-	
-	public Set<Utente> getUtenti(){
-		HashSet<Utente> utenti = new HashSet<Utente>();
-		
-		for(Utente u : setUtente){
-			utenti.add(u);
-		}
-		
+
+	/**metodo get degli Utenti
+	 * @return
+	 */
+	public Map<String,Utente> getUtenti(){
+		HashMap<String,Utente> utenti = new HashMap<String,Utente>();
+		utenti.putAll(mappaUtente);
 		return utenti;
 	}
 	
-	public void insertValutazioneInserzioneValutatore(Inserzione inserzione,Utente utente,int valutazione,Date data){
+	/** inserimento di una valutazione di un'inserzione
+	 * @param inserzione
+	 * @param inserzionista
+	 * @param valutatore
+	 * @param valutazione
+	 * @param data
+	 */
+	public void inserimentoValutazioneInserzione(Inserzione inserzione,Utente inserzionista, Utente valutatore, int valutazione, Date data){
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
-		
-		if(utente == null || valutazione<0 || data == null)
+
+		if(inserzionista == null || valutatore == null || valutazione<0 || data == null)
 			throw new RuntimeException("parametri non corretti");
 		
-		ValutazioneInserzione valutazioneinserzione = new ValutazioneInserzione(inserzione,utente, null, valutazione, data);
-		
-		
-		
+		ValutazioneInserzione valutazioneInserzione = new ValutazioneInserzione(inserzione,inserzionista, valutatore, valutazione, data);
 		try{
 			tx=session.beginTransaction();
-			
-			session.save(valutazioneinserzione);
-			
-			session.persist(valutazioneinserzione);
-			
-			setValutazioneInserzione.add(valutazioneinserzione);
-			
-			for(Utente u : setUtente){
-				if(u.equals(utente)){
-					u.getValutazioneInserzionesForIdUtenteValutatore().add(valutazioneinserzione);
-					break;
-				}
-			}
-			
-			for(Inserzione i : setInserzione){
-				if(i.equals(inserzione)){
-					i.getValutazioneInserziones().add(valutazioneinserzione);
-					break;
-				}
-			}
-			
+			Integer idValutazioneInserzione = (Integer)session.save(valutazioneInserzione);
+			mappaValutazioneInserzione.put(idValutazioneInserzione,valutazioneInserzione);
+			mappaUtente.get(inserzionista.getMail()).getValutazioneInserzionesForIdUtenteInserzionista().add(valutazioneInserzione);
+			mappaUtente.get(valutatore.getMail()).getValutazioneInserzionesForIdUtenteValutatore().add(valutazioneInserzione);
+			mappaInserzioni.get(inserzione.getIdInserzione()).getValutazioneInserziones().add(valutazioneInserzione);
 			tx.commit();
 		}catch(Throwable ex){
 			if(tx!=null)
@@ -2002,64 +1797,47 @@ public class Dati {
 			}
 			session=null;
 		}
-		
-		
 	}
 	
-	public void modifyValutazioneInserzioneValutatore(int idvalutazione,Inserzione inserzione,Utente utente,Date data,int valutazione){
+
+	/**modifica di una valutazione di una inserzione
+	 * @param idValutazione
+	 * @param inserzione
+	 * @param inserzionista
+	 * @param valutatore
+	 * @param data
+	 * @param valutazione
+	 */
+	public void modificaValutazioneInserzione(int idValutazione,Inserzione inserzione,Utente inserzionista,Utente valutatore,Date data,int valutazione){
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
-		ValutazioneInserzione vold = null;
-		
-		if(idvalutazione <=0 || utente == null || valutazione<0 || data == null)
+		ValutazioneInserzione valutazioneInserzioneVecchia = mappaValutazioneInserzione.get(idValutazione);
+
+		if(idValutazione <=0 || inserzionista == null || valutatore == null || valutazione<0 || data == null)
 			throw new RuntimeException("parametri non corretti");
-		
-		for(ValutazioneInserzione v : setValutazioneInserzione){
-			if(v.getIdValutazioneInserzione().equals(idvalutazione)){
-				vold=v;
-				break;
-			}
-		}
-		
-		if(vold==null)
+
+		if(valutazioneInserzioneVecchia==null)
 			throw new RuntimeException("elemento non trovato");
-		
-		ValutazioneInserzione valutazioneinserzione = new ValutazioneInserzione(inserzione,utente, null, valutazione, data);
-		valutazioneinserzione.setIdValutazioneInserzione(idvalutazione);
-		
+
+		ValutazioneInserzione valutazioneinserzione = new ValutazioneInserzione(inserzione,inserzionista, valutatore, valutazione, data);
+		valutazioneinserzione.setIdValutazioneInserzione(idValutazione);
+
 		try{
 			tx=session.beginTransaction();
-			
-			for(Utente u : setUtente){
-				if(u.equals(vold.getUtenteByIdUtenteValutatore())){
-					u.getValutazioneInserzionesForIdUtenteValutatore().remove(vold);
-					break;
-				}
+			session.update(valutazioneinserzione);
+			if(!inserzionista.equals(valutazioneInserzioneVecchia.getUtenteByIdUtenteInserzionista())){
+				mappaUtente.get(valutazioneInserzioneVecchia.getUtenteByIdUtenteInserzionista().getMail()).getValutazioneInserzionesForIdUtenteInserzionista().remove(valutazioneInserzioneVecchia);
+				mappaUtente.get(inserzionista.getMail()).getValutazioneInserzionesForIdUtenteInserzionista().add(valutazioneInserzioneVecchia);
 			}
 			
-			for(Inserzione i : setInserzione){
-				if(i.equals(vold.getInserzione())){
-					i.getValutazioneInserziones().remove(vold);
-					break;
-				}
+			if(!valutatore.equals(valutazioneInserzioneVecchia.getUtenteByIdUtenteValutatore())){
+				mappaUtente.get(valutazioneInserzioneVecchia.getUtenteByIdUtenteValutatore().getMail()).getValutazioneInserzionesForIdUtenteValutatore().remove(valutazioneInserzioneVecchia);
+				mappaUtente.get(valutatore.getMail()).getValutazioneInserzionesForIdUtenteValutatore().add(valutazioneInserzioneVecchia);
 			}
-			
-			setValutazioneInserzione.remove(vold);
-			
-			setValutazioneInserzione.add(valutazioneinserzione);
-			
-			for(Utente u : setUtente){
-				if(u.equals(utente)){
-					u.getValutazioneInserzionesForIdUtenteValutatore().add(valutazioneinserzione);
-					break;
-				}
-			}
-			
-			for(Inserzione i : setInserzione){
-				if(i.equals(inserzione)){
-					i.getValutazioneInserziones().add(valutazioneinserzione);
-					break;
-				}
+
+			if(!inserzione.equals(valutazioneInserzioneVecchia.getInserzione())){
+				mappaInserzioni.get(valutazioneInserzioneVecchia.getInserzione().getIdInserzione()).getValutazioneInserziones().remove(valutazioneInserzioneVecchia);
+				mappaInserzioni.get(inserzione.getIdInserzione()).getValutazioneInserziones().add(valutazioneInserzioneVecchia);
 			}
 			
 			tx.commit();
@@ -2073,189 +1851,51 @@ public class Dati {
 			}
 			session=null;
 		}
-		
+
 	}
-	
-	public void deleteValutazioneInserzione(int idvalutazione){
-		
+
+	/**eliminazione di una valutazione di una inserzione
+	 * @param idValutazione
+	 */
+	public void eliminaValutazioneInserzione(int idValutazione){
+
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
-		ValutazioneInserzione vold = null;
-		
-		if(idvalutazione <=0 )
+		ValutazioneInserzione valutazioneVecchia = mappaValutazioneInserzione.get(idValutazione);
+
+		if(idValutazione <=0 )
 			throw new RuntimeException("id non valido");
-		
-		for(ValutazioneInserzione v : setValutazioneInserzione){
-			if(v.getIdValutazioneInserzione().equals(idvalutazione)){
-				vold=v;
-				break;
-			}
-		}
-		
-		if(vold==null)
+
+		if(valutazioneVecchia==null)
 			throw new RuntimeException("elemento non trovato");
-		
 
 		try{
 			tx=session.beginTransaction();
-			
-			session.delete(vold);
-			
-			for(Utente u : setUtente){
-				if(u.equals(vold.getUtenteByIdUtenteValutatore())){
-					u.getValutazioneInserzionesForIdUtenteValutatore().remove(vold);
-					break;
-				}
+			session.delete(valutazioneVecchia);
+			mappaUtente.get(valutazioneVecchia.getUtenteByIdUtenteInserzionista().getMail()).getValutazioneInserzionesForIdUtenteInserzionista().remove(valutazioneVecchia);
+			mappaUtente.get(valutazioneVecchia.getUtenteByIdUtenteValutatore().getMail()).getValutazioneInserzionesForIdUtenteValutatore().remove(valutazioneVecchia);
+			mappaInserzioni.get(valutazioneVecchia.getInserzione().getIdInserzione()).getValutazioneInserziones().remove(valutazioneVecchia);
+			tx.commit();
+		}catch(Throwable ex){
+			if(tx!=null)
+				tx.rollback();
+			throw new RuntimeException(ex);
+		}finally{
+			if(session!=null && session.isOpen()){
+				session.close();
 			}
-			
-			for(Inserzione i : setInserzione){
-				if(i.equals(vold.getInserzione())){
-					i.getValutazioneInserziones().remove(vold);
-					break;
-				}
-			}
+			session=null;
+		}
 
-			tx.commit();
-		}catch(Throwable ex){
-			if(tx!=null)
-				tx.rollback();
-			throw new RuntimeException(ex);
-		}finally{
-			if(session!=null && session.isOpen()){
-				session.close();
-			}
-			session=null;
-		}
-		
 	}
-	
-	public void insertValutazioneInserzioneInserzionista(Inserzione inserzione,Utente utente,int valutazione,Date data){
-		Session session = factory.getCurrentSession();
-		Transaction tx = null;
-		
-		if(utente == null || valutazione<0 || data == null)
-			throw new RuntimeException("parametri non corretti");
-		
-		ValutazioneInserzione valutazioneinserzione = new ValutazioneInserzione(inserzione,null, utente, valutazione, data);
-		
-		
-		
-		try{
-			tx=session.beginTransaction();
-			
-			session.save(valutazioneinserzione);
-			
-			session.persist(valutazioneinserzione);
-			
-			setValutazioneInserzione.add(valutazioneinserzione);
-			
-			for(Utente u : setUtente){
-				if(u.equals(utente)){
-					u.getValutazioneInserzionesForIdUtenteInserzionista().add(valutazioneinserzione);
-					break;
-				}
-			}
-			
-			for(Inserzione i : setInserzione){
-				if(i.equals(inserzione)){
-					i.getValutazioneInserziones().add(valutazioneinserzione);
-					break;
-				}
-			}
-			
-			tx.commit();
-		}catch(Throwable ex){
-			if(tx!=null)
-				tx.rollback();
-			throw new RuntimeException(ex);
-		}finally{
-			if(session!=null && session.isOpen()){
-				session.close();
-			}
-			session=null;
-		}
-		
-		
-	}
-	
-	public void modifyValutazioneInserzioneInserzionista(Inserzione inserzione,int idvalutazione,Utente utente,Date data,int valutazione){
-		Session session = factory.getCurrentSession();
-		Transaction tx = null;
-		ValutazioneInserzione vold = null;
-		
-		if(idvalutazione <=0 || utente == null || valutazione<0 || data == null)
-			throw new RuntimeException("parametri non corretti");
-		
-		for(ValutazioneInserzione v : setValutazioneInserzione){
-			if(v.getIdValutazioneInserzione().equals(idvalutazione)){
-				vold=v;
-				break;
-			}
-		}
-		
-		if(vold==null)
-			throw new RuntimeException("elemento non trovato");
-		
-		ValutazioneInserzione valutazioneinserzione = new ValutazioneInserzione(inserzione,null , utente, valutazione, data);
-		valutazioneinserzione.setIdValutazioneInserzione(idvalutazione);
-		
-		try{
-			tx=session.beginTransaction();
-			
-			for(Utente u : setUtente){
-				if(u.equals(vold.getUtenteByIdUtenteInserzionista())){
-					u.getValutazioneInserzionesForIdUtenteInserzionista().remove(vold);
-					break;
-				}
-			}
-			
-			for(Inserzione i : setInserzione){
-				if(i.equals(vold.getInserzione())){
-					i.getValutazioneInserziones().remove(vold);
-					break;
-				}
-			}
-			
-			setValutazioneInserzione.remove(vold);
-			
-			setValutazioneInserzione.add(valutazioneinserzione);
-			
-			for(Utente u : setUtente){
-				if(u.equals(utente)){
-					u.getValutazioneInserzionesForIdUtenteInserzionista().add(valutazioneinserzione);
-					break;
-				}
-			}
-			
-			for(Inserzione i : setInserzione){
-				if(i.equals(inserzione)){
-					i.getValutazioneInserziones().add(valutazioneinserzione);
-					break;
-				}
-			}
-			
-			tx.commit();
-		}catch(Throwable ex){
-			if(tx!=null)
-				tx.rollback();
-			throw new RuntimeException(ex);
-		}finally{
-			if(session!=null && session.isOpen()){
-				session.close();
-			}
-			session=null;
-		}
-		
-	}
-	
-	
-	public Set<ValutazioneInserzione> getValutazioniInserzioni(){
-		HashSet<ValutazioneInserzione> valutazioni = new HashSet<ValutazioneInserzione>();
-		
-		for(ValutazioneInserzione v : setValutazioneInserzione){
-			valutazioni.add(v);
-		}
-		
+
+
+	/**metodo get della mappa ValutazioniInserzioni
+	 * @return
+	 */
+	public Map<Integer,ValutazioneInserzione> getValutazioniInserzioni(){
+		HashMap<Integer,ValutazioneInserzione> valutazioni = new HashMap<Integer,ValutazioneInserzione>();
+		valutazioni.putAll(mappaValutazioneInserzione);
 		return valutazioni;
 	}
 }

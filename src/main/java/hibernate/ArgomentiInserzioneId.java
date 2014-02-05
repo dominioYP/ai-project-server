@@ -1,6 +1,6 @@
 package hibernate;
 
-// Generated 1-gen-2014 19.41.13 by Hibernate Tools 3.4.0.CR1
+// Generated 3-feb-2014 16.30.21 by Hibernate Tools 3.4.0.CR1
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -11,36 +11,24 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class ArgomentiInserzioneId implements java.io.Serializable {
 
-	private int idArgomentiInserzione;
-	private int idInsezione;
+	private int idInserzione;
 	private int idArgomento;
 
 	public ArgomentiInserzioneId() {
 	}
 
-	public ArgomentiInserzioneId(int idArgomentiInserzione, int idInsezione,
-			int idArgomento) {
-		this.idArgomentiInserzione = idArgomentiInserzione;
-		this.idInsezione = idInsezione;
+	public ArgomentiInserzioneId(int idInserzione, int idArgomento) {
+		this.idInserzione = idInserzione;
 		this.idArgomento = idArgomento;
 	}
 
-	@Column(name = "ID_Argomenti_Inserzione", nullable = false)
-	public int getIdArgomentiInserzione() {
-		return this.idArgomentiInserzione;
+	@Column(name = "ID_Inserzione", nullable = false)
+	public int getIdInserzione() {
+		return this.idInserzione;
 	}
 
-	public void setIdArgomentiInserzione(int idArgomentiInserzione) {
-		this.idArgomentiInserzione = idArgomentiInserzione;
-	}
-
-	@Column(name = "ID_Insezione", nullable = false)
-	public int getIdInsezione() {
-		return this.idInsezione;
-	}
-
-	public void setIdInsezione(int idInsezione) {
-		this.idInsezione = idInsezione;
+	public void setIdInserzione(int idInserzione) {
+		this.idInserzione = idInserzione;
 	}
 
 	@Column(name = "ID_Argomento", nullable = false)
@@ -61,17 +49,14 @@ public class ArgomentiInserzioneId implements java.io.Serializable {
 			return false;
 		ArgomentiInserzioneId castOther = (ArgomentiInserzioneId) other;
 
-		return (this.getIdArgomentiInserzione() == castOther
-				.getIdArgomentiInserzione())
-				&& (this.getIdInsezione() == castOther.getIdInsezione())
+		return (this.getIdInserzione() == castOther.getIdInserzione())
 				&& (this.getIdArgomento() == castOther.getIdArgomento());
 	}
 
 	public int hashCode() {
 		int result = 17;
 
-		result = 37 * result + this.getIdArgomentiInserzione();
-		result = 37 * result + this.getIdInsezione();
+		result = 37 * result + this.getIdInserzione();
 		result = 37 * result + this.getIdArgomento();
 		return result;
 	}

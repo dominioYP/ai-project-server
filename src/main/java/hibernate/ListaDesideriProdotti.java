@@ -1,6 +1,6 @@
 package hibernate;
 
-// Generated 1-gen-2014 19.41.13 by Hibernate Tools 3.4.0.CR1
+// Generated 3-feb-2014 16.30.21 by Hibernate Tools 3.4.0.CR1
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
@@ -22,6 +22,7 @@ public class ListaDesideriProdotti implements java.io.Serializable {
 	private ListaDesideriProdottiId id;
 	private Prodotto prodotto;
 	private ListaDesideri listaDesideri;
+	private Integer quantità;
 
 	public ListaDesideriProdotti() {
 	}
@@ -31,6 +32,14 @@ public class ListaDesideriProdotti implements java.io.Serializable {
 		this.id = id;
 		this.prodotto = prodotto;
 		this.listaDesideri = listaDesideri;
+	}
+
+	public ListaDesideriProdotti(ListaDesideriProdottiId id, Prodotto prodotto,
+			ListaDesideri listaDesideri, Integer quantità) {
+		this.id = id;
+		this.prodotto = prodotto;
+		this.listaDesideri = listaDesideri;
+		this.quantità = quantità;
 	}
 
 	@EmbeddedId
@@ -64,6 +73,15 @@ public class ListaDesideriProdotti implements java.io.Serializable {
 
 	public void setListaDesideri(ListaDesideri listaDesideri) {
 		this.listaDesideri = listaDesideri;
+	}
+
+	@Column(name = "Quantità")
+	public Integer getQuantità() {
+		return this.quantità;
+	}
+
+	public void setQuantità(Integer quantità) {
+		this.quantità = quantità;
 	}
 
 }
