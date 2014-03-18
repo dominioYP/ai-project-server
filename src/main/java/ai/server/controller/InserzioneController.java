@@ -12,6 +12,7 @@ import java.io.File;
 import java.net.URL;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -19,6 +20,8 @@ import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.codehaus.jackson.JsonFactory;
@@ -32,7 +35,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
+
+
+
+
 
 
 
@@ -173,7 +181,7 @@ public class InserzioneController {
 	}
 	
 	@RequestMapping(value="/inserzione",method= RequestMethod.POST)
-	public ModelAndView processInserzione(@Valid InserzioneForm inserzioneForm,BindingResult result,Principal principal){
+	public ModelAndView processInserzione(@Valid InserzioneForm inserzioneForm,BindingResult result,Principal principal,HttpServletRequest request){
 		boolean inserimentoSupermercato=false;
 		boolean inserimentoInserzione=false;
 		boolean inserimentoProdotto=false;
@@ -182,6 +190,8 @@ public class InserzioneController {
 		int idInsererzione=-1;
 		int idProdotto = -1;
 		int idSupermercato = -1;
+		System.out.println("*******"+request.getAttributeNames());
+		
 		try{	
 			inserzioneValidator.validate(inserzioneForm, result,principal);
 			if(result.hasErrors()){

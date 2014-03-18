@@ -53,7 +53,7 @@ public class Categoria implements java.io.Serializable {
 		this.nome = nome;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "categoria")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "categoria")
 	public Set getSottocategorias() {
 		return this.sottocategorias;
 	}

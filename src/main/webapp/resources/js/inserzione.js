@@ -335,16 +335,17 @@ $('#insertionForm').submit(function(event){
 	$('#supermercato').val($('#supermercato').val()+" - "+$('#indirizzo').val());
 	var geocoder = new google.maps.Geocoder();
 	geocoder.geocode({'address':$("#indirizzo").val()},function(results,status){
-		if(status == google.maps.GeocoderStatus.OK){
+		if(status == google.maps.GeocoderStatus.OK){			
 			var form = new FormData();
-			$.each($("form").serialize(),function(index,value){
-				alert(index+":"+value);
-				form.append(index,value);
+			
+			$.each($("form").serializeArray(),function(index,value){				
+				form.append(value.name,value.value);
 			});
 			form.append("lat",results[0].geometry.location.lat());
 			form.append("lng",results[0].geometry.location.lng());
 			form.append("foto",$('#preview').attr("src"));
-			form.append("file",$("#file.input").files[0]);
+		
+			form.append("file",$("#file")[0].files[0]);
 			$.ajax({
 				type:'POST',
 				url:window.location.pathname,
@@ -353,6 +354,7 @@ $('#insertionForm').submit(function(event){
 				processData:false,
 				data: form,
 				success:function(response){
+					alert("successo");
 					$(":root").html(response);
 				}
 			});

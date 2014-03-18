@@ -11,7 +11,7 @@
         <property name="nome" type="string">
             <column name="Nome" length="45" unique="true" />
         </property>
-        <set name="sottocategorias" table="sottocategoria" inverse="true" lazy="true" fetch="select">
+        <set name="sottocategorias" table="sottocategoria" inverse="true" lazy="false" fetch="select">
             <key>
                 <column name="ID_Categoria" />
             </key>

@@ -25,7 +25,7 @@ public class InserzioneValidation {
 	public void validate(Object target, Errors errors,Principal principal){
 		
 		InserzioneForm inserzione = (InserzioneForm)target;
-		
+		System.out.println("231231231"+inserzione.getDescrizione());
 		if(inserzione.getDescrizione().length()<10){
 			errors.rejectValue("descrizione", 
 					"lengthOfDescrizione.InserzioneForm.descrizione", 
