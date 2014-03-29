@@ -14,9 +14,9 @@ public class InserzioneForm {
 	
 	private long codiceBarre;
 	
-	private  CommonsMultipartFile file;
-	
-	public MultipartFile getFile() {
+	private CommonsMultipartFile file;	
+
+	public CommonsMultipartFile getFile() {
 		return file;
 	}
 

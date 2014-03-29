@@ -15,8 +15,12 @@ import java.text.SimpleDateFormat;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javassist.expr.Instanceof;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletContext;
@@ -24,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.apache.commons.io.FileUtils;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.JsonNodeFactory;
@@ -31,12 +36,27 @@ import org.codehaus.jackson.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.ModelAndView;
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -181,7 +201,7 @@ public class InserzioneController {
 	}
 	
 	@RequestMapping(value="/inserzione",method= RequestMethod.POST)
-	public ModelAndView processInserzione(@Valid InserzioneForm inserzioneForm,BindingResult result,Principal principal,HttpServletRequest request){
+	public ModelAndView processInserzione(InserzioneForm inserzioneForm,BindingResult result,Principal principal,HttpServletRequest request,CommonsMultipartResolver resolver){
 		boolean inserimentoSupermercato=false;
 		boolean inserimentoInserzione=false;
 		boolean inserimentoProdotto=false;
@@ -190,8 +210,6 @@ public class InserzioneController {
 		int idInsererzione=-1;
 		int idProdotto = -1;
 		int idSupermercato = -1;
-		System.out.println("*******"+request.getAttributeNames());
-		
 		try{	
 			inserzioneValidator.validate(inserzioneForm, result,principal);
 			if(result.hasErrors()){
@@ -229,12 +247,13 @@ public class InserzioneController {
 			}
 			System.out.println(inserzioneForm.getFile());
 			if(inserzioneForm.getFile()!=null){
-				System.out.println("fatto");
+				path = context.getRealPath("/")+"resources\\images"+File.separator+inserzioneForm.getCodiceBarre()+".png";
+				File file = new File(path);
+				FileUtils.writeByteArrayToFile(file, inserzioneForm.getFile().getBytes());
+				System.out.println("file salvato in : "+path);
 			}
 		
 			supermercato = dati.getSupermercati().get(inserzioneForm.getSupermercato());
-			
-			
 			
 			if(supermercato == null){
 				idSupermercato=dati.inserisciSupermercato(inserzioneForm.getSupermercato(), inserzioneForm.getLat(), inserzioneForm.getLng());

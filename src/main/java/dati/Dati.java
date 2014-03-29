@@ -1168,7 +1168,7 @@ public class Dati {
 		Set<Inserzione> inserzioni = new HashSet<Inserzione>();
 		Set<ListaDesideriProdotti> listaDesideriProdotti = new HashSet<ListaDesideriProdotti>();
 		Set<ListaSpesaProdotti> listaSpesaProdotti = new HashSet<ListaSpesaProdotti>();
-		
+		System.out.println(prodotto);
 		if(prodotto!=null){
 			try{
 				tx=session.beginTransaction();
