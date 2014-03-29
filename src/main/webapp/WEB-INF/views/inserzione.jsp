@@ -100,12 +100,13 @@
 	
 	<tr><td><div id="map-canvas"></div></td></tr>
 	<tr>
-	<td><form:errors path="*" cssClass="errorblock" element="div" />
- 
-		Carica una foto se non trovata : <input id="file" type="file" name="file" />
-		<span><form:errors path="file" cssClass="error" />
-		</span>
-		</td></tr>
+	<td>
+		<tr>
+            <td>Browse File :</td>
+            <td><form:input type="file" path="file" /></td>
+        </tr>
+		
+	</td></tr>
 	<tr>
 	<td><input type="submit" value="Invia">
 	</td>	

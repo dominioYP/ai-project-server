@@ -29,11 +29,10 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter{
 		return resolver;
 	}
 	@Bean
-	public CommonsMultipartResolver getMultipartResolver(){
+	public CommonsMultipartResolver multipartResolver(){
 		CommonsMultipartResolver mr = new CommonsMultipartResolver();
        
-        mr.setMaxUploadSize(10000);
-        
+        mr.setMaxUploadSize(10000000);
         return mr;
 	}
 	

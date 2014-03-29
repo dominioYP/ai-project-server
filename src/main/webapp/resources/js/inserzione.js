@@ -344,12 +344,13 @@ $('#insertionForm').submit(function(event){
 			form.append("lat",results[0].geometry.location.lat());
 			form.append("lng",results[0].geometry.location.lng());
 			form.append("foto",$('#preview').attr("src"));
-		
+			
 			form.append("file",$("#file")[0].files[0]);
 			$.ajax({
 				type:'POST',
 				url:window.location.pathname,
-				cache:false,
+			//	cache:false,
+				dataType: 'text',
 				contentType:false,
 				processData:false,
 				data: form,

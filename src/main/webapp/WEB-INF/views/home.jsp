@@ -1,3 +1,4 @@
+<%@page import="hibernate.Prodotto"%>
 <%@page import="hibernate.Profilo"%>
 <%@page import="hibernate.Utente"%>
 <%@page import="hibernate.Argomenti"%>
@@ -26,18 +27,12 @@
 		<div id="utenti">
 	        <h1>Hello World!</h1>
 	        <p>This is the homepage!</p>
-	        <% for(Map.Entry<String,Utente> u : dati.getUtenti().entrySet()){ %>
-	        <%= u.getValue().getNickname() %><br>
-	        <%= u.getValue().getMail() %><br>
-	        <%= u.getValue().getPassword() %><br>
-	        <%= u.getValue().getDataRegistrazione().toString() %><br>
-	        <% if(u.getValue().getConfermato()){ %>
-	        	Confermato
-	        <%}else{ %>
-	        	Non Confermato
-	        	<%} %>
-	        	<br>
-	        <%= u.getValue().getProfilos() %>
+	        <% for(Map.Entry<Long,Prodotto> u : dati.getProdotti().entrySet()){ %>
+	        <%= u.getValue().getCodiceBarre() %><br>
+	        <%= u.getValue().getDescrizione()%><br>
+	        <%= u.getValue().getIdProdotto() %><br>
+	        <%= u.getValue().getSottocategoria() %><br>
+	        
 	        <br>
 	        <%} %>
 	        

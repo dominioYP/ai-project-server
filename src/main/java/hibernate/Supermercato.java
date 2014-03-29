@@ -75,7 +75,7 @@ public class Supermercato implements java.io.Serializable {
 		this.longitudine = longitudine;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "supermercato")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "supermercato")
 	public Set getInserziones() {
 		return this.inserziones;
 	}

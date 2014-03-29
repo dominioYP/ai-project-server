@@ -1086,6 +1086,7 @@ public class Dati {
 			tx=session.beginTransaction();
 			Prodotto prodotto = new Prodotto(sottoCategoria,codiceBarre, descrizione, new HashSet<Inserzione>(), new HashSet<ListaDesideriProdotti>(),new HashSet<ListaSpesaProdotti>());			
 			idProdotto = (Integer)session.save(prodotto);
+			prodotto.setIdProdotto(idProdotto);
 			mappaProdotti.put(codiceBarre,prodotto);
 			mappaSottocategorie.get(sottoCategoria.getNome()).getProdottos().add(prodotto);
 			tx.commit();
@@ -1168,7 +1169,7 @@ public class Dati {
 		Set<Inserzione> inserzioni = new HashSet<Inserzione>();
 		Set<ListaDesideriProdotti> listaDesideriProdotti = new HashSet<ListaDesideriProdotti>();
 		Set<ListaSpesaProdotti> listaSpesaProdotti = new HashSet<ListaSpesaProdotti>();
-		
+		System.out.println(prodotto);
 		if(prodotto!=null){
 			try{
 				tx=session.beginTransaction();
