@@ -355,7 +355,6 @@ $('#insertionForm').submit(function(event){
 				processData:false,
 				data: form,
 				success:function(response){
-					alert("successo");
 					$(":root").html(response);
 				}
 			});

@@ -28,7 +28,7 @@
 <form:form id="insertionForm" method="post" action="inserzione" commandName="inserzioneForm" enctype="multipart/form-data">
 	<% String error = (String) request.getAttribute("error");
 	if(null != error ) {%>
-		<div id="hibernate.error" class="errors"><%= error %></div>
+		<div id="hibernate.error" class="errors"><%= error %> DIO PORCO</div>
 	<%} %>
 	<table>
 	<tr>
