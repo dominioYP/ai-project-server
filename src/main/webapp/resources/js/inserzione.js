@@ -2,7 +2,7 @@
  * 
  */
 
-var risposta;
+var risposta = "No";
 var i = 0;
 
 var supermercati_markers = [];
@@ -264,7 +264,7 @@ function searchImage(){
 }
 
 function elaboraRisposta(risp){
-	if(risposta=="No"){
+	if(risposta == "No"){
 		i++;
 		if(results.length>i){
 			$('td.domanda').next().html('Risposta ricevuta - <a class="domanda"> Next?</a>');

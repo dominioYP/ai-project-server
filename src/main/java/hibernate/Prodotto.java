@@ -63,7 +63,7 @@ public class Prodotto implements java.io.Serializable {
 		this.idProdotto = idProdotto;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "ID_SottoCategoria", nullable = false)
 	public Sottocategoria getSottocategoria() {
 		return this.sottocategoria;
@@ -91,7 +91,7 @@ public class Prodotto implements java.io.Serializable {
 		this.descrizione = descrizione;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "prodotto")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "prodotto")
 	public Set getInserziones() {
 		return this.inserziones;
 	}
@@ -100,7 +100,7 @@ public class Prodotto implements java.io.Serializable {
 		this.inserziones = inserziones;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "prodotto")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "prodotto")
 	public Set getListaDesideriProdottis() {
 		return this.listaDesideriProdottis;
 	}
@@ -109,7 +109,7 @@ public class Prodotto implements java.io.Serializable {
 		this.listaDesideriProdottis = listaDesideriProdottis;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "prodotto")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "prodotto")
 	public Set getListaSpesaProdottis() {
 		return this.listaSpesaProdottis;
 	}

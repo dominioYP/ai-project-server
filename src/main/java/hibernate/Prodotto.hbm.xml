@@ -17,19 +17,19 @@
         <property name="descrizione" type="string">
             <column name="Descrizione" length="45" not-null="true" />
         </property>
-        <set name="inserziones" table="inserzione" inverse="true" lazy="true" fetch="select">
+        <set name="inserziones" table="inserzione" inverse="true" lazy="false" fetch="select">
             <key>
                 <column name="ID_Prodotto" />
             </key>
             <one-to-many class="hibernate.Inserzione" />
         </set>
-        <set name="listaDesideriProdottis" table="lista_desideri_prodotti" inverse="true" lazy="true" fetch="select">
+        <set name="listaDesideriProdottis" table="lista_desideri_prodotti" inverse="true" lazy="false" fetch="select">
             <key>
                 <column name="ID_Prodotto" not-null="true" />
             </key>
             <one-to-many class="hibernate.ListaDesideriProdotti" />
         </set>
-        <set name="listaSpesaProdottis" table="lista_spesa_prodotti" inverse="true" lazy="true" fetch="select">
+        <set name="listaSpesaProdottis" table="lista_spesa_prodotti" inverse="true" lazy="false" fetch="select">
             <key>
                 <column name="ID_Prodotto" not-null="true" />
             </key>

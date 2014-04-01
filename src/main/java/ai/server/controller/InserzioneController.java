@@ -165,24 +165,19 @@ public class InserzioneController {
 		try{	
 			inserzioneValidator.validate(inserzioneForm, result,principal);
 			if(result.hasErrors()){
-				Map model = new HashMap<String, Object>();
-				
-				model.put("inserzioneForm", inserzioneForm);
-				
+				Map model = new HashMap<String, Object>();				
+				model.put("inserzioneForm", inserzioneForm);				
 				Set<String> categorie = new HashSet<String>();
 				
 				for(Map.Entry<Integer,Categoria> c : dati.getCategorie().entrySet()){
 					categorie.add(c.getValue().getNome());
 				}
 				
-				model.put("categorie", categorie);
-				
+				model.put("categorie", categorie);				
 				Set<String> argomenti = new HashSet<String>();
 				
-				for(Map.Entry<Integer,Argomenti> a : dati.getArgomenti().entrySet()){
-					
-					argomenti.add(a.getValue().getArg1());
-					
+				for(Map.Entry<Integer,Argomenti> a : dati.getArgomenti().entrySet()){					
+					argomenti.add(a.getValue().getArg1());					
 				}
 				model.put("argomenti", argomenti);
 				return new ModelAndView("inserzione",model);
@@ -218,16 +213,6 @@ public class InserzioneController {
 			//Bisogna ancora inserire gli argomenti usati
 			if(prodotto != null){
 				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-				int count = 0;
-				for(Inserzione i : (Set<Inserzione>)prodotto.getInserziones()){					
-					if(Math.abs(sdf.parse(inserzioneForm.getDataInizio()).getTime()/3600000-i.getDataInizio().getTime()/3600000) < 1 && i.getUtente().getMail().equals(principal.getName()) && inserzioneForm.getSupermercato().equals(i.getSupermercato().getNome()))
-						throw new RuntimeException("Inserzione già inserita per il giorno attuale");
-					if(Math.abs(sdf.parse(inserzioneForm.getDataInizio()).getTime()/3600000-i.getDataInizio().getTime()/3600000) < 15 && i.getUtente().getMail().equals(principal.getName()) && inserzioneForm.getSupermercato().equals(i.getSupermercato().getNome()))
-						count++;
-					if(count > 2)
-						throw new RuntimeException("Troppe inserzioni in un lasso di tempo piccolo");
-				}
-				
 				trovato = true;
 				if(inserzioneForm.getDataFine()!=null&&!(inserzioneForm.getDataFine().equals(""))){				
 					idInsererzione=dati.inserisciInserzione(utente, supermercato, prodotto, inserzioneForm.getPrezzo(), sdf.parse(inserzioneForm.getDataInizio()), sdf.parse(inserzioneForm.getDataFine()), inserzioneForm.getDescrizione(),path,new HashSet<Argomenti>());
@@ -270,7 +255,24 @@ public class InserzioneController {
 				dati.eliminaSupermercato(idSupermercato);
 			}
 			e.printStackTrace();
-			return new ModelAndView("inserzione","error","errore nell'immissione del form");
+			
+			Map model = new HashMap<String, Object>();				
+			model.put("inserzioneForm", inserzioneForm);				
+			Set<String> categorie = new HashSet<String>();
+			
+			for(Map.Entry<Integer,Categoria> c : dati.getCategorie().entrySet()){
+				categorie.add(c.getValue().getNome());
+			}
+			
+			model.put("categorie", categorie);				
+			Set<String> argomenti = new HashSet<String>();
+			
+			for(Map.Entry<Integer,Argomenti> a : dati.getArgomenti().entrySet()){					
+				argomenti.add(a.getValue().getArg1());					
+			}
+			model.put("argomenti", argomenti);
+			model.put("error","errore nell'immissione del form");
+			return new ModelAndView("inserzione",model);
 		}
 		
 		return new ModelAndView("inserzionesuccess","inserzione",inserzioneForm);

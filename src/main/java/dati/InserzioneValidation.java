@@ -2,9 +2,11 @@ package dati;
 
 import java.security.Principal;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Set;
 
 import hibernate.Inserzione;
+import hibernate.Prodotto;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,7 +27,6 @@ public class InserzioneValidation {
 	public void validate(Object target, Errors errors,Principal principal){
 		
 		InserzioneForm inserzione = (InserzioneForm)target;
-		System.out.println("231231231"+inserzione.getDescrizione());
 		if(inserzione.getDescrizione().length()<10){
 			errors.rejectValue("descrizione", 
 					"lengthOfDescrizione.InserzioneForm.descrizione", 
@@ -37,10 +38,28 @@ public class InserzioneValidation {
 					"lengthOfCodiceBarre.InserzioneForm.codiceBarre", 
 					"Il codice a barre deve avere 13 cifre");
 		}
+		
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		try{
-			for(Inserzione i : (Set<Inserzione>) dati.getUtenti().get(principal.getName()).getInserziones() ){
-				if(i.getProdotto().getCodiceBarre()==inserzione.getCodiceBarre()&&
+
+			if((new Date().getTime()/3600000-sdf.parse(inserzione.getDataInizio()).getTime()/3600000) > 30){
+				errors.rejectValue("dataInizio", "invalidDate.InserzioneForm.dataInizio", 
+						"inserzione troppo vecchia");
+			}
+			if((new Date().getTime()/3600000-sdf.parse(inserzione.getDataInizio()).getTime()/3600000) < 0){
+				errors.rejectValue("dataInizio", "invalidDate.InserzioneForm.dataInizio", 
+						"inserzione troppo vecchia");
+			}
+			Prodotto prodotto = dati.getProdotti().get(inserzione.getCodiceBarre());
+			int count = 0;
+			for(Inserzione i : (Set<Inserzione>)prodotto.getInserziones()){
+				if(i.getUtente().getMail().equals(principal.getName()) && Math.abs(i.getPrezzo() - inserzione.getPrezzo()) < 0.10 
+						&& Math.abs(sdf.parse(inserzione.getDataInizio()).getTime()/3600000-i.getDataInizio().getTime()/3600000) <= 30){
+					errors.rejectValue("prezzo", "invalidPrezzo.InserzioneForm.prezzo", 
+							"è gia presente una tua inserzione con un prezzo simile");
+					break;
+				}
+				if(i.getUtente().getMail().equals(principal.getName()) &&
 						i.getDataInizio().equals(sdf.parse(inserzione.getDataInizio()))&&
 						i.getSupermercato().getLatitudine().intValue()==(int)inserzione.getLat()&&
 						i.getSupermercato().getLongitudine().intValue()==(int)inserzione.getLng()){
@@ -48,10 +67,20 @@ public class InserzioneValidation {
 							"è gia presente una tua inserzione con la stessa data");
 					break;
 				}
+				if(Math.abs(sdf.parse(inserzione.getDataInizio()).getTime()/3600000-i.getDataInizio().getTime()/3600000) <= 30 
+						&& i.getUtente().getMail().equals(principal.getName()) 
+						&& inserzione.getSupermercato().equals(i.getSupermercato().getNome()))
+					count++;
+				if(count > 2){
+					errors.rejectValue("dataInizio", "invalidDate.InserzioneForm.dataInizio", 
+							"troppe inserzion");
+				}
 			}
 		}catch(Exception e){
 			e.printStackTrace();
 		}
+		
+		
 		
 	}
 
