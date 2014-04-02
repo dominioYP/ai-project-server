@@ -42,19 +42,20 @@ public class InserzioneValidation {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		try{
 
-			if((new Date().getTime()/3600000-sdf.parse(inserzione.getDataInizio()).getTime()/3600000) > 30){
+			if((new Date().getTime()/86400000-sdf.parse(inserzione.getDataInizio()).getTime()/86400000) > 30){
 				errors.rejectValue("dataInizio", "invalidDate.InserzioneForm.dataInizio", 
 						"inserzione troppo vecchia");
 			}
-			if((new Date().getTime()/3600000-sdf.parse(inserzione.getDataInizio()).getTime()/3600000) < 0){
+			
+			if((new Date().getTime()/86400000-sdf.parse(inserzione.getDataInizio()).getTime()/86400000) < 0){
 				errors.rejectValue("dataInizio", "invalidDate.InserzioneForm.dataInizio", 
-						"inserzione troppo vecchia");
+						"Tempo inconsistente");
 			}
 			Prodotto prodotto = dati.getProdotti().get(inserzione.getCodiceBarre());
 			int count = 0;
 			for(Inserzione i : (Set<Inserzione>)prodotto.getInserziones()){
 				if(i.getUtente().getMail().equals(principal.getName()) && Math.abs(i.getPrezzo() - inserzione.getPrezzo()) < 0.10 
-						&& Math.abs(sdf.parse(inserzione.getDataInizio()).getTime()/3600000-i.getDataInizio().getTime()/3600000) <= 30){
+						&& Math.abs(sdf.parse(inserzione.getDataInizio()).getTime()/86400000-i.getDataInizio().getTime()/86400000) <= 30){
 					errors.rejectValue("prezzo", "invalidPrezzo.InserzioneForm.prezzo", 
 							"è gia presente una tua inserzione con un prezzo simile");
 					break;
@@ -67,7 +68,7 @@ public class InserzioneValidation {
 							"è gia presente una tua inserzione con la stessa data");
 					break;
 				}
-				if(Math.abs(sdf.parse(inserzione.getDataInizio()).getTime()/3600000-i.getDataInizio().getTime()/3600000) <= 30 
+				if(Math.abs(sdf.parse(inserzione.getDataInizio()).getTime()/86400000-i.getDataInizio().getTime()/86400000) <= 30 
 						&& i.getUtente().getMail().equals(principal.getName()) 
 						&& inserzione.getSupermercato().equals(i.getSupermercato().getNome()))
 					count++;
