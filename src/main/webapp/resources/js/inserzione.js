@@ -344,7 +344,6 @@ $('#insertionForm').submit(function(event){
 			form.append("lat",results[0].geometry.location.lat());
 			form.append("lng",results[0].geometry.location.lng());
 			form.append("foto",$('#preview').attr("src"));
-			
 			form.append("file",$("#file")[0].files[0]);
 			$.ajax({
 				type:'POST',
@@ -354,8 +353,14 @@ $('#insertionForm').submit(function(event){
 				contentType:false,
 				processData:false,
 				data: form,
-				success:function(response){
+				success:function(response){		
+					alert($(":root"));
 					$(":root").html(response);
+					alert(response);
+					if(response.indexOf("insertionForm") >= 0){
+						alert("fatto");
+						inizialize();
+					}
 				}
 			});
 		}else{
