@@ -1,8 +1,5 @@
 package dati;
 
-
-
-
 import hibernate.Argomenti;
 import hibernate.ArgomentiInserzione;
 import hibernate.ArgomentiInserzioneId;
@@ -22,28 +19,25 @@ import hibernate.Utente;
 import hibernate.ValutazioneInserzione;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.TimeUnit;
 
+import javax.annotation.PostConstruct;
 
-
-
-
-
-
-
-
-
-
-
-
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -57,14 +51,11 @@ import org.springframework.stereotype.Service;
  * @author ciakky
  *
  */
+
 /**
- * @author ciakky
- *
+ * @author gnz.chp
  */
-/**
- * @author ciakky
- *
- */
+
 @Service("dati")
 @Scope("singleton")
 public class Dati {
@@ -86,8 +77,11 @@ public class Dati {
 	private volatile Map<String,Supermercato> mappaSupermercati = new ConcurrentHashMap<String, Supermercato>();
 	private volatile Map<Integer,ValutazioneInserzione> mappaValutazioneInserzione = new ConcurrentHashMap<Integer, ValutazioneInserzione>();
 
-	private static SessionFactory factory;
-
+	public static SessionFactory factory = null;
+	
+	private TimerSistemaCrediti timerSC;
+	private Timer timer;
+	
 	public static SessionFactory buildSessionFactory(){
 		try{
 			Configuration configuration = new Configuration().configure("hibernate.cfg.xml");		
@@ -100,6 +94,7 @@ public class Dati {
 	}
 
 	private Dati(){
+
 		factory = buildSessionFactory();
 		Session session = factory.openSession();
 		Transaction tx = null;
@@ -178,6 +173,35 @@ public class Dati {
 			if(session!=null && session.isOpen())
 				session.close();
 		}
+		
+		// Inizializzazione Timer per Sistema a Crediti
+		setTimerSistemaCrediti();
+	}
+	
+	/***
+	 * Questo metodo inizializza il timer che scatterà per la prima volta alla mezzanotte del giorno in cui viene lanciato
+	 * e successivamente ogni 24 ore. Inoltre inizializza un oggetto della classe TimerSistemaCrediti che contiene il metodo (run) che
+	 * verrà eseguito quando il timer scatterà.
+	 */
+	public void setTimerSistemaCrediti() {
+		timerSC = new TimerSistemaCrediti();
+		timer = new Timer();
+		
+		Calendar cal = new GregorianCalendar();
+		System.out.println("#1: " + cal.getTime());
+		
+		cal.set(Calendar.HOUR, 11);
+		cal.set(Calendar.MINUTE, 59);
+		cal.set(Calendar.SECOND, 59);
+		
+		System.out.println("#2: " + cal.getTime());
+		System.out.println("#3: " + TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS));
+		
+		timer.schedule(timerSC, cal.getTime(), TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS));
+		
+		// SOLO TEST
+		//cal.add(Calendar.MINUTE, +1);
+		//timer.schedule(timerSC, cal.getTime(), 100*1000);
 	}
 
 	public static Dati getInstance()
