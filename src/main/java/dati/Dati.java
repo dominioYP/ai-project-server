@@ -1,8 +1,5 @@
 package dati;
 
-
-
-
 import hibernate.Argomenti;
 import hibernate.ArgomentiInserzione;
 import hibernate.ArgomentiInserzioneId;
@@ -21,29 +18,24 @@ import hibernate.Supermercato;
 import hibernate.Utente;
 import hibernate.ValutazioneInserzione;
 
-import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.TimeUnit;
 
+import javax.annotation.PostConstruct;
 
-
-
-
-
-
-
-
-
-
-
-
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -51,20 +43,16 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.ServiceRegistryBuilder;
 import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 /**
  * @author ciakky
  *
  */
+
 /**
- * @author ciakky
- *
+ * @author gnz.chp
  */
-/**
- * @author ciakky
- *
- */
+
 @Service("dati")
 @Scope("singleton")
 public class Dati {
@@ -86,8 +74,11 @@ public class Dati {
 	private volatile Map<String,Supermercato> mappaSupermercati = new ConcurrentHashMap<String, Supermercato>();
 	private volatile Map<Integer,ValutazioneInserzione> mappaValutazioneInserzione = new ConcurrentHashMap<Integer, ValutazioneInserzione>();
 
-	private static SessionFactory factory;
-
+	public static SessionFactory factory = null;
+	
+	private TimerSistemaCrediti timerSC;
+	private Timer timer;
+	
 	public static SessionFactory buildSessionFactory(){
 		try{
 			Configuration configuration = new Configuration().configure("hibernate.cfg.xml");		
@@ -100,6 +91,7 @@ public class Dati {
 	}
 
 	private Dati(){
+
 		factory = buildSessionFactory();
 		Session session = factory.openSession();
 		Transaction tx = null;
@@ -159,7 +151,6 @@ public class Dati {
 			{
 				mappaSottocategorie.put(s.getNome(), s);
 			}
-			
 			for(Supermercato s : (List<Supermercato>)session.createQuery("from Supermercato").list())
 			{
 				mappaSupermercati.put(s.getNome(), s);
@@ -178,6 +169,35 @@ public class Dati {
 			if(session!=null && session.isOpen())
 				session.close();
 		}
+		
+		// Inizializzazione Timer per Sistema a Crediti
+		setTimerSistemaCrediti();
+	}
+	
+	/***
+	 * Questo metodo inizializza il timer che scatterà per la prima volta alla mezzanotte del giorno in cui viene lanciato
+	 * e successivamente ogni 24 ore. Inoltre inizializza un oggetto della classe TimerSistemaCrediti che contiene il metodo (run) che
+	 * verrà eseguito quando il timer scatterà.
+	 */
+	public void setTimerSistemaCrediti() {
+		timerSC = new TimerSistemaCrediti();
+		timer = new Timer();
+		
+		Calendar cal = new GregorianCalendar();
+		System.out.println("#1: " + cal.getTime());
+		
+		cal.set(Calendar.HOUR, 11);
+		cal.set(Calendar.MINUTE, 59);
+		cal.set(Calendar.SECOND, 59);
+		
+		System.out.println("#2: " + cal.getTime());
+		System.out.println("#3: " + TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS));
+		
+		timer.schedule(timerSC, cal.getTime(), TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS));
+		
+		// SOLO TEST
+		//cal.add(Calendar.MINUTE, +1);
+		//timer.schedule(timerSC, cal.getTime(), 100*1000);
 	}
 
 	public static Dati getInstance()
@@ -187,7 +207,6 @@ public class Dati {
 		return istanza; 
 	}
 
-	
 	/**metodo get per ottenere tutti i vari argomenti delle inserzioni 
 	 * Es : litri, grammi etc etc
 	 * @return
@@ -200,8 +219,6 @@ public class Dati {
 		
 		return argomenti;
 	}
-
-	
 	
 	/**Inserimento di un argomento
 	 * @param arg1 nome dell'argomento
@@ -1284,13 +1301,13 @@ public class Dati {
 	 * @param premium
 	 * @param contatoreInfrazioni
 	 */
-	public void inserisciProfilo(Utente utente,int creditiAcquisiti,int creditiPendenti,int reputazione,boolean premium,int contatoreInfrazioni){
+	public void inserisciProfilo(Utente utente, int creditiAcquisiti, int creditiPendenti, int reputazione, boolean premium, int contatoreInfrazioni){
 		if(utente == null || creditiAcquisiti<0 || creditiPendenti<0  || contatoreInfrazioni<0)
 			throw new RuntimeException("parametro/i non validi");
 		
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
-		Profilo profilo = new Profilo(utente, creditiAcquisiti, creditiPendenti, reputazione, premium, contatoreInfrazioni);
+		Profilo profilo = new Profilo(utente, creditiAcquisiti, creditiPendenti, reputazione, premium, contatoreInfrazioni, 0, 0, 0, 0);
 
 		try{
 			tx=session.beginTransaction();
@@ -1329,7 +1346,7 @@ public class Dati {
 
 		if(profiloVecchio != null){
 
-			Profilo profilo = new Profilo(profiloVecchio.getUtente(), creditiAcquisiti, creditiPendenti, reputazione, premium, contatoreInfrazioni);
+			Profilo profilo = new Profilo(profiloVecchio.getUtente(), creditiAcquisiti, creditiPendenti, reputazione, premium, contatoreInfrazioni, 0, 0, 0, 0);
 			profilo.setIdProfilo(idProfilo);
 
 			try{
@@ -1851,7 +1868,6 @@ public class Dati {
 			}
 			session=null;
 		}
-
 	}
 
 	/**eliminazione di una valutazione di una inserzione
@@ -1898,4 +1914,5 @@ public class Dati {
 		valutazioni.putAll(mappaValutazioneInserzione);
 		return valutazioni;
 	}
+	
 }
