@@ -77,8 +77,11 @@ public class Dati {
 	private volatile Map<String,Supermercato> mappaSupermercati = new ConcurrentHashMap<String, Supermercato>();
 	private volatile Map<Integer,ValutazioneInserzione> mappaValutazioneInserzione = new ConcurrentHashMap<Integer, ValutazioneInserzione>();
 
+	/***
+	 * Questa è session factory
+	 */
 	public static SessionFactory factory = null;
-	
+	public int a;
 	private TimerSistemaCrediti timerSC;
 	private Timer timer;
 	
