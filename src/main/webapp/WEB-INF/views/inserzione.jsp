@@ -5,8 +5,9 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true&libraries=places"></script>
 <script src="https://www.google.com/jsapi"
         type="text/javascript"></script>
@@ -106,7 +107,7 @@
             <td><form:input type="file" path="file" /></td>
         </tr>
 		
-	</td></tr>
+	
 	<tr>
 	<td><input type="submit" value="Invia">
 	</td>	
@@ -114,6 +115,6 @@
 	</table>
 </form:form>
 
-</body>
 <script type="text/javascript" src="resources/js/inserzione.js"></script>
+</body>
 </html>

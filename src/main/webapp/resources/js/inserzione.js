@@ -4,10 +4,21 @@
 
 var risposta = "No";
 var i = 0;
-
+var codici_prodotti= [];
+var prodotto_selected="";
+var infowindow = new google.maps.InfoWindow();
+var geocoder = new google.maps.Geocoder();
 var supermercati_markers = [];
+var doneTypingInterval = 5000;
+var descrizioneInterval= 5000;
+var markers = [];
+var map;
+var typingTimer;
+var descrizioneTimer;
+var results;
 
-(function getSottocategorie(){
+
+function getSottocategorie(){
 	var selected=$('#categorie option:selected').text();
 	selected = $("#categorie option:selected").text();
 	path=window.location.pathname;
@@ -28,78 +39,152 @@ var supermercati_markers = [];
     	});
     	
     });
-})();
+}
 
+getSottocategorie();
 
-$('#categorie').change(function(){
-	var selected= "";
-	selected = $("#categorie option:selected").text();
-	path=window.location.pathname;
-	path=path+"/sottocategorie/"+selected;
+function porcodidio(){
+	$('#supermercato').val("diocane di quello stronzo");
+}
+
+function initialize(){
 	
-    $.ajax({type:"GET",url: path,contentType:"application/json"}).done(function( data ) {
-    	var select = $("#sottoCategorie");
-    	var options;
-    	if(select.prop){
-    		options = select.prop('options');
-    	}else{
-    		options = select.attr('options');
-    	}
-    	$('option',select).remove();
-    	
-    	$.each(data,function(val,text){
-    		options[options.length] = new Option(text, text);
-    	});
-    	
-    });
-});
-var codici_prodotti= [];
-var prodotto_selected="";
-$("#descrizione").autocomplete({
-	
-	source: function(request,response){
-		var risp = [];
-		$.ajax({type:"GET",
-			url: window.location.pathname+"/getSuggerimenti/prodotti",
-			contentType:"application/json",
-			data:{"term":request.term},
-			success:function(data){
-				codici_prodotti=data;
-			}				
-		});
-		$.each(codici_prodotti,function(index,value){
-			
-			$.each(value,function(index,value){
-				risp.push(value);
-			});
-		});
-		response(risp);	
-	},
-	select:function(event,ui){
-		$.each(codici_prodotti,function(index,value){
-			
-			if(value==ui.item.label){
-				$('#codiceBarre').val(index);
-				return false;
+	//overide del sumbit
+	$('#insertionForm').submit(function(event){
+		if(risposta=="No"){
+			$('#preview').attr("src","");
+		}
+		
+		$('#supermercato').val($('#supermercato').val()+" - "+$('#indirizzo').val());
+		var geocoder = new google.maps.Geocoder();
+		geocoder.geocode({'address':$("#indirizzo").val()},function(results,status){
+			if(status == google.maps.GeocoderStatus.OK){			
+				var form = new FormData();
+				
+				$.each($("form").serializeArray(),function(index,value){				
+					form.append(value.name,value.value);
+				});
+				form.append("lat",results[0].geometry.location.lat());
+				form.append("lng",results[0].geometry.location.lng());
+				form.append("foto",$('#preview').attr("src"));
+				form.append("file",$("#file")[0].files[0]);
+				$.ajax({
+					type:'POST',
+					url:window.location.pathname,
+				//	cache:false,
+					dataType: 'text',
+					contentType:false,
+					processData:false,
+					data: form,
+					success:function(response){	
+						document.documentElement.innerHTML = response;
+						risposta = "No";
+						i = 0;
+						codici_prodotti= [];
+						prodotto_selected="";
+						infowindow = new google.maps.InfoWindow();
+						geocoder = new google.maps.Geocoder();
+						supermercati_markers = [];
+						doneTypingInterval = 5000;
+						descrizioneInterval= 5000;
+						markers = [];
+						initialize();
+						getSottocategorie();
+					}
+				});
+			}else{
+				alert("errore nel submit");
 			}
 		});
-	}
-});
+		event.preventDefault();
+	});
 
-$("#supermercato").autocomplete({
-	source: window.location.pathname+"/getSuggerimenti/supermercati",
-	select:function(event,ui){
-		var selected = ui.item.label;
-		var strs = selected.split(/\s-\s/);
-		$('#supermercato').val(strs[0]);
-		$('#indirizzo').val(strs[1]);
-	}
-});
+	$('#indirizzo').keyup(function(){
+		typingTimer = setTimeout(doneTyping, doneTypingInterval);
+	});
 
-var map;
-var infowindow = new google.maps.InfoWindow();
-var geocoder = new google.maps.Geocoder();
-(function inizialize(){
+	$('#indirizzo').keydown(function(){
+		clearTimeout(typingTimer);
+	});
+	
+	$('#descrizione').keyup(function(){
+		descrizioneTimer = setTimeout(searchImage,descrizioneInterval);
+	});
+
+	$('#descrizione').keydown(function(){
+		clearTimeout(descrizioneTimer);
+	});
+	
+	$("#descrizione").autocomplete({
+		
+		source: function(request,response){
+			var risp = [];
+			$.ajax({type:"GET",
+				url: window.location.pathname+"/getSuggerimenti/prodotti",
+				contentType:"application/json",
+				data:{"term":request.term},
+				success:function(data){
+					codici_prodotti=data;
+				}				
+			});
+			$.each(codici_prodotti,function(index,value){
+				
+				$.each(value,function(index,value){
+					risp.push(value);
+				});
+			});
+			response(risp);	
+		},
+		select:function(event,ui){
+			$.each(codici_prodotti,function(index,value){
+				
+				$.each(value,function(index,value){
+					if(value==ui.item.label){
+						$('#codiceBarre').val(index);
+						return false;
+					}
+				});			
+				
+			});
+		}
+	});
+
+	
+	$("#supermercato").autocomplete({
+		source: window.location.pathname+"/getSuggerimenti/supermercati",
+		select:function(event,ui){
+			var selected = ui.item.label;
+			var strs = selected.split(/\s-\s/);
+			$('#supermercato').val(strs[0]);
+			$('#indirizzo').val(strs[1]);
+			event.preventDefault();
+		}
+	});
+	
+	$('#categorie').change(function(){
+		var selected= "";
+		selected = $("#categorie option:selected").text();
+		path=window.location.pathname;
+		path=path+"/sottocategorie/"+selected;
+		
+	    $.ajax({type:"GET",url: path,contentType:"application/json"}).done(function( data ) {
+	    	var select = $("#sottoCategorie");
+	    	var options;
+	    	if(select.prop){
+	    		options = select.prop('options');
+	    	}else{
+	    		options = select.attr('options');
+	    	}
+	    	$('option',select).remove();
+	    	
+	    	$.each(data,function(val,text){
+	    		options[options.length] = new Option(text, text);
+	    	});
+	    	
+	    });
+	});
+	
+	
 	var currentLocation;
 	geocoder.geocode({'address':"Italia"},function(results,status){
 		if(status == google.maps.GeocoderStatus.OK){
@@ -169,7 +254,9 @@ var geocoder = new google.maps.Geocoder();
 	
 	
 	
-})();
+}
+
+initialize();
 
 function callback(results, status) {
 	  if (status == google.maps.places.PlacesServiceStatus.OK) {
@@ -191,20 +278,6 @@ function createMarker(place) {
   });
 };
 
-var typingTimer;
-var doneTypingInterval = 5000;
-var descrizioneTimer;
-var descrizioneInterval= 5000;
-
-$('#descrizione').keyup(function(){
-	descrizioneTimer = setTimeout(searchImage,descrizioneInterval);
-});
-
-$('#descrizione').keydown(function(){
-	clearTimeout(descrizioneTimer);
-});
-
-var results;
 
 function searchImage(){
 	/*var iURL = "http://ajax.googleapis.com/ajax/services/search/images";
@@ -295,15 +368,6 @@ function elaboraRisposta(risp){
 	}
 }
 
-
-$('#indirizzo').keyup(function(){
-	typingTimer = setTimeout(doneTyping, doneTypingInterval);
-});
-
-$('#indirizzo').keydown(function(){
-	clearTimeout(typingTimer);
-});
-var markers = [];
 function doneTyping(){
 	var geocoder = new google.maps.Geocoder();
 	geocoder.geocode({'address':$("#indirizzo").val()},function(results,status){
@@ -325,47 +389,3 @@ function doneTyping(){
 	});
 }
 
-$('#insertionForm').submit(function(event){
-	if(risposta=="No"){
-		$('#preview').attr("src","");
-	}
-	var supermercato = $('#supermercato').val();
-	supermercato = supermercato.split(/\s*-\s*/);
-	$('#supermercato').val(supermercato[0]);
-	$('#supermercato').val($('#supermercato').val()+" - "+$('#indirizzo').val());
-	var geocoder = new google.maps.Geocoder();
-	geocoder.geocode({'address':$("#indirizzo").val()},function(results,status){
-		if(status == google.maps.GeocoderStatus.OK){			
-			var form = new FormData();
-			
-			$.each($("form").serializeArray(),function(index,value){				
-				form.append(value.name,value.value);
-			});
-			form.append("lat",results[0].geometry.location.lat());
-			form.append("lng",results[0].geometry.location.lng());
-			form.append("foto",$('#preview').attr("src"));
-			form.append("file",$("#file")[0].files[0]);
-			$.ajax({
-				type:'POST',
-				url:window.location.pathname,
-			//	cache:false,
-				dataType: 'text',
-				contentType:false,
-				processData:false,
-				data: form,
-				success:function(response){		
-					alert($(":root"));
-					$(":root").html(response);
-					alert(response);
-					if(response.indexOf("insertionForm") >= 0){
-						alert("fatto");
-						inizialize();
-					}
-				}
-			});
-		}else{
-			alert("errore nel submit");
-		}
-	});
-	event.preventDefault();
-});

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
-<!-- Generated 3-feb-2014 16.30.21 by Hibernate Tools 3.4.0.CR1 -->
+<!-- Generated 7-apr-2014 22.47.58 by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
     <class name="hibernate.Profilo" table="profilo" catalog="supermercati">
         <id name="idProfilo" type="java.lang.Integer">
@@ -9,22 +9,34 @@
             <generator class="identity" />
         </id>
         <many-to-one name="utente" class="hibernate.Utente" fetch="select">
-            <column name="ID_Utente" unique="true" />
+            <column name="ID_Utente" not-null="true" unique="true" />
         </many-to-one>
-        <property name="creditiAcquisiti" type="java.lang.Integer">
-            <column name="CreditiAcquisiti" />
+        <property name="creditiAcquisiti" type="int">
+            <column name="CreditiAcquisiti" not-null="true" />
         </property>
-        <property name="creditiPendenti" type="java.lang.Integer">
-            <column name="CreditiPendenti" />
+        <property name="creditiPendenti" type="int">
+            <column name="CreditiPendenti" not-null="true" />
         </property>
-        <property name="reputazione" type="java.lang.Integer">
-            <column name="Reputazione" />
+        <property name="reputazione" type="int">
+            <column name="Reputazione" not-null="true" />
         </property>
         <property name="premium" type="java.lang.Boolean">
             <column name="Premium" />
         </property>
-        <property name="contatoreInfrazioni" type="java.lang.Integer">
-            <column name="ContatoreInfrazioni" />
+        <property name="contatoreInfrazioni" type="int">
+            <column name="ContatoreInfrazioni" not-null="true" />
+        </property>
+        <property name="numeroInserzioniPositive" type="int">
+            <column name="NumeroInserzioniPositive" not-null="true" />
+        </property>
+        <property name="numeroInserzioniTotali" type="int">
+            <column name="NumeroInserzioniTotali" not-null="true" />
+        </property>
+        <property name="numeroValutazioniPositive" type="int">
+            <column name="NumeroValutazioniPositive" not-null="true" />
+        </property>
+        <property name="numeroValutazioniTotali" type="int">
+            <column name="NumeroValutazioniTotali" not-null="true" />
         </property>
     </class>
 </hibernate-mapping>

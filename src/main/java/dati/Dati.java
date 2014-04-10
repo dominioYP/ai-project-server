@@ -1318,8 +1318,7 @@ public class Dati {
 		
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
-		Profilo profilo = new Profilo(utente, creditiAcquisiti, creditiPendenti, reputazione, premium, contatoreInfrazioni);
-
+		Profilo profilo = new Profilo(utente, creditiAcquisiti, creditiPendenti, reputazione, premium, contatoreInfrazioni,0,0,0,0);
 		try{
 			tx=session.beginTransaction();
 			Integer idProfilo=(Integer)session.save(profilo);
@@ -1347,7 +1346,7 @@ public class Dati {
 	 * @param premium
 	 * @param contatoreInfrazioni
 	 */
-	public void modificaProfilo(int idProfilo,int creditiAcquisiti,int creditiPendenti,int reputazione,boolean premium,int contatoreInfrazioni){
+	public void modificaProfilo(int idProfilo,int creditiAcquisiti,int creditiPendenti,int reputazione,boolean premium,int contatoreInfrazioni,int numeroInserzioniPositive,int numeroInserzioniTotali,int numeroValutazioniPositive,int numeroValutazioniTotali){
 		if(idProfilo <0 || creditiAcquisiti<0 || creditiPendenti<0 ||  contatoreInfrazioni<0)
 			throw new RuntimeException("parametro/i non validi");
 		
@@ -1356,8 +1355,7 @@ public class Dati {
 		Profilo profiloVecchio = mappaProfili.get(idProfilo);
 
 		if(profiloVecchio != null){
-
-			Profilo profilo = new Profilo(profiloVecchio.getUtente(), creditiAcquisiti, creditiPendenti, reputazione, premium, contatoreInfrazioni);
+			Profilo profilo = new Profilo(profiloVecchio.getUtente(), creditiAcquisiti, creditiPendenti, reputazione, premium, contatoreInfrazioni,numeroInserzioniPositive,numeroInserzioniTotali,numeroValutazioniPositive, numeroValutazioniTotali);
 			profilo.setIdProfilo(idProfilo);
 
 			try{

@@ -1,6 +1,6 @@
 package hibernate;
 
-// Generated 3-feb-2014 16.30.21 by Hibernate Tools 3.4.0.CR1
+// Generated 7-apr-2014 22.47.58 by Hibernate Tools 3.4.0.CR1
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,24 +22,48 @@ public class Profilo implements java.io.Serializable {
 
 	private Integer idProfilo;
 	private Utente utente;
-	private Integer creditiAcquisiti;
-	private Integer creditiPendenti;
-	private Integer reputazione;
+	private int creditiAcquisiti;
+	private int creditiPendenti;
+	private int reputazione;
 	private Boolean premium;
-	private Integer contatoreInfrazioni;
+	private int contatoreInfrazioni;
+	private int numeroInserzioniPositive;
+	private int numeroInserzioniTotali;
+	private int numeroValutazioniPositive;
+	private int numeroValutazioniTotali;
 
 	public Profilo() {
 	}
 
-	public Profilo(Utente utente, Integer creditiAcquisiti,
-			Integer creditiPendenti, Integer reputazione, Boolean premium,
-			Integer contatoreInfrazioni) {
+	public Profilo(Utente utente, int creditiAcquisiti, int creditiPendenti,
+			int reputazione, int contatoreInfrazioni,
+			int numeroInserzioniPositive, int numeroInserzioniTotali,
+			int numeroValutazioniPositive, int numeroValutazioniTotali) {
+		this.utente = utente;
+		this.creditiAcquisiti = creditiAcquisiti;
+		this.creditiPendenti = creditiPendenti;
+		this.reputazione = reputazione;
+		this.contatoreInfrazioni = contatoreInfrazioni;
+		this.numeroInserzioniPositive = numeroInserzioniPositive;
+		this.numeroInserzioniTotali = numeroInserzioniTotali;
+		this.numeroValutazioniPositive = numeroValutazioniPositive;
+		this.numeroValutazioniTotali = numeroValutazioniTotali;
+	}
+
+	public Profilo(Utente utente, int creditiAcquisiti, int creditiPendenti,
+			int reputazione, Boolean premium, int contatoreInfrazioni,
+			int numeroInserzioniPositive, int numeroInserzioniTotali,
+			int numeroValutazioniPositive, int numeroValutazioniTotali) {
 		this.utente = utente;
 		this.creditiAcquisiti = creditiAcquisiti;
 		this.creditiPendenti = creditiPendenti;
 		this.reputazione = reputazione;
 		this.premium = premium;
 		this.contatoreInfrazioni = contatoreInfrazioni;
+		this.numeroInserzioniPositive = numeroInserzioniPositive;
+		this.numeroInserzioniTotali = numeroInserzioniTotali;
+		this.numeroValutazioniPositive = numeroValutazioniPositive;
+		this.numeroValutazioniTotali = numeroValutazioniTotali;
 	}
 
 	@Id
@@ -54,7 +78,7 @@ public class Profilo implements java.io.Serializable {
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "ID_Utente", unique = true)
+	@JoinColumn(name = "ID_Utente", unique = true, nullable = false)
 	public Utente getUtente() {
 		return this.utente;
 	}
@@ -63,30 +87,30 @@ public class Profilo implements java.io.Serializable {
 		this.utente = utente;
 	}
 
-	@Column(name = "CreditiAcquisiti")
-	public Integer getCreditiAcquisiti() {
+	@Column(name = "CreditiAcquisiti", nullable = false)
+	public int getCreditiAcquisiti() {
 		return this.creditiAcquisiti;
 	}
 
-	public void setCreditiAcquisiti(Integer creditiAcquisiti) {
+	public void setCreditiAcquisiti(int creditiAcquisiti) {
 		this.creditiAcquisiti = creditiAcquisiti;
 	}
 
-	@Column(name = "CreditiPendenti")
-	public Integer getCreditiPendenti() {
+	@Column(name = "CreditiPendenti", nullable = false)
+	public int getCreditiPendenti() {
 		return this.creditiPendenti;
 	}
 
-	public void setCreditiPendenti(Integer creditiPendenti) {
+	public void setCreditiPendenti(int creditiPendenti) {
 		this.creditiPendenti = creditiPendenti;
 	}
 
-	@Column(name = "Reputazione")
-	public Integer getReputazione() {
+	@Column(name = "Reputazione", nullable = false)
+	public int getReputazione() {
 		return this.reputazione;
 	}
 
-	public void setReputazione(Integer reputazione) {
+	public void setReputazione(int reputazione) {
 		this.reputazione = reputazione;
 	}
 
@@ -99,13 +123,49 @@ public class Profilo implements java.io.Serializable {
 		this.premium = premium;
 	}
 
-	@Column(name = "ContatoreInfrazioni")
-	public Integer getContatoreInfrazioni() {
+	@Column(name = "ContatoreInfrazioni", nullable = false)
+	public int getContatoreInfrazioni() {
 		return this.contatoreInfrazioni;
 	}
 
-	public void setContatoreInfrazioni(Integer contatoreInfrazioni) {
+	public void setContatoreInfrazioni(int contatoreInfrazioni) {
 		this.contatoreInfrazioni = contatoreInfrazioni;
+	}
+
+	@Column(name = "NumeroInserzioniPositive", nullable = false)
+	public int getNumeroInserzioniPositive() {
+		return this.numeroInserzioniPositive;
+	}
+
+	public void setNumeroInserzioniPositive(int numeroInserzioniPositive) {
+		this.numeroInserzioniPositive = numeroInserzioniPositive;
+	}
+
+	@Column(name = "NumeroInserzioniTotali", nullable = false)
+	public int getNumeroInserzioniTotali() {
+		return this.numeroInserzioniTotali;
+	}
+
+	public void setNumeroInserzioniTotali(int numeroInserzioniTotali) {
+		this.numeroInserzioniTotali = numeroInserzioniTotali;
+	}
+
+	@Column(name = "NumeroValutazioniPositive", nullable = false)
+	public int getNumeroValutazioniPositive() {
+		return this.numeroValutazioniPositive;
+	}
+
+	public void setNumeroValutazioniPositive(int numeroValutazioniPositive) {
+		this.numeroValutazioniPositive = numeroValutazioniPositive;
+	}
+
+	@Column(name = "NumeroValutazioniTotali", nullable = false)
+	public int getNumeroValutazioniTotali() {
+		return this.numeroValutazioniTotali;
+	}
+
+	public void setNumeroValutazioniTotali(int numeroValutazioniTotali) {
+		this.numeroValutazioniTotali = numeroValutazioniTotali;
 	}
 
 }

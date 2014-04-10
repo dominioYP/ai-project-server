@@ -153,7 +153,7 @@ public class InserzioneController {
 	}
 	
 	@RequestMapping(value="/inserzione",method= RequestMethod.POST)
-	public ModelAndView processInserzione(InserzioneForm inserzioneForm,BindingResult result,Principal principal,HttpServletRequest request,CommonsMultipartResolver resolver){
+	public ModelAndView processInserzione(InserzioneForm inserzioneForm,BindingResult result,Principal principal){
 		boolean inserimentoSupermercato=false;
 		boolean inserimentoInserzione=false;
 		boolean inserimentoProdotto=false;
@@ -163,9 +163,14 @@ public class InserzioneController {
 		int idProdotto = -1;
 		int idSupermercato = -1;
 		try{	
+			if(result.hasErrors())
+				System.out.println(result.getAllErrors().get(0).toString());
 			inserzioneValidator.validate(inserzioneForm, result,principal);
 			if(result.hasErrors()){
-				Map model = new HashMap<String, Object>();				
+				Map model = new HashMap<String, Object>();		
+				if(inserzioneForm.getFile() != null)
+					inserzioneForm.setFile(null);
+				inserzioneForm.setSupermercato(inserzioneForm.getSupermercato().split("-")[0]);
 				model.put("inserzioneForm", inserzioneForm);				
 				Set<String> categorie = new HashSet<String>();
 				
