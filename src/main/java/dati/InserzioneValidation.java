@@ -76,6 +76,7 @@ public class InserzioneValidation {
 						&& i.getUtente().getMail().equals(principal.getName()) 
 						&& inserzione.getSupermercato().equals(i.getSupermercato().getNome()))
 					count++;
+				System.out.println(count);
 				if(count > 2){
 					errors.rejectValue("dataInizio", "invalidDate.InserzioneForm.dataInizio", 
 							"troppe inserzion");
