@@ -53,7 +53,6 @@ public class InserzioneValidation {
 			}
 			Prodotto prodotto = dati.getProdotti().get(inserzione.getCodiceBarre());
 			int count = 0;
-			
 			for(Inserzione i : (Set<Inserzione>)prodotto.getInserziones()){
 				// varianza del prezzo troppo bassa
 				if(i.getUtente().getMail().equals(principal.getName()) && Math.abs(i.getPrezzo() - inserzione.getPrezzo()) < 0.10 
@@ -71,15 +70,16 @@ public class InserzioneValidation {
 							"è gia presente una tua inserzione con la stessa data");
 					break;
 				}
+				
 				//troppe insezioni in un mese
 				if(Math.abs(sdf.parse(inserzione.getDataInizio()).getTime()/86400000-i.getDataInizio().getTime()/86400000) <= 30 
 						&& i.getUtente().getMail().equals(principal.getName()) 
-						&& inserzione.getSupermercato().equals(i.getSupermercato().getNome()))
+						&& inserzione.getSupermercato().equals(i.getSupermercato().getNome())){
 					count++;
-				System.out.println(count);
+				}
 				if(count > 2){
 					errors.rejectValue("dataInizio", "invalidDate.InserzioneForm.dataInizio", 
-							"troppe inserzion");
+							"troppe inserzioni in un certo periodo di tempo");
 				}
 			}
 		}catch(Exception e){

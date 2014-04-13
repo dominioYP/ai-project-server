@@ -54,7 +54,6 @@ function initialize(){
 		if(risposta=="No"){
 			$('#preview').attr("src","");
 		}
-		
 		$('#supermercato').val($('#supermercato').val()+" - "+$('#indirizzo').val());
 		var geocoder = new google.maps.Geocoder();
 		geocoder.geocode({'address':$("#indirizzo").val()},function(results,status){

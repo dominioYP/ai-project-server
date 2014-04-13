@@ -170,7 +170,7 @@ public class InserzioneController {
 				Map model = new HashMap<String, Object>();		
 				if(inserzioneForm.getFile() != null)
 					inserzioneForm.setFile(null);
-				inserzioneForm.setSupermercato(inserzioneForm.getSupermercato().split("-")[0]);
+				inserzioneForm.setSupermercato(inserzioneForm.getSupermercato().split(" - ")[0]);
 				model.put("inserzioneForm", inserzioneForm);				
 				Set<String> categorie = new HashSet<String>();
 				
