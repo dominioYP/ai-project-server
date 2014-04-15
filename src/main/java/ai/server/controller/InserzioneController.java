@@ -215,7 +215,8 @@ public class InserzioneController {
 			
 			boolean trovato = false;
 			Prodotto prodotto = dati.getProdotti().get(inserzioneForm.getCodiceBarre());
-			//Bisogna ancora inserire gli argomenti usati
+			//TODO Bisogna ancora inserire gli argomenti usati
+			
 			if(prodotto != null){
 				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 				trovato = true;

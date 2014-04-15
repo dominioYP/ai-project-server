@@ -1,5 +1,7 @@
 package dati;
 
+import java.util.List;
+
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.NotEmpty;
@@ -42,8 +44,16 @@ public class InserzioneForm {
 	
 	private float prezzo;
 	
-	private String arg1;
+	private List<String> argomenti;
 	
+	public List<String> getArgomenti() {
+		return argomenti;
+	}
+
+	public void setArgomenti(List<String> argomenti) {
+		this.argomenti = argomenti;
+	}
+
 	@NotEmpty
 	private String indirizzo;
 	
@@ -130,14 +140,7 @@ public class InserzioneForm {
 	public void setPrezzo(float prezzo) {
 		this.prezzo = prezzo;
 	}
-
-	public String getArg1() {
-		return arg1;
-	}
-
-	public void setArg1(String arg1) {
-		this.arg1 = arg1;
-	}
+	
 
 	public String getArg1_corpo() {
 		return arg1_corpo;

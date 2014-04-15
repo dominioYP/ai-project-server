@@ -43,9 +43,24 @@ function getSottocategorie(){
 
 getSottocategorie();
 
-function porcodidio(){
-	$('#supermercato').val("diocane di quello stronzo");
-}
+$("#aggiungiArgomento").click(function(){
+	$("#dettaglio").after('<tr>'+
+	'<tr>'+
+	'<td>Dettaglio<font color="red"></font>'+
+	'</td>'+
+	'<td><div id="aggiungiArgomento">+</div></td>'+
+	'</tr>'+
+	'<tr>'+
+	'<td><select id="arg1" name="arg1"><option value="prezzo/l">prezzo/l</option><option value="litri">litri</option><option value="kilogrammi">kilogrammi</option><option value="grammi">grammi</option><option value="prezzo/kg">prezzo/kg</option><option value="prezzo/g">prezzo/g</option></select>'+
+	'</td>'+
+	'</tr>'+
+	'<tr>'+
+	'<td><font color="red"></font></td>'+
+	'</tr>'+
+	'<tr  id="dettaglio">'+
+	'<td><input id="arg1_corpo" name="arg1_corpo" type="text" value=""/></td>'+
+	'</tr>');
+});
 
 function initialize(){
 	

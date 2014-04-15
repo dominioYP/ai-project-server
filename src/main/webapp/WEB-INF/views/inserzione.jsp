@@ -66,7 +66,9 @@
 	<td><form:input path="prezzo"/></td>
 	</tr>
 	<tr>
-	<td>Dettaglio<font color="red"><form:errors path="arg1"></form:errors></font></td>
+	<td>Dettaglio<font color="red"><form:errors path="arg1"></form:errors></font>
+	</td>
+	<td><div id="aggiungiArgomento">+</div></td>
 	</tr>
 	<tr>
 	<td><form:select path="arg1" items="${argomenti}"></form:select>
@@ -75,11 +77,12 @@
 	<tr>
 	<td><font color="red"><form:errors path="arg1_corpo"></form:errors></font></td>
 	</tr>
-	<tr>
+	<tr  id="dettaglio">
 	<td><form:input path="arg1_corpo"/></td>
 	</tr>
-	<tr>
-	<td>Data Acquisizione<font color="red"><form:errors path="dataInizio"></form:errors></font></td>
+	<tr>	
+	<td>Data Acquisizione<font color="red"><form:errors path="dataInizio"></form:errors></font>
+	</td>
 	</tr>
 	<tr>
 	<td><form:input path="dataInizio"/></td>
