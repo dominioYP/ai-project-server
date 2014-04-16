@@ -1,6 +1,6 @@
 package hibernate;
 
-// Generated 7-apr-2014 22.47.58 by Hibernate Tools 3.4.0.CR1
+// Generated 15-apr-2014 23.19.49 by Hibernate Tools 3.4.0.CR1
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
@@ -45,7 +45,7 @@ public class ArgomentiInserzione implements java.io.Serializable {
 	@EmbeddedId
 	@AttributeOverrides({
 			@AttributeOverride(name = "idInserzione", column = @Column(name = "ID_Inserzione", nullable = false)),
-			@AttributeOverride(name = "idArgomento", column = @Column(name = "ID_Argomento", nullable = false)) })
+			@AttributeOverride(name = "argomento", column = @Column(name = "Argomento", nullable = false, length = 30)) })
 	public ArgomentiInserzioneId getId() {
 		return this.id;
 	}
@@ -54,7 +54,7 @@ public class ArgomentiInserzione implements java.io.Serializable {
 		this.id = id;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "ID_Inserzione", nullable = false, insertable = false, updatable = false)
 	public Inserzione getInserzione() {
 		return this.inserzione;
@@ -64,8 +64,8 @@ public class ArgomentiInserzione implements java.io.Serializable {
 		this.inserzione = inserzione;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "ID_Argomento", nullable = false, insertable = false, updatable = false)
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "Argomento", nullable = false, insertable = false, updatable = false)
 	public Argomenti getArgomenti() {
 		return this.argomenti;
 	}

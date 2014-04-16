@@ -1,6 +1,6 @@
 package hibernate;
 
-// Generated 7-apr-2014 22.47.58 by Hibernate Tools 3.4.0.CR1
+// Generated 15-apr-2014 23.19.49 by Hibernate Tools 3.4.0.CR1
 
 import java.util.Date;
 import java.util.HashSet;
@@ -72,7 +72,7 @@ public class Inserzione implements java.io.Serializable {
 		this.idInserzione = idInserzione;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "ID_Utente")
 	public Utente getUtente() {
 		return this.utente;
@@ -82,7 +82,7 @@ public class Inserzione implements java.io.Serializable {
 		this.utente = utente;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "ID_Supermercato")
 	public Supermercato getSupermercato() {
 		return this.supermercato;
@@ -92,7 +92,7 @@ public class Inserzione implements java.io.Serializable {
 		this.supermercato = supermercato;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "ID_Prodotto")
 	public Prodotto getProdotto() {
 		return this.prodotto;
@@ -167,7 +167,7 @@ public class Inserzione implements java.io.Serializable {
 		this.totaleVoti = totaleVoti;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "inserzione")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "inserzione")
 	public Set getValutazioneInserziones() {
 		return this.valutazioneInserziones;
 	}
@@ -176,7 +176,7 @@ public class Inserzione implements java.io.Serializable {
 		this.valutazioneInserziones = valutazioneInserziones;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "inserzione")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "inserzione")
 	public Set getArgomentiInserziones() {
 		return this.argomentiInserziones;
 	}

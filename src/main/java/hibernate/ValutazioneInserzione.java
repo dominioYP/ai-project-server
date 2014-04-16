@@ -1,6 +1,6 @@
 package hibernate;
 
-// Generated 7-apr-2014 22.47.58 by Hibernate Tools 3.4.0.CR1
+// Generated 15-apr-2014 23.19.49 by Hibernate Tools 3.4.0.CR1
 
 import java.util.Date;
 import javax.persistence.Column;
@@ -53,7 +53,7 @@ public class ValutazioneInserzione implements java.io.Serializable {
 		this.idValutazioneInserzione = idValutazioneInserzione;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "ID_Inserzione")
 	public Inserzione getInserzione() {
 		return this.inserzione;
@@ -63,7 +63,7 @@ public class ValutazioneInserzione implements java.io.Serializable {
 		this.inserzione = inserzione;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "ID_UtenteValutatore")
 	public Utente getUtenteByIdUtenteValutatore() {
 		return this.utenteByIdUtenteValutatore;
@@ -73,7 +73,7 @@ public class ValutazioneInserzione implements java.io.Serializable {
 		this.utenteByIdUtenteValutatore = utenteByIdUtenteValutatore;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "ID_UtenteInserzionista")
 	public Utente getUtenteByIdUtenteInserzionista() {
 		return this.utenteByIdUtenteInserzionista;

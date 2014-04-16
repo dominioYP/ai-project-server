@@ -67,7 +67,7 @@ public class Dati {
 	private volatile Map<Integer,Categoria> mappaCategorie = new ConcurrentHashMap<Integer, Categoria>();
 	private volatile Map<Integer,ListaSpesaProdotti> mappaListaSpesaProdotti = new ConcurrentHashMap<Integer, ListaSpesaProdotti>();
 	private volatile Map<Integer,ListaDesideriProdotti> mappaListaDesideriProdotti = new ConcurrentHashMap<Integer, ListaDesideriProdotti>();
-	private volatile Map<Integer,Argomenti> mappaArgomenti = new ConcurrentHashMap<Integer, Argomenti>();
+	private volatile Map<String,Argomenti> mappaArgomenti = new ConcurrentHashMap<String, Argomenti>();
 	private volatile Map<Integer,Inserzione> mappaInserzioni = new ConcurrentHashMap<Integer, Inserzione>();
 	private volatile Map<Integer,ListaDesideri> mappaListaDesideri = new ConcurrentHashMap<Integer, ListaDesideri>();
 	private volatile Map<Integer,ListaSpesa> mappaListaSpesa = new ConcurrentHashMap<Integer, ListaSpesa>();
@@ -128,7 +128,7 @@ public class Dati {
 			}
 			for(Argomenti a : (List<Argomenti>)session.createQuery("from Argomenti").list())
 			{
-				mappaArgomenti.put(a.getIdArgomenti(), a);
+				mappaArgomenti.put(a.getArgomento(), a);
 			}
 			
 			for(Inserzione i : (List<Inserzione>)session.createQuery("from Inserzione").list())
@@ -219,9 +219,9 @@ public class Dati {
 	 * Es : litri, grammi etc etc
 	 * @return
 	 */
-	public Map<Integer,Argomenti> getArgomenti(){
+	public Map<String,Argomenti> getArgomenti(){
 		
-		HashMap<Integer,Argomenti> argomenti = new HashMap<Integer, Argomenti>();
+		HashMap<String,Argomenti> argomenti = new HashMap<String, Argomenti>();
 		
 		argomenti.putAll(mappaArgomenti);
 		
@@ -242,9 +242,8 @@ public class Dati {
 		try {
 			tx=session.beginTransaction();			
 			Argomenti arg = new Argomenti(arg1,new HashSet<ArgomentiInserzione>());
-			Integer idArgomento=(Integer) session.save(arg);
 			
-			mappaArgomenti.put(idArgomento, arg);
+			mappaArgomenti.put(arg1, arg);
 
 			tx.commit();
 		}
@@ -264,43 +263,43 @@ public class Dati {
 	 * @param IdArgomento
 	 * @return
 	 */
-	public Argomenti getArgomento(int IdArgomento){
+	public Argomenti getArgomento(String nomeArgomento){
 
 
 		Argomenti argomento = null;
 
-		mappaArgomenti.get(IdArgomento);
+		argomento = mappaArgomenti.get(nomeArgomento);
 		
 		if(argomento == null)
 			throw new RuntimeException("Elemento non trovato");
+		
 		return argomento;
 	}
 	
 	
 	/**modifica dell'argomento
 	 * @param idArgomento
-	 * @param arg1
+	 * @param nomeArgomentoNuovo
 	 * @param argomentiInserzione Set delle inserzioni che usano tale argomento
 	 */
-	public void modificaArgomento(int idArgomento,String arg1){
+	public void modificaArgomento(String nomeArgomento,String nomeArgomentoNuovo){
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
-		if(idArgomento <= 0 || arg1 == null)
+		if(nomeArgomento != null || nomeArgomentoNuovo == null)
 			throw new RuntimeException("tutti gli argomenti devono essere non nulli");
 		
-		Argomenti argomentoVecchio=null;
-		argomentoVecchio = mappaArgomenti.get(idArgomento);		
+		Argomenti argomentoVecchio = null;
+		argomentoVecchio = mappaArgomenti.get(nomeArgomento);		
 		
 		if(argomentoVecchio==null)
 			throw new RuntimeException("elemento non trovato");
 		
-		Argomenti argomento = new Argomenti(arg1,argomentoVecchio.getArgomentiInserziones());
-		argomento.setIdArgomenti(idArgomento);
+		Argomenti argomento = new Argomenti(nomeArgomentoNuovo,argomentoVecchio.getArgomentiInserziones());
 		
 		try{
 			tx=session.beginTransaction();			
 			session.update(argomento);
-			argomentoVecchio.setArg1(arg1);
+			argomentoVecchio.setArgomento(nomeArgomentoNuovo);
 			tx.commit();
 		}catch(Throwable ex){			
 			if(tx!=null)
@@ -379,7 +378,7 @@ public class Dati {
 	 * @param foto uri della foto all'interno del server
 	 * @return
 	 */
-	public int inserisciInserzione(Utente utente,Supermercato supermercato,Prodotto prodotto,float prezzo,Date dataInizio,Date dataFine,String descrizione,String foto,Set<Argomenti> argomenti) {
+	public int inserisciInserzione(Utente utente,Supermercato supermercato,Prodotto prodotto,float prezzo,Date dataInizio,Date dataFine,String descrizione,String foto,Set<ArgomentiInserzione> argomenti) {
 		if(utente == null || supermercato == null || prodotto == null || prezzo <= 0 || dataInizio == null )
 			throw new RuntimeException("errore nell'immissione dei parametri");
 		
@@ -394,12 +393,12 @@ public class Dati {
 			
 			Inserzione inserzione = new Inserzione(utente, supermercato, prodotto, prezzo, dataInizio, dataFine, descrizione, foto,0,(float)0.0,new HashSet<ValutazioneInserzione>(),new HashSet<ArgomentiInserzione>());
 			idInserzione=(Integer)session.save(inserzione);
-			for(Argomenti a : argomenti){
-				ArgomentiInserzioneId id = new ArgomentiInserzioneId(idInserzione, a.getIdArgomenti());
-				ArgomentiInserzione ai = new ArgomentiInserzione(id, inserzione, a);
+			for(ArgomentiInserzione ai : argomenti){
+		//		ArgomentiInserzioneId id = new ArgomentiInserzioneId(idInserzione, a.getArgomento());
+			//	ArgomentiInserzione ai = new ArgomentiInserzione(id, inserzione, a);
 				Integer idArgomentoInserzione = (Integer)session.save(ai);
 				mappaArgomentiInserzione.put(idArgomentoInserzione, ai);
-				mappaArgomenti.get(a.getIdArgomenti()).getArgomentiInserziones().add(ai);
+				mappaArgomenti.get(ai.getArgomenti().getArgomento()).getArgomentiInserziones().add(ai);
 				argomentiInserzioneSalvati.add(ai);
 				if(!salvataggioArgomentiInserzione)
 					salvataggioArgomentiInserzione = true;
@@ -416,7 +415,7 @@ public class Dati {
 			if(salvataggioArgomentiInserzione){
 				for(ArgomentiInserzione ai : argomentiInserzioneSalvati){
 					mappaArgomentiInserzione.remove(ai.getId().hashCode());
-					mappaArgomenti.get(ai.getArgomenti().getIdArgomenti()).getArgomentiInserziones().remove(ai);
+					mappaArgomenti.get(ai.getArgomenti().getArgomento()).getArgomentiInserziones().remove(ai);
 				}
 			}
 			throw new RuntimeException(ex);
@@ -442,7 +441,7 @@ public class Dati {
 	 * @param valutazioni
 	 * @param argomenti gli argomenti usati per quella inserzione
 	 */
-	public void modificaInserzione(int idInserzione,Utente utente,Supermercato supermercato,Prodotto prodotto,float prezzo,Date dataInizio,Date dataFine,String descrizione,String foto,Set<Argomenti> argomenti){
+	public void modificaInserzione(int idInserzione,Utente utente,Supermercato supermercato,Prodotto prodotto,float prezzo,Date dataInizio,Date dataFine,String descrizione,String foto,Set<ArgomentiInserzione> argomenti){
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
 		boolean eliminazioneArgomentiInserzione = false;
@@ -457,11 +456,7 @@ public class Dati {
 		Set<ArgomentiInserzione> argomentiInserzioneEliminati = new HashSet<ArgomentiInserzione>();
 		Set<ArgomentiInserzione> argomentiInserzioneInseriti = new HashSet<ArgomentiInserzione>();
 		
-		for(Argomenti a : argomenti){
-			ArgomentiInserzioneId id = new ArgomentiInserzioneId(idInserzione, a.getIdArgomenti());
-			ArgomentiInserzione ai = new ArgomentiInserzione(id, inserzioneVecchia, a);
-			argomentiInserzione.add(ai);
-		}
+		argomentiInserzione.addAll(argomenti);
 		
 		if(inserzioneVecchia == null)
 			throw new RuntimeException("elemento non trovato");
@@ -476,7 +471,7 @@ public class Dati {
 				if(!argomentiInserzione.contains(ai)){
 					session.delete(ai);
 					mappaArgomentiInserzione.remove(ai.getId().hashCode());
-					mappaArgomenti.get(ai.getArgomenti().getIdArgomenti()).getArgomentiInserziones().remove(ai);
+					mappaArgomenti.get(ai.getArgomenti().getArgomento()).getArgomentiInserziones().remove(ai);
 					argomentiInserzioneEliminati.add(ai);
 					if(!eliminazioneArgomentiInserzione)
 						eliminazioneArgomentiInserzione = true;
@@ -488,7 +483,7 @@ public class Dati {
 				if(!inserzioneVecchia.getArgomentiInserziones().contains(ai)){
 					session.save(ai);
 					mappaArgomentiInserzione.put(ai.getId().hashCode(),ai);
-					mappaArgomenti.get(ai.getArgomenti().getIdArgomenti()).getArgomentiInserziones().add(ai);
+					mappaArgomenti.get(ai.getArgomenti().getArgomento()).getArgomentiInserziones().add(ai);
 					argomentiInserzioneInseriti.add(ai);
 					if(!inserimentoArgomentiInserzione)
 						inserimentoArgomentiInserzione = true;
@@ -519,17 +514,17 @@ public class Dati {
 			if(eliminazioneArgomentiInserzione && !inserimentoArgomentiInserzione){
 				for(ArgomentiInserzione ai : argomentiInserzioneEliminati){
 					mappaArgomentiInserzione.put(ai.getId().hashCode(), ai);
-					mappaArgomenti.get(ai.getArgomenti().getIdArgomenti()).getArgomentiInserziones().add(ai);
+					mappaArgomenti.get(ai.getArgomenti().getArgomento()).getArgomentiInserziones().add(ai);
 				}
 			}
 			if(inserimentoArgomentiInserzione){
 				for(ArgomentiInserzione ai : argomentiInserzioneEliminati){
 					mappaArgomentiInserzione.put(ai.getId().hashCode(), ai);
-					mappaArgomenti.get(ai.getArgomenti().getIdArgomenti()).getArgomentiInserziones().add(ai);
+					mappaArgomenti.get(ai.getArgomenti().getArgomento()).getArgomentiInserziones().add(ai);
 				}
 				for(ArgomentiInserzione ai : argomentiInserzioneInseriti){
 					mappaArgomentiInserzione.remove(ai.getId().hashCode());
-					mappaArgomenti.get(ai.getArgomenti().getIdArgomenti()).getArgomentiInserziones().remove(ai);
+					mappaArgomenti.get(ai.getArgomenti().getArgomento()).getArgomentiInserziones().remove(ai);
 				}
 			}
 			throw new RuntimeException(ex);
@@ -571,7 +566,7 @@ public class Dati {
 				
 				session.delete(ai);
 				mappaArgomentiInserzione.remove(ai.getId().hashCode());
-				mappaArgomenti.get(ai.getArgomenti().getIdArgomenti()).getArgomentiInserziones().remove(ai);
+				mappaArgomenti.get(ai.getArgomenti().getArgomento()).getArgomentiInserziones().remove(ai);
 				argomentiInserzioneEliminati.add(ai);
 				if(!eliminazioneArgomentiInserzione)
 					eliminazioneArgomentiInserzione = true;
@@ -597,7 +592,7 @@ public class Dati {
 				}
 				for(ArgomentiInserzione ai : argomentiInserzioneEliminati){
 					mappaArgomentiInserzione.put(ai.getId().hashCode(), ai);
-					mappaArgomenti.get(ai.getArgomenti().getIdArgomenti()).getArgomentiInserziones().add(ai);
+					mappaArgomenti.get(ai.getArgomenti().getArgomento()).getArgomentiInserziones().add(ai);
 				}				
 			}
 			throw new RuntimeException(ex);

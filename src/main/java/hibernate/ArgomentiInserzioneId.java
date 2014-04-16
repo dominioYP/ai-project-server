@@ -1,6 +1,6 @@
 package hibernate;
 
-// Generated 7-apr-2014 22.47.58 by Hibernate Tools 3.4.0.CR1
+// Generated 15-apr-2014 23.19.49 by Hibernate Tools 3.4.0.CR1
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -12,14 +12,14 @@ import javax.persistence.Embeddable;
 public class ArgomentiInserzioneId implements java.io.Serializable {
 
 	private int idInserzione;
-	private int idArgomento;
+	private String argomento;
 
 	public ArgomentiInserzioneId() {
 	}
 
-	public ArgomentiInserzioneId(int idInserzione, int idArgomento) {
+	public ArgomentiInserzioneId(int idInserzione, String argomento) {
 		this.idInserzione = idInserzione;
-		this.idArgomento = idArgomento;
+		this.argomento = argomento;
 	}
 
 	@Column(name = "ID_Inserzione", nullable = false)
@@ -31,13 +31,13 @@ public class ArgomentiInserzioneId implements java.io.Serializable {
 		this.idInserzione = idInserzione;
 	}
 
-	@Column(name = "ID_Argomento", nullable = false)
-	public int getIdArgomento() {
-		return this.idArgomento;
+	@Column(name = "Argomento", nullable = false, length = 30)
+	public String getArgomento() {
+		return this.argomento;
 	}
 
-	public void setIdArgomento(int idArgomento) {
-		this.idArgomento = idArgomento;
+	public void setArgomento(String argomento) {
+		this.argomento = argomento;
 	}
 
 	public boolean equals(Object other) {
@@ -50,14 +50,18 @@ public class ArgomentiInserzioneId implements java.io.Serializable {
 		ArgomentiInserzioneId castOther = (ArgomentiInserzioneId) other;
 
 		return (this.getIdInserzione() == castOther.getIdInserzione())
-				&& (this.getIdArgomento() == castOther.getIdArgomento());
+				&& ((this.getArgomento() == castOther.getArgomento()) || (this
+						.getArgomento() != null
+						&& castOther.getArgomento() != null && this
+						.getArgomento().equals(castOther.getArgomento())));
 	}
 
 	public int hashCode() {
 		int result = 17;
 
 		result = 37 * result + this.getIdInserzione();
-		result = 37 * result + this.getIdArgomento();
+		result = 37 * result
+				+ (getArgomento() == null ? 0 : this.getArgomento().hashCode());
 		return result;
 	}
 

@@ -1,6 +1,6 @@
 package hibernate;
 
-// Generated 7-apr-2014 22.47.58 by Hibernate Tools 3.4.0.CR1
+// Generated 15-apr-2014 23.19.49 by Hibernate Tools 3.4.0.CR1
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -77,7 +77,7 @@ public class Profilo implements java.io.Serializable {
 		this.idProfilo = idProfilo;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "ID_Utente", unique = true, nullable = false)
 	public Utente getUtente() {
 		return this.utente;

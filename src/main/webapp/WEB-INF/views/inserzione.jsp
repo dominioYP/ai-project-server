@@ -66,19 +66,19 @@
 	<td><form:input path="prezzo"/></td>
 	</tr>
 	<tr>
-	<td>Dettaglio<font color="red"><form:errors path="arg1"></form:errors></font>
+	<td>Dettaglio<font color="red"><form:errors path="argomento[0]"></form:errors></font>
 	</td>
 	<td><div id="aggiungiArgomento">+</div></td>
 	</tr>
 	<tr>
-	<td><form:select path="arg1" items="${argomenti}"></form:select>
+	<td><form:select path="argomento[0]" items="${argomenti}"></form:select>
 	</td>
 	</tr>
 	<tr>
-	<td><font color="red"><form:errors path="arg1_corpo"></form:errors></font></td>
+	<td><font color="red"><form:errors path="arg_corpo[0]"></form:errors></font></td>
 	</tr>
-	<tr  id="dettaglio">
-	<td><form:input path="arg1_corpo"/></td>
+	<tr id="dettaglio">
+	<td><form:input path="arg_corpo[0]"/></td>
 	</tr>
 	<tr>	
 	<td>Data Acquisizione<font color="red"><form:errors path="dataInizio"></form:errors></font>

@@ -81,9 +81,9 @@ public class InserzioneController {
 		
 		Set<String> argomenti = new HashSet<String>();
 		
-		for(Map.Entry<Integer, Argomenti> a : dati.getArgomenti().entrySet()){
+		for(Map.Entry<String, Argomenti> a : dati.getArgomenti().entrySet()){
 			
-			argomenti.add(a.getValue().getArg1());
+			argomenti.add(a.getValue().getArgomento());
 			
 		}
 		model.put("argomenti", argomenti);
@@ -181,8 +181,8 @@ public class InserzioneController {
 				model.put("categorie", categorie);				
 				Set<String> argomenti = new HashSet<String>();
 				
-				for(Map.Entry<Integer,Argomenti> a : dati.getArgomenti().entrySet()){					
-					argomenti.add(a.getValue().getArg1());					
+				for(Map.Entry<String,Argomenti> a : dati.getArgomenti().entrySet()){					
+					argomenti.add(a.getValue().getArgomento());					
 				}
 				model.put("argomenti", argomenti);
 				return new ModelAndView("inserzione",model);
@@ -216,6 +216,13 @@ public class InserzioneController {
 			boolean trovato = false;
 			Prodotto prodotto = dati.getProdotti().get(inserzioneForm.getCodiceBarre());
 			//TODO Bisogna ancora inserire gli argomenti usati
+			Argomenti argomento = null;
+			for(String nomeArgomento : inserzioneForm.getArgomento()){
+				argomento = dati.getArgomento(nomeArgomento);
+				ArgomentiInserzioneId id = new ArgomentiInserzioneId(idInserzione, a.getArgomento());
+				//	ArgomentiInserzione ai = new ArgomentiInserzione(id, inserzione, a);
+			}
+						
 			
 			if(prodotto != null){
 				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
@@ -273,8 +280,8 @@ public class InserzioneController {
 			model.put("categorie", categorie);				
 			Set<String> argomenti = new HashSet<String>();
 			
-			for(Map.Entry<Integer,Argomenti> a : dati.getArgomenti().entrySet()){					
-				argomenti.add(a.getValue().getArg1());					
+			for(Map.Entry<String,Argomenti> a : dati.getArgomenti().entrySet()){					
+				argomenti.add(a.getValue().getArgomento());					
 			}
 			model.put("argomenti", argomenti);
 			model.put("error","errore nell'immissione del form");

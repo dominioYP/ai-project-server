@@ -1,6 +1,6 @@
 package hibernate;
 
-// Generated 7-apr-2014 22.47.58 by Hibernate Tools 3.4.0.CR1
+// Generated 15-apr-2014 23.19.49 by Hibernate Tools 3.4.0.CR1
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
@@ -55,7 +55,7 @@ public class ListaDesideriProdotti implements java.io.Serializable {
 		this.id = id;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "ID_Prodotto", nullable = false, insertable = false, updatable = false)
 	public Prodotto getProdotto() {
 		return this.prodotto;
@@ -65,7 +65,7 @@ public class ListaDesideriProdotti implements java.io.Serializable {
 		this.prodotto = prodotto;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "ID_ListaDesideri", nullable = false, insertable = false, updatable = false)
 	public ListaDesideri getListaDesideri() {
 		return this.listaDesideri;

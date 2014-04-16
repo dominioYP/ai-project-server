@@ -1,6 +1,6 @@
 package hibernate;
 
-// Generated 7-apr-2014 22.47.58 by Hibernate Tools 3.4.0.CR1
+// Generated 15-apr-2014 23.19.49 by Hibernate Tools 3.4.0.CR1
 
 import java.util.HashSet;
 import java.util.Set;
@@ -53,7 +53,7 @@ public class ListaDesideri implements java.io.Serializable {
 		this.idListaDesideri = idListaDesideri;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "ID_Utente", nullable = false)
 	public Utente getUtente() {
 		return this.utente;
@@ -72,7 +72,7 @@ public class ListaDesideri implements java.io.Serializable {
 		this.nomeListaDesideri = nomeListaDesideri;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "listaDesideri")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "listaDesideri")
 	public Set getListaDesideriProdottis() {
 		return this.listaDesideriProdottis;
 	}

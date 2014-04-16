@@ -44,14 +44,14 @@ public class InserzioneForm {
 	
 	private float prezzo;
 	
-	private List<String> argomenti;
+	private List<String> argomento;
 	
-	public List<String> getArgomenti() {
-		return argomenti;
+	public List<String> getArgomento() {
+		return argomento;
 	}
 
-	public void setArgomenti(List<String> argomenti) {
-		this.argomenti = argomenti;
+	public void setArgomento(List<String> argomento) {
+		this.argomento = argomento;
 	}
 
 	@NotEmpty
@@ -93,8 +93,16 @@ public class InserzioneForm {
 	public void setSupermercato(String supermercato) {
 		this.supermercato = supermercato;
 	}
+	private List<String> arg_corpo;
+	
+	public List<String> getArg_corpo() {
+		return arg_corpo;
+	}
 
-	private String arg1_corpo;
+	public void setArg_corpo(List<String> arg_corpo) {
+		this.arg_corpo = arg_corpo;
+	}
+
 	@NotEmpty
 	@DateTimeFormat(pattern="dd/MM/yyyy")
 	private String dataInizio;
@@ -141,15 +149,6 @@ public class InserzioneForm {
 		this.prezzo = prezzo;
 	}
 	
-
-	public String getArg1_corpo() {
-		return arg1_corpo;
-	}
-
-	public void setArg1_corpo(String arg1_corpo) {
-		this.arg1_corpo = arg1_corpo;
-	}
-
 	public String getDataInizio() {
 		return dataInizio;
 	}

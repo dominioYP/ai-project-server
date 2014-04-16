@@ -16,6 +16,7 @@ var map;
 var typingTimer;
 var descrizioneTimer;
 var results;
+var numArgomenti = 1;
 
 
 function getSottocategorie(){
@@ -44,22 +45,22 @@ function getSottocategorie(){
 getSottocategorie();
 
 $("#aggiungiArgomento").click(function(){
-	$("#dettaglio").after('<tr>'+
+	$("#dettaglio").after(
 	'<tr>'+
 	'<td>Dettaglio<font color="red"></font>'+
 	'</td>'+
-	'<td><div id="aggiungiArgomento">+</div></td>'+
 	'</tr>'+
 	'<tr>'+
-	'<td><select id="arg1" name="arg1"><option value="prezzo/l">prezzo/l</option><option value="litri">litri</option><option value="kilogrammi">kilogrammi</option><option value="grammi">grammi</option><option value="prezzo/kg">prezzo/kg</option><option value="prezzo/g">prezzo/g</option></select>'+
+	'<td><select id="argomento'+numArgomenti+'" name="argomento['+numArgomenti+']"><option value="prezzo/l">prezzo/l</option><option value="litri">litri</option><option value="kilogrammi">kilogrammi</option><option value="grammi">grammi</option><option value="prezzo/kg">prezzo/kg</option><option value="prezzo/g">prezzo/g</option></select>'+
 	'</td>'+
 	'</tr>'+
 	'<tr>'+
 	'<td><font color="red"></font></td>'+
 	'</tr>'+
 	'<tr  id="dettaglio">'+
-	'<td><input id="arg1_corpo" name="arg1_corpo" type="text" value=""/></td>'+
+	'<td><input id="arg_corpo'+numArgomenti+'" name="arg_corpo['+numArgomenti+']" type="text" value=""/></td>'+
 	'</tr>');
+	numArgomenti++;
 });
 
 function initialize(){
@@ -77,6 +78,7 @@ function initialize(){
 				
 				$.each($("form").serializeArray(),function(index,value){				
 					form.append(value.name,value.value);
+					alert("name = "+value.name+", value = "+value.value);
 				});
 				form.append("lat",results[0].geometry.location.lat());
 				form.append("lng",results[0].geometry.location.lng());
