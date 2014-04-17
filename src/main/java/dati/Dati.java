@@ -199,7 +199,7 @@ public class Dati {
 		
 		timer.schedule(timerSC, cal.getTime(), TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS));
 		
-		// SOLO TEST
+		// SOLO TEST, fa scattare il timer un minuto dopo essere stato inizializzato e poi ogni 100 secondi
 		//cal.add(Calendar.MINUTE, +1);
 		//timer.schedule(timerSC, cal.getTime(), 100*1000);
 	}
@@ -1315,7 +1315,7 @@ public class Dati {
 		
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
-		Profilo profilo = new Profilo(utente, creditiAcquisiti, creditiPendenti, reputazione, premium, contatoreInfrazioni);
+		Profilo profilo = new Profilo(utente, creditiAcquisiti, creditiPendenti, reputazione, premium, contatoreInfrazioni, 0, 0, 0, 0);
 
 		try{
 			tx=session.beginTransaction();
@@ -1344,8 +1344,8 @@ public class Dati {
 	 * @param premium
 	 * @param contatoreInfrazioni
 	 */
-	public void modificaProfilo(int idProfilo,int creditiAcquisiti,int creditiPendenti,int reputazione,boolean premium,int contatoreInfrazioni){
-		if(idProfilo <0 || creditiAcquisiti<0 || creditiPendenti<0 ||  contatoreInfrazioni<0)
+	public void modificaProfilo(int idProfilo,int creditiAcquisiti,int creditiPendenti,int reputazione,boolean premium,int contatoreInfrazioni, int numInserzioniPositive, int numInserzioniTotali, int numValutazioniPositive, int numValutazioniTotali){
+		if(idProfilo <0 || creditiAcquisiti<0 || creditiPendenti<0 ||  contatoreInfrazioni<0 || numInserzioniPositive<0 || numInserzioniTotali<0 || numValutazioniPositive<0 || numValutazioniTotali<0)
 			throw new RuntimeException("parametro/i non validi");
 		
 		Session session = factory.getCurrentSession();
@@ -1354,7 +1354,7 @@ public class Dati {
 
 		if(profiloVecchio != null){
 
-			Profilo profilo = new Profilo(profiloVecchio.getUtente(), creditiAcquisiti, creditiPendenti, reputazione, premium, contatoreInfrazioni);
+			Profilo profilo = new Profilo(profiloVecchio.getUtente(), creditiAcquisiti, creditiPendenti, reputazione, premium, contatoreInfrazioni, 0, 0, 0, 0);
 			profilo.setIdProfilo(idProfilo);
 
 			try{
@@ -1365,6 +1365,10 @@ public class Dati {
 				profiloVecchio.setCreditiPendenti(creditiPendenti);
 				profiloVecchio.setPremium(premium);
 				profiloVecchio.setReputazione(reputazione);
+				profiloVecchio.setNumeroInserzioniPositive(numInserzioniPositive);
+				profiloVecchio.setNumeroInserzioniTotali(numInserzioniTotali);
+				profiloVecchio.setNumeroValutazioniPositive(numValutazioniPositive);
+				profiloVecchio.setNumeroValutazioniTotali(numValutazioniTotali);
 				tx.commit();
 			}catch(Throwable ex){
 				if(tx!=null)
