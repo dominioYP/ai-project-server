@@ -15,6 +15,8 @@ import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.ModelAndView;
+
 import dati.Dati;
 import dati.InserzioneForm;
 import dati.InserzioneValidation;
@@ -216,22 +219,25 @@ public class InserzioneController {
 			boolean trovato = false;
 			Prodotto prodotto = dati.getProdotti().get(inserzioneForm.getCodiceBarre());
 			//TODO Bisogna ancora inserire gli argomenti usati
+			List<Argomenti> argomenti = new LinkedList<Argomenti>();
 			Argomenti argomento = null;
 			for(String nomeArgomento : inserzioneForm.getArgomento()){
 				argomento = dati.getArgomento(nomeArgomento);
-				ArgomentiInserzioneId id = new ArgomentiInserzioneId(idInserzione, a.getArgomento());
-				//	ArgomentiInserzione ai = new ArgomentiInserzione(id, inserzione, a);
+				if(argomento != null)
+					argomenti.add(argomento);
 			}
-						
+			List<String> valori = new LinkedList<String>();
+			if(inserzioneForm.getArg_corpo() != null)
+				valori.addAll(inserzioneForm.getArg_corpo());
 			
 			if(prodotto != null){
 				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 				trovato = true;
 				if(inserzioneForm.getDataFine()!=null&&!(inserzioneForm.getDataFine().equals(""))){				
-					idInsererzione=dati.inserisciInserzione(utente, supermercato, prodotto, inserzioneForm.getPrezzo(), sdf.parse(inserzioneForm.getDataInizio()), sdf.parse(inserzioneForm.getDataFine()), inserzioneForm.getDescrizione(),path,new HashSet<Argomenti>());
+					idInsererzione=dati.inserisciInserzione(utente, supermercato, prodotto, inserzioneForm.getPrezzo(), sdf.parse(inserzioneForm.getDataInizio()), sdf.parse(inserzioneForm.getDataFine()), inserzioneForm.getDescrizione(),path,argomenti,valori);
 					inserimentoInserzione=true;
 				}else{
-					idInsererzione=dati.inserisciInserzione(utente, supermercato, prodotto, inserzioneForm.getPrezzo(), sdf.parse(inserzioneForm.getDataInizio()), null, inserzioneForm.getDescrizione(), path,new HashSet<Argomenti>());
+					idInsererzione=dati.inserisciInserzione(utente, supermercato, prodotto, inserzioneForm.getPrezzo(), sdf.parse(inserzioneForm.getDataInizio()), null, inserzioneForm.getDescrizione(), path,argomenti,valori);
 					inserimentoInserzione=true;
 				}
 			}
@@ -247,10 +253,10 @@ public class InserzioneController {
 				if(p.getIdProdotto().equals(idProdotto)){
 					SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 					if(inserzioneForm.getDataFine()!=null&&!(inserzioneForm.getDataFine().equals(""))){						
-						idInsererzione=dati.inserisciInserzione(utente, supermercato, p, inserzioneForm.getPrezzo(), sdf.parse(inserzioneForm.getDataInizio()), sdf.parse(inserzioneForm.getDataFine()), inserzioneForm.getDescrizione(),path, new HashSet<Argomenti>());
+						idInsererzione=dati.inserisciInserzione(utente, supermercato, p, inserzioneForm.getPrezzo(), sdf.parse(inserzioneForm.getDataInizio()), sdf.parse(inserzioneForm.getDataFine()), inserzioneForm.getDescrizione(),path,argomenti,valori);
 						inserimentoInserzione=true;
 					}else{
-						idInsererzione=dati.inserisciInserzione(utente, supermercato, p, inserzioneForm.getPrezzo(), sdf.parse(inserzioneForm.getDataInizio()), null, inserzioneForm.getDescrizione(), path, new HashSet<Argomenti>());
+						idInsererzione=dati.inserisciInserzione(utente, supermercato, p, inserzioneForm.getPrezzo(), sdf.parse(inserzioneForm.getDataInizio()), null, inserzioneForm.getDescrizione(), path,argomenti,valori);
 						inserimentoInserzione=true;
 					}
 				}

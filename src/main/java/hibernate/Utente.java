@@ -1,6 +1,6 @@
 package hibernate;
 
-// Generated 15-apr-2014 23.19.49 by Hibernate Tools 3.4.0.CR1
+// Generated 17-apr-2014 0.21.19 by Hibernate Tools 3.4.0.CR1
 
 import java.util.Date;
 import java.util.HashSet;

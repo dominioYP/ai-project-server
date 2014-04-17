@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
-<!-- Generated 15-apr-2014 23.19.50 by Hibernate Tools 3.4.0.CR1 -->
+<!-- Generated 17-apr-2014 0.21.19 by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
     <class name="hibernate.ArgomentiInserzione" table="argomenti_inserzione" catalog="supermercati">
         <composite-id name="id" class="hibernate.ArgomentiInserzioneId">
@@ -18,8 +18,8 @@
         <many-to-one name="argomenti" class="hibernate.Argomenti" update="false" insert="false" fetch="select">
             <column name="Argomento" length="30" not-null="true" />
         </many-to-one>
-        <property name="argVal" type="java.lang.Integer">
-            <column name="Arg_Val" />
+        <property name="argVal" type="java.lang.Float">
+            <column name="Arg_Val" precision="12" scale="0" />
         </property>
     </class>
 </hibernate-mapping>

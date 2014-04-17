@@ -378,7 +378,7 @@ public class Dati {
 	 * @param foto uri della foto all'interno del server
 	 * @return
 	 */
-	public int inserisciInserzione(Utente utente,Supermercato supermercato,Prodotto prodotto,float prezzo,Date dataInizio,Date dataFine,String descrizione,String foto,Set<ArgomentiInserzione> argomenti) {
+	public int inserisciInserzione(Utente utente,Supermercato supermercato,Prodotto prodotto,float prezzo,Date dataInizio,Date dataFine,String descrizione,String foto,List<Argomenti> argomenti,List<String> valori) {
 		if(utente == null || supermercato == null || prodotto == null || prezzo <= 0 || dataInizio == null )
 			throw new RuntimeException("errore nell'immissione dei parametri");
 		
@@ -393,17 +393,24 @@ public class Dati {
 			
 			Inserzione inserzione = new Inserzione(utente, supermercato, prodotto, prezzo, dataInizio, dataFine, descrizione, foto,0,(float)0.0,new HashSet<ValutazioneInserzione>(),new HashSet<ArgomentiInserzione>());
 			idInserzione=(Integer)session.save(inserzione);
-			for(ArgomentiInserzione ai : argomenti){
-		//		ArgomentiInserzioneId id = new ArgomentiInserzioneId(idInserzione, a.getArgomento());
-			//	ArgomentiInserzione ai = new ArgomentiInserzione(id, inserzione, a);
-				Integer idArgomentoInserzione = (Integer)session.save(ai);
-				mappaArgomentiInserzione.put(idArgomentoInserzione, ai);
-				mappaArgomenti.get(ai.getArgomenti().getArgomento()).getArgomentiInserziones().add(ai);
+			Iterator<Argomenti> itArgomenti = argomenti.iterator();
+			Iterator<String> itValori = valori.iterator();
+			Argomenti a = null;
+			String valore = null;
+			while(itArgomenti.hasNext() && itValori.hasNext()){
+				a = itArgomenti.next();
+				valore = itValori.next();
+				ArgomentiInserzioneId id = new ArgomentiInserzioneId(idInserzione, a.getArgomento());
+				ArgomentiInserzione ai = new ArgomentiInserzione(id, inserzione, a,new Float(valore));
+				session.save(a);
+				mappaArgomentiInserzione.put(id.hashCode(), ai);
+				mappaArgomenti.get(ai.getArgomenti().getArgomento()).getArgomentiInserziones().add(a);
 				argomentiInserzioneSalvati.add(ai);
 				if(!salvataggioArgomentiInserzione)
 					salvataggioArgomentiInserzione = true;
 			}
 			inserzione.setArgomentiInserziones(argomentiInserzioneSalvati);
+			session.update(inserzione);
 			mappaInserzioni.put(idInserzione,inserzione);			
 			mappaUtente.get(utente.getMail()).getInserziones().add(inserzione);
 			mappaSupermercati.get(supermercato.getNome()).getInserziones().add(inserzione);
@@ -441,7 +448,7 @@ public class Dati {
 	 * @param valutazioni
 	 * @param argomenti gli argomenti usati per quella inserzione
 	 */
-	public void modificaInserzione(int idInserzione,Utente utente,Supermercato supermercato,Prodotto prodotto,float prezzo,Date dataInizio,Date dataFine,String descrizione,String foto,Set<ArgomentiInserzione> argomenti){
+	public void modificaInserzione(int idInserzione,Utente utente,Supermercato supermercato,Prodotto prodotto,float prezzo,Date dataInizio,Date dataFine,String descrizione,String foto,Set<Argomenti> argomenti,List<String> valori){
 		Session session = factory.getCurrentSession();
 		Transaction tx = null;
 		boolean eliminazioneArgomentiInserzione = false;
@@ -452,14 +459,24 @@ public class Dati {
 		
 		Inserzione inserzioneVecchia = null;
 		inserzioneVecchia=mappaInserzioni.get(idInserzione);
+		if(inserzioneVecchia == null)
+			throw new RuntimeException("elemento non trovato");
 		Set<ArgomentiInserzione> argomentiInserzione = new HashSet<ArgomentiInserzione>();
 		Set<ArgomentiInserzione> argomentiInserzioneEliminati = new HashSet<ArgomentiInserzione>();
 		Set<ArgomentiInserzione> argomentiInserzioneInseriti = new HashSet<ArgomentiInserzione>();
 		
-		argomentiInserzione.addAll(argomenti);
+		Iterator<Argomenti> itArgomenti = argomenti.iterator();
+		Iterator<String> itValori = valori.iterator();
+		Argomenti a = null;
+		String valore = null;
 		
-		if(inserzioneVecchia == null)
-			throw new RuntimeException("elemento non trovato");
+		while(itArgomenti.hasNext() && itValori.hasNext()){
+			a = itArgomenti.next();
+			valore = itValori.next();
+			ArgomentiInserzioneId id = new ArgomentiInserzioneId(idInserzione, a.getArgomento());
+			ArgomentiInserzione ai = new ArgomentiInserzione(id, inserzioneVecchia, a,new Float(valore));			
+		}		
+		
 		Inserzione inserzione = new Inserzione(utente, supermercato, prodotto, prezzo, dataInizio, dataFine, descrizione, foto,0,(float)0.0,inserzioneVecchia.getValutazioneInserziones(),argomenti);
 		inserzione.setIdInserzione(idInserzione);
 		

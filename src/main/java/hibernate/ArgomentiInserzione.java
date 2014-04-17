@@ -1,6 +1,6 @@
 package hibernate;
 
-// Generated 15-apr-2014 23.19.49 by Hibernate Tools 3.4.0.CR1
+// Generated 17-apr-2014 0.21.19 by Hibernate Tools 3.4.0.CR1
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
@@ -22,7 +22,7 @@ public class ArgomentiInserzione implements java.io.Serializable {
 	private ArgomentiInserzioneId id;
 	private Inserzione inserzione;
 	private Argomenti argomenti;
-	private Integer argVal;
+	private Float argVal;
 
 	public ArgomentiInserzione() {
 	}
@@ -35,7 +35,7 @@ public class ArgomentiInserzione implements java.io.Serializable {
 	}
 
 	public ArgomentiInserzione(ArgomentiInserzioneId id, Inserzione inserzione,
-			Argomenti argomenti, Integer argVal) {
+			Argomenti argomenti, Float argVal) {
 		this.id = id;
 		this.inserzione = inserzione;
 		this.argomenti = argomenti;
@@ -74,12 +74,12 @@ public class ArgomentiInserzione implements java.io.Serializable {
 		this.argomenti = argomenti;
 	}
 
-	@Column(name = "Arg_Val")
-	public Integer getArgVal() {
+	@Column(name = "Arg_Val", precision = 12, scale = 0)
+	public Float getArgVal() {
 		return this.argVal;
 	}
 
-	public void setArgVal(Integer argVal) {
+	public void setArgVal(Float argVal) {
 		this.argVal = argVal;
 	}
 
